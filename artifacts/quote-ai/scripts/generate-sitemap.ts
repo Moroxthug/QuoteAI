@@ -13,7 +13,8 @@ const LISTED_ARTICLES = BLOG_ARTICLES.filter((a) => !a.noindex);
 import { PUBLIC_ROUTES } from "../src/data/sitemap-routes.js";
 import { HELP_ARTICLES } from "../src/data/help-articles.js";
 import { PILOT_PROVINCES } from "../src/data/province-data.js";
-import { TOOL_SLUG_PAIRS, COMPARE_SLUG_PAIRS } from "../src/data/seo-slugs.js";
+import { TOOL_SLUG_PAIRS, COMPARE_SLUG_PAIRS, FEATURE_SLUG_PAIRS } from "../src/data/seo-slugs.js";
+import { FEATURE_PAGES } from "../src/data/feature-pages.js";
 import { CHECKED_AT } from "../src/data/compare-pages.js";
 import { FR_GUIDES } from "../src/data/fr-guides.js";
 import { TOOL_PAGES } from "../src/data/tool-pages.js";
@@ -66,6 +67,12 @@ entries.push(url(`${BASE_URL}/fr/outils/`, "0.8", "monthly", toolsUpdated));
 for (const t of TOOL_SLUG_PAIRS) {
   entries.push(url(`${BASE_URL}/tools/${t.en}/`, "0.8", "monthly", TOOL_PAGES[t.id].updatedAt));
   entries.push(url(`${BASE_URL}/fr/outils/${t.fr}/`, "0.8", "monthly", TOOL_PAGES[t.id].updatedAt));
+}
+
+// Feature pages (SEO plan S4), both languages.
+for (const f of FEATURE_SLUG_PAIRS) {
+  entries.push(url(`${BASE_URL}/${f.en}/`, "0.9", "monthly", FEATURE_PAGES[f.id].en.updatedAt));
+  entries.push(url(`${BASE_URL}/fr/${f.fr}/`, "0.9", "monthly", FEATURE_PAGES[f.id].fr.updatedAt));
 }
 
 // Comparison pages: lastmod = the day competitor prices were last checked.

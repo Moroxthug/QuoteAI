@@ -7,7 +7,7 @@ import { SECTORS, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS, enSect
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "./blog-data";
 import { HELP_ARTICLES } from "./help-articles";
 import { PILOT_PROVINCES } from "./province-data";
-import { TOOL_SLUG_PAIRS, COMPARE_SLUG_PAIRS } from "./seo-slugs";
+import { TOOL_SLUG_PAIRS, COMPARE_SLUG_PAIRS, FEATURE_SLUG_PAIRS } from "./seo-slugs";
 import { FR_GUIDES } from "./fr-guides";
 
 interface PrerenderRoute {
@@ -35,6 +35,11 @@ export function listPrerenderRoutes(): PrerenderRoute[] {
     ...TOOL_SLUG_PAIRS.flatMap((t) => [
       { path: `/tools/${t.en}`, lang: "en" as const },
       { path: `/fr/outils/${t.fr}`, lang: "fr" as const },
+    ]),
+    // Feature pages (SEO plan S4), both languages.
+    ...FEATURE_SLUG_PAIRS.flatMap((f) => [
+      { path: `/${f.en}`, lang: "en" as const },
+      { path: `/fr/${f.fr}`, lang: "fr" as const },
     ]),
     // Comparison pages, both languages.
     { path: "/compare", lang: "en" },

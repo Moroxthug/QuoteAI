@@ -1,5 +1,7 @@
 // Phase 118: first — in the phone app this puts the API fetch in place before anything captures window.fetch.
 import "./lib/native/boot.ts";
+// Dev only: sample API answers for the feature-page screenshots (src/dev/shots-mock.ts).
+if (import.meta.env.DEV && localStorage.getItem("qa-shots")) await import("./dev/shots-mock.ts");
 import { StrictMode } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";

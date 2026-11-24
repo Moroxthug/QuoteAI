@@ -32,6 +32,14 @@ Annual billing charges ten months for a year. Details: [Pricing](https://quoteai
 - [Help centre](https://quoteai.ca/help/): how-to articles for every part of the product.
 - [Blog](https://quoteai.ca/blog/): Canadian cost guides and how-to-quote guides for trades.
 
+## Features
+
+- [Estimating software for contractors, with Canadian sales tax built in](https://quoteai.ca/estimating-software/): Quoting software for Canadian contractors: itemized quotes from a description, voice memo or photos, provincial GST/HST, PST or QST, and online acceptance.
+- [Invoicing software for Canadian contractors](https://quoteai.ca/invoicing-software/): Deposit, progress and final invoices that follow your contract, with GST/HST and QST shown, e-Transfer or card payment, and reminders at 3, 7 and 14 days.
+- [A contractor CRM that follows up for you](https://quoteai.ca/contractor-crm/): A CRM for contractors in Canada: leads from your website and WhatsApp, automatic quote follow-ups, review requests and a full history per client, within CASL.
+- [Job costing software for contractors](https://quoteai.ca/job-costing-software/): Job costing for Canadian contractors: a budget per job from the signed contract, scanned receipts, crew hours as labour cost, budget vs actual, margin alerts.
+- [Contracts and e-signature for Canadian contractors](https://quoteai.ca/contracts-e-signature/): Turn an accepted quote into a provincial contract, send it for e-signature with an email code, and keep the signed PDF, audit certificate and change orders.
+
 ## Free calculators
 
 Free, no sign-up, in English and French: [all calculators](https://quoteai.ca/tools/).
@@ -125,6 +133,13 @@ quoteai est un logiciel de soumissions et de gestion de chantiers pour les entre
 - [Accueil](https://quoteai.ca/fr/)
 - [Tarifs](https://quoteai.ca/fr/tarifs/)
 - [Projet pilote](https://quoteai.ca/fr/pilote/)
+
+Fonctionnalités :
+- [Logiciel de soumission pour entrepreneurs du Québec](https://quoteai.ca/fr/logiciel-soumission/): Logiciel de soumission pour entrepreneurs du Québec : soumission détaillée à partir d’une description ou de photos, TPS et TVQ séparées, acceptation en ligne.
+- [Logiciel de facturation pour entrepreneurs au Québec](https://quoteai.ca/fr/logiciel-facturation/): Factures de dépôt, d'étape et finale tirées du contrat, TPS, TVQ et licence RBQ affichées, Virement Interac ou carte, rappels à 3, 7 et 14 jours de retard.
+- [Un CRM d'entrepreneur qui relance à votre place](https://quoteai.ca/fr/crm-entrepreneur/): CRM pour entrepreneur en construction : prospects du site Web et de WhatsApp, relances de soumission automatiques, demandes d'avis et historique client. LCAP.
+- [Le coût de revient de chaque chantier](https://quoteai.ca/fr/logiciel-cout-de-revient/): Suivi des coûts de chantier pour entrepreneurs : budget tiré du contrat signé, reçus numérisés, heures de l'équipe, budget vs réel et alertes de dépassement.
+- [Contrats et signature électronique pour les entrepreneurs du Québec](https://quoteai.ca/fr/contrats-signature-electronique/): Votre soumission acceptée devient un contrat sur le modèle de votre province, signé en ligne avec un code par courriel. Vos avenants signés suivent.
 
 Calculateurs gratuits ([tous](https://quoteai.ca/fr/outils/)) :
 - [Calculateur de TPS, TVH, TVP et TVQ pour entrepreneurs](https://quoteai.ca/fr/outils/calculateur-taxes-de-vente/): Ajoutez ou retirez la TPS, la TVH, la TVP et la TVQ pour toute province, chaque taxe sur sa ligne.

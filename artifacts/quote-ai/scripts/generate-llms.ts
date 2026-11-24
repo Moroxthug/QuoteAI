@@ -21,7 +21,8 @@ const LISTED_ARTICLES = BLOG_ARTICLES.filter((a) => !a.noindex);
 import { HELP_ARTICLES, HELP_CATEGORIES, type HelpBlock } from "../src/data/help-articles.js";
 import { PILOT_PROVINCES, provinceName, provinceTaxComponents, provincePath } from "../src/data/province-data.js";
 import { MARKETING_PLANS } from "../src/data/pricing.js";
-import { toolPath, comparePath } from "../src/data/seo-slugs.js";
+import { toolPath, comparePath, featurePath, FEATURE_SLUG_PAIRS } from "../src/data/seo-slugs.js";
+import { FEATURE_PAGES } from "../src/data/feature-pages.js";
 import { COMPETITORS, COMPARE_ORDER, CHECKED_AT } from "../src/data/compare-pages.js";
 import { FR_GUIDES } from "../src/data/fr-guides.js";
 import { TOOL_PAGES, TOOL_ORDER } from "../src/data/tool-pages.js";
@@ -63,6 +64,9 @@ const toolLinks = (lang: "en" | "fr") =>
 const compareLinks = (lang: "en" | "fr") =>
   COMPARE_ORDER.map((id) => `- [quoteai ${lang === "fr" ? "ou" : "vs"} ${COMPETITORS[id].name}](${BASE}${comparePath(lang, id)})`).join("\n");
 
+const featureLinks = (lang: "en" | "fr") =>
+  FEATURE_SLUG_PAIRS.map((f) => `- [${FEATURE_PAGES[f.id][lang].h1} ${FEATURE_PAGES[f.id][lang].h1Highlight}](${BASE}${featurePath(lang, f.id)}): ${FEATURE_PAGES[f.id][lang].metaDescription}`).join("\n");
+
 const helpLinks = HELP_ARTICLES.map((a) => `- [${a.title.en}](${BASE}/help/${a.slug}/): ${a.summary.en}`).join("\n");
 
 const newest = [...LISTED_ARTICLES].sort((a, b) => (b.updatedAt ?? b.publishedAt).localeCompare(a.updatedAt ?? a.publishedAt));
@@ -100,6 +104,10 @@ Annual billing charges ten months for a year. Details: [Pricing](${BASE}/pricing
 - [Help centre](${BASE}/help/): how-to articles for every part of the product.
 - [Blog](${BASE}/blog/): Canadian cost guides and how-to-quote guides for trades.
 
+## Features
+
+${featureLinks("en")}
+
 ## Free calculators
 
 Free, no sign-up, in English and French: [all calculators](${BASE}/tools/).
@@ -133,6 +141,9 @@ quoteai est un logiciel de soumissions et de gestion de chantiers pour les entre
 - [Accueil](${BASE}/fr/)
 - [Tarifs](${BASE}/fr/tarifs/)
 - [Projet pilote](${BASE}/fr/pilote/)
+
+Fonctionnalités :
+${featureLinks("fr")}
 
 Calculateurs gratuits ([tous](${BASE}/fr/outils/)) :
 ${toolLinks("fr")}

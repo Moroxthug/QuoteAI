@@ -13,7 +13,7 @@ import { SkipLink } from "@/components/a11y";
 import SupportBot, { openSupportChat } from "@/components/support-bot";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TRADE_LABELS } from "@/i18n/translations";
-import { getLanguageCounterpartPath, localizedPath, PROVINCE_SLUG_PAIRS, RETIRED_SECTOR_SLUGS } from "@/data/seo-slugs";
+import { getLanguageCounterpartPath, localizedPath, PROVINCE_SLUG_PAIRS, RETIRED_SECTOR_SLUGS, featurePath } from "@/data/seo-slugs";
 import { PROVINCE_NAMES } from "@/lib/tax-profiles";
 import { legalIdentityLines } from "@workspace/legal-entity";
 
@@ -314,11 +314,12 @@ function SiteLayout({ children }: { children: React.ReactNode }) {
           </FooterCol>
           <FooterCol title={t("footer.features")} folded={phone}>
             <Link href="/whatsapp/">{t("nav.whatsapp")}<span className="chip-new chip">{t("nav.new")}</span></Link>
-            <Link href={localizedPath("/#story-jobs", lang)}>{t("footer.jobSites")}</Link>
-            <Link href={localizedPath("/#story-invoicing", lang)}>{t("footer.contracts")}</Link>
-            <Link href={localizedPath("/#products", lang)}>{t("footer.analytics")}</Link>
-            <Link href={localizedPath("/#products", lang)}>{t("footer.aiAssistant")}</Link>
-            <Link href={localizedPath("/#products", lang)}>{t("footer.imports")}</Link>
+            {/* SEO plan S4: one page per feature, in the reader's language */}
+            <Link href={featurePath(lang, "estimating")}>{t("footer.estimating")}</Link>
+            <Link href={featurePath(lang, "invoicing")}>{t("footer.invoicing")}</Link>
+            <Link href={featurePath(lang, "crm")}>{t("footer.crm")}</Link>
+            <Link href={featurePath(lang, "job-costing")}>{t("footer.jobCosting")}</Link>
+            <Link href={featurePath(lang, "contracts")}>{t("footer.contracts")}</Link>
           </FooterCol>
           <FooterCol title={t("footer.guides")} folded={phone}>
             <Link href="/blog/">{t("footer.blog")}</Link>

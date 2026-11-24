@@ -76,7 +76,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
       ),
       bullets([
         ["Legal name, address and phone — printed on every document and required on invoices by the CRA.", "Nom légal, adresse et téléphone — imprimés sur chaque document et exigés sur les factures par l'ARC."],
-        ["GST/HST (and QST) registration number — must appear on any invoice of $30 or more.", "Numéro d'inscription TPS/TVH (et TVQ) — obligatoire sur toute facture de 30 $ ou plus."],
+        ["GST/HST (and QST) registration number — must appear on any invoice of $100 or more.", "Numéro d'inscription TPS/TVH (et TVQ) — obligatoire sur toute facture de 100 $ ou plus."],
         ["Licence number — for example your RBQ number in Québec; it is inserted into the contract where the law requires it.", "Numéro de licence — par exemple votre numéro RBQ au Québec; il est inséré dans le contrat là où la loi l'exige."],
         ["Interac e-Transfer email — shown on invoices so customers know where to send payment. Most Canadian customers pay contractors this way.", "Courriel Virement Interac — affiché sur les factures pour que les clients sachent où envoyer le paiement. La plupart des clients canadiens paient les entrepreneurs ainsi."],
         ["Logo — appears on PDFs and on the customer-facing quote, signing and invoice pages.", "Logo — apparaît sur les PDF et sur les pages client de soumission, de signature et de facture."],
@@ -84,8 +84,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
       ]),
       h("3. Choose a plan", "3. Choisissez un forfait"),
       p(
-        "Settings → Plan & billing. Starter covers quotes, emailing them and acceptance notifications. Pro adds the price catalog, contracts and e-signature, jobs, costs, invoicing and team accounts (2 seats included). Elite adds worker time tracking, the AI assistant, advanced analytics and 5 seats. Billing is handled by Stripe; you can cancel any time and keep access until the end of the period you paid for.",
-        "Paramètres → Forfait et facturation. Starter couvre les soumissions, leur envoi par courriel et les notifications d'acceptation. Pro ajoute le catalogue de prix, les contrats et la signature électronique, les chantiers, les coûts, la facturation et les comptes d'équipe (2 sièges inclus). Elite ajoute le suivi du temps des travailleurs, l'assistant IA, les analyses avancées et 5 sièges. La facturation est gérée par Stripe; vous pouvez annuler à tout moment et conserver l'accès jusqu'à la fin de la période payée.",
+        "Settings → Plan & billing. Starter covers quotes, emailing them and acceptance notifications. Pro adds the price catalog, contracts and e-signature, jobs, costs, invoicing and team accounts (2 seats included). Business adds worker time tracking, the AI assistant, advanced analytics, card payments, QuickBooks Online and Wave sync, and 5 seats. Elite adds Financeit financing, the public API and 10 seats. Billing is handled by Stripe; you can cancel any time and keep access until the end of the period you paid for.",
+        "Paramètres → Forfait et facturation. Starter couvre les soumissions, leur envoi par courriel et les notifications d'acceptation. Pro ajoute le catalogue de prix, les contrats et la signature électronique, les chantiers, les coûts, la facturation et les comptes d'équipe (2 sièges inclus). Business ajoute le suivi du temps des travailleurs, l'assistant IA, les analyses avancées, le paiement par carte, la synchronisation QuickBooks en ligne et Wave, et 5 sièges. Elite ajoute le financement Financeit, l'API publique et 10 sièges. La facturation est gérée par Stripe; vous pouvez annuler à tout moment et conserver l'accès jusqu'à la fin de la période payée.",
       ),
       note(
         "Usage (quotes generated, photos analysed, WhatsApp messages) resets on the 1st of each month and is visible under Settings → Plan & billing. Going over your allowance never blocks you — it is there to tell you when to upgrade.",
@@ -161,8 +161,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
       ),
       h("After acceptance", "Après l'acceptation"),
       p(
-        "On Pro and Elite, an accepted quote automatically drafts a contract from the province template (see the contracts article). On Starter, the acceptance is your signed-off go-ahead — you can still download the PDF and start work.",
-        "Sur Pro et Elite, une soumission acceptée génère automatiquement un projet de contrat à partir du modèle provincial (voir l'article sur les contrats). Sur Starter, l'acceptation est votre feu vert signé — vous pouvez toujours télécharger le PDF et commencer les travaux.",
+        "On Pro and up, an accepted quote automatically drafts a contract from the province template (see the contracts article). On Starter, the acceptance is your signed-off go-ahead — you can still download the PDF and start work.",
+        "Sur Pro et les forfaits supérieurs, une soumission acceptée génère automatiquement un projet de contrat à partir du modèle provincial (voir l'article sur les contrats). Sur Starter, l'acceptation est votre feu vert signé — vous pouvez toujours télécharger le PDF et commencer les travaux.",
       ),
       note(
         "Sent quotes are locked so the customer always sees the version they accepted. To change a price after sending, duplicate the quote and send the new one.",
@@ -318,7 +318,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
         "Each cost is charged against the budget line from the setup review, so the job page shows budget vs. actual per category and the projected margin. Confirmed costs sync to QuickBooks or Wave when connected.",
         "Chaque coût est imputé à la ligne budgétaire de la révision de configuration, de sorte que la page du chantier montre le budget par rapport au réel par catégorie et la marge projetée. Les coûts confirmés se synchronisent avec QuickBooks ou Wave si connecté.",
       ),
-      h("Worker time (Elite)", "Temps des travailleurs (Elite)"),
+      h("Worker time (Business and Elite)", "Temps des travailleurs (Business et Elite)"),
       steps([
         ["Open Team and add a worker with their hourly cost. Click Time-entry link: a personal link is emailed to them, or copy it and send it by text.", "Ouvrez Équipe et ajoutez un travailleur avec son coût horaire. Cliquez sur Lien de saisie du temps : un lien personnel lui est envoyé par courriel, ou copiez-le et envoyez-le par texto."],
         ["The worker opens the link on their phone, picks the job and taps Clock in. No account, no app to install. The link is valid for 6 months; issue a new one to replace it or revoke it from the worker's row.", "Le travailleur ouvre le lien sur son téléphone, choisit le chantier et appuie sur Pointer l'arrivée. Aucun compte, aucune application à installer. Le lien est valide 6 mois; émettez-en un nouveau pour le remplacer ou révoquez-le depuis la ligne du travailleur."],
@@ -337,8 +337,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
     category: "team",
     title: { en: "Invite your team and set roles", fr: "Inviter votre équipe et définir les rôles" },
     summary: {
-      en: "Give office staff, foremen or your accountant their own login with a role that limits what they can see and do. Pro includes 2 seats, Elite 5.",
-      fr: "Donnez au personnel de bureau, aux contremaîtres ou à votre comptable leur propre connexion avec un rôle qui limite ce qu'ils peuvent voir et faire. Pro inclut 2 sièges, Elite 5.",
+      en: "Give office staff, foremen or your accountant their own login with a role that limits what they can see and do. Pro includes 2 seats, Business 5 and Elite 10.",
+      fr: "Donnez au personnel de bureau, aux contremaîtres ou à votre comptable leur propre connexion avec un rôle qui limite ce qu'ils peuvent voir et faire. Pro inclut 2 sièges, Business 5 et Elite 10.",
     },
     updatedAt: "2026-09-21",
     readingTimeMin: 3,
@@ -366,8 +366,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
         ["Change a role at any time. Suspend someone to block access without losing their history; Remove them when they leave.", "Changez un rôle à tout moment. Suspendez quelqu'un pour bloquer l'accès sans perdre son historique; Retirez-le quand il quitte."],
       ]),
       note(
-        "Pro includes 2 seats and Elite 5 (the owner counts as one). When every seat is used, the invite button tells you; add seats from Settings → Plan & billing.",
-        "Pro inclut 2 sièges et Elite 5 (le propriétaire compte pour un). Quand tous les sièges sont utilisés, le bouton d'invitation vous l'indique; ajoutez des sièges depuis Forfait et facturation.",
+        "Pro includes 2 seats, Business 5 and Elite 10 (the owner counts as one). When every seat is used, the invite button tells you; add seats from Settings → Plan & billing.",
+        "Pro inclut 2 sièges, Business 5 et Elite 10 (le propriétaire compte pour un). Quand tous les sièges sont utilisés, le bouton d'invitation vous l'indique; ajoutez des sièges depuis Forfait et facturation.",
       ),
     ],
   },
@@ -431,7 +431,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
         "Connect Google Calendar or Outlook and every job milestone becomes an event. Move the date in QuoteAI and the event moves; complete the milestone and the event is marked done.",
         "Connectez Google Agenda ou Outlook et chaque jalon de chantier devient un événement. Déplacez la date dans QuoteAI et l'événement se déplace; terminez le jalon et l'événement est marqué comme fait.",
       ),
-      h("Accounting: QuickBooks Online and Wave (Elite)", "Comptabilité : QuickBooks en ligne et Wave (Elite)"),
+      h("Accounting: QuickBooks Online and Wave (Business and Elite)", "Comptabilité : QuickBooks en ligne et Wave (Business et Elite)"),
       steps([
         ["Click Connect QuickBooks (or Connect Wave) and approve access.", "Cliquez sur Connecter QuickBooks (ou Connecter Wave) et approuvez l'accès."],
         ["In Account mapping, pick which income account invoices post to, which account expenses are paid from, and an expense account per cost category. Save.", "Dans Correspondance des comptes, choisissez à quel compte de revenus les factures sont comptabilisées, depuis quel compte les dépenses sont payées, et un compte de dépenses par catégorie de coût. Enregistrez."],

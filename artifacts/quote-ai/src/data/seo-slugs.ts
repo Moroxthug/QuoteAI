@@ -75,6 +75,22 @@ export function toolPath(lang: "en" | "fr", id?: ToolId): string {
   return `${base}${pair[lang]}/`;
 }
 
+/** Feature pages (SEO plan S4): /<en>/ ↔ /fr/<fr>/, both at the site root. */
+export const FEATURE_SLUG_PAIRS = [
+  { id: "estimating", en: "estimating-software", fr: "logiciel-soumission" },
+  { id: "invoicing", en: "invoicing-software", fr: "logiciel-facturation" },
+  { id: "crm", en: "contractor-crm", fr: "crm-entrepreneur" },
+  { id: "job-costing", en: "job-costing-software", fr: "logiciel-cout-de-revient" },
+  { id: "contracts", en: "contracts-e-signature", fr: "contrats-signature-electronique" },
+] as const;
+export type FeatureId = (typeof FEATURE_SLUG_PAIRS)[number]["id"];
+
+/** /<slug>/ or /fr/<slug>/ for a feature page. */
+export function featurePath(lang: "en" | "fr", id: FeatureId): string {
+  const pair = FEATURE_SLUG_PAIRS.find((p) => p.id === id)!;
+  return lang === "fr" ? `/fr/${pair.fr}/` : `/${pair.en}/`;
+}
+
 /** Comparison pages: /compare/<slug>/ ↔ /fr/comparer/<slug>/. */
 export const COMPARE_SLUG_PAIRS = [
   { id: "jobber", en: "quoteai-vs-jobber", fr: "quoteai-ou-jobber" },
@@ -157,6 +173,12 @@ export function getLanguageCounterpartPath(pathname: string): string | null {
   if (frProvince) {
     const pair = PROVINCE_SLUG_PAIRS.find((p) => p.fr === frProvince[1]);
     if (pair) return `/provinces/${pair.en}/`;
+  }
+
+  // Feature pages (SEO plan S4).
+  for (const f of FEATURE_SLUG_PAIRS) {
+    if (bare === `/${f.en}`) return `/fr/${f.fr}/`;
+    if (bare === `/fr/${f.fr}`) return `/${f.en}/`;
   }
 
   // Trade hubs.

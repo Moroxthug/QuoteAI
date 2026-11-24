@@ -289,6 +289,18 @@ Every page that stays indexed must meet this bar: at least 900 words of main con
 3. Articles on HST on renovation quotes (Ontario) and holdback rules by province, each linking to the calculators.
 4. Internal links: every article links to one tool and one feature page; hubs link to every child page; the home page links to the hubs.
 
+**S4 item 1 status (2026-11-24): built.** Ten feature pages, five in each language, at the site root:
+- /estimating-software/ ↔ /fr/logiciel-soumission/, /invoicing-software/ ↔ /fr/logiciel-facturation/, /contractor-crm/ ↔ /fr/crm-entrepreneur/, /job-costing-software/ ↔ /fr/logiciel-cout-de-revient/, /contracts-e-signature/ ↔ /fr/contrats-signature-electronique/ (`seo-slugs.ts` FEATURE_SLUG_PAIRS, copy in `src/data/feature-pages.ts`, page `src/pages/feature.tsx`).
+- Each is 1,100–1,200 words per language, the French written for Québec. Product claims were checked against the help centre and the code; legal points link to the official source (CRA, Revenu Québec, RBQ, OPC, CASL, the e-commerce acts, BC lien and PST rules).
+- **Screenshots are the real signed-in screens** with invented sample data, in each language. `scripts/capture-feature-shots.ts` drives the dev server with `src/dev/shots-mock.ts` answering the API (no database); the invoice and contract are rendered by the API's own renderers (`api-server/src/e2e/shots-fixtures.ts`). Re-run both after a UI change.
+- The footer's Features column now links the five pages in the reader's language. Sitemap 124 → 134 URLs.
+- **Product gaps the pages state openly** (owner to decide whether to fix):
+  - AI-written quote lines and dictation are English only; Québec users rewrite descriptions in French.
+  - The quote PDF has no RBQ licence number (only the contract has it).
+  - Québec at-home contracts covered by the OPC (doors and windows, insulation, roofing and exterior cladding) must be on paper, in French, in two copies. The e-signature flow does not switch to paper, so the page tells contractors to print those.
+  - No purchase orders; payroll is a CSV export.
+- Fixed along the way: the help centre's plan labels (time tracking, accounting sync and 5 seats are Business; Elite has 10 seats) and the invoice GST/HST-number threshold ($100, not $30). The French guides' call to action no longer claims French AI text or an RBQ number on the quote.
+
 ### S5: Trust and E-E-A-T (owner input needed; this week)
 1. About page with the founder's real name and photo, founding date, Canadian business address and a short honest story.
 2. One author page per writer, with a bio and credentials; every article carries a byline.

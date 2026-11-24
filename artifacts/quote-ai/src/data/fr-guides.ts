@@ -269,7 +269,7 @@ export const FR_GUIDES_HUB = {
   all: "Tous les guides",
   disclaimer: "Ce guide résume des règles publiques à la date indiquée. Ce n'est pas un avis juridique ou fiscal; vérifiez votre situation auprès de l'organisme concerné, de votre comptable ou d'un avocat.",
   ctaTitle: "Des soumissions en français, avec les bonnes taxes.",
-  ctaBody: "quoteai rédige la soumission à partir de quelques mots, en français, avec la TPS et la TVQ sur des lignes distinctes et votre numéro de licence RBQ, puis le contrat, la facture et le paiement suivent.",
+  ctaBody: "quoteai prépare la soumission à partir de quelques mots, avec la TPS et la TVQ sur des lignes distinctes, puis le contrat (avec votre numéro de licence RBQ), la facture et le paiement suivent.",
   ctaButton: "Essayer quoteai gratuitement",
   ctaNote: "7 jours gratuits, sans carte de crédit.",
 } as const;

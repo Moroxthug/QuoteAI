@@ -65,6 +65,7 @@ const FrGuidesIndexPage = lazy(() => import("@/pages/fr-guides/index"));
 const FrGuidePage = lazy(() => import("@/pages/fr-guides/[slug]"));
 
 import { PATHS } from "@/data/sitemap-routes";
+import { FEATURE_SLUG_PAIRS } from "@/data/seo-slugs";
 
 // Phase 115: the signed-in pages load through the shared loaders in
 // lib/route-chunks.ts, so a nav link or list row can prefetch the same chunk.
@@ -110,6 +111,7 @@ const PublicQuotePage = lazy(() => import("@/pages/p/[id]"));
 
 const SeoLanding = lazy(() => import("@/pages/seo/en-type"));
 const SeoLandingFr = lazy(() => import("@/pages/seo/fr-type"));
+const FeaturePage = lazy(() => import("@/pages/feature"));
 const SeoCityLanding = lazy(() => import("@/pages/seo/city-landing"));
 const BlogPage = lazy(() => import("@/pages/blog/index"));
 const ContractsListPage = lazy(pageLoaders.contracts);
@@ -278,6 +280,11 @@ function Router() {
       <Route path="/tools/:slug" component={() => <PublicLayout><Suspense fallback={null}><ToolPage /></Suspense></PublicLayout>} />
       <Route path="/fr/outils/:slug" component={() => <PublicLayout><Suspense fallback={null}><ToolPage /></Suspense></PublicLayout>} />
       {/* Comparison pages, both languages (pages/compare) */}
+      {/* Feature pages (SEO plan S4), both languages, at the site root */}
+      {FEATURE_SLUG_PAIRS.flatMap((f) => [
+        <Route key={f.en} path={`/${f.en}`} component={() => <PublicLayout><Suspense fallback={null}><FeaturePage id={f.id} lang="en" /></Suspense></PublicLayout>} />,
+        <Route key={f.fr} path={`/fr/${f.fr}`} component={() => <PublicLayout><Suspense fallback={null}><FeaturePage id={f.id} lang="fr" /></Suspense></PublicLayout>} />,
+      ])}
       <Route path="/compare" component={() => <PublicLayout><Suspense fallback={null}><CompareIndexPage /></Suspense></PublicLayout>} />
       <Route path="/fr/comparer" component={() => <PublicLayout><Suspense fallback={null}><CompareIndexPage /></Suspense></PublicLayout>} />
       <Route path="/compare/:slug" component={() => <PublicLayout><Suspense fallback={null}><ComparePage /></Suspense></PublicLayout>} />

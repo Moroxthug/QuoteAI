@@ -1,0 +1,834 @@
+{
+ "en": {
+  "invoice": {
+   "invoice": {
+    "id": "inv_deck_2",
+    "userId": "u_shots",
+    "number": "INV-2026-041",
+    "type": "progress",
+    "status": "viewed",
+    "source": "manual",
+    "language": "en",
+    "province": "ON",
+    "title": "Cedar deck, 14 x 16",
+    "projectId": "j_deck",
+    "clientId": "c_q_deck",
+    "contractId": "ct_deck",
+    "milestoneId": null,
+    "paymentTermId": "t2",
+    "paymentTermLabel": "40% when framing is complete",
+    "creditNoteForId": null,
+    "issueDate": "2026-11-18T15:00:00.000Z",
+    "dueDate": "2026-12-03T15:00:00.000Z",
+    "scheduledFor": null,
+    "contractor": {
+     "name": "Northline Renovations Ltd.",
+     "address": "220 Bank St",
+     "city": "Ottawa",
+     "province": "ON",
+     "postalCode": "K2P 1X4",
+     "email": "office@example.invalid",
+     "phone": "613-555-0142",
+     "gstHstNumber": "123456789 RT0001"
+    },
+    "customer": {
+     "name": "Daniel Okafor",
+     "address": "48 Linden Ave",
+     "city": "Ottawa",
+     "province": "ON",
+     "postalCode": "K1S 3H9",
+     "email": "client@example.invalid"
+    },
+    "siteAddress": "48 Linden Ave, Ottawa ON K1S 3H9",
+    "lines": [
+     {
+      "description": "Progress billing: framing, joists and ledger complete (40% of contract)",
+      "quantity": 1,
+      "unitCents": 473600,
+      "amountCents": 473600
+     }
+    ],
+    "subtotalCents": 473600,
+    "holdbackPercent": 10,
+    "holdbackCents": 47360,
+    "taxableCents": 473600,
+    "taxLines": [
+     {
+      "code": "HST",
+      "label": "HST",
+      "rate": 13,
+      "amountCents": 61568,
+      "registrationNumber": "123456789 RT0001"
+     }
+    ],
+    "taxCents": 61568,
+    "totalCents": 487808,
+    "paidCents": 0,
+    "notes": "10% holdback retained under Ontario's Construction Act, released after the lien period.",
+    "paymentInstructions": {
+     "etransferEmail": "pay@example.invalid",
+     "chequePayableTo": "Northline Renovations Ltd.",
+     "note": null
+    },
+    "sentAt": "2026-11-18T15:00:00.000Z",
+    "viewedAt": "2026-11-19T01:12:00.000Z",
+    "paidAt": null,
+    "voidedAt": null,
+    "voidReason": null,
+    "autoSendAt": null,
+    "reminderCount": 0,
+    "lastReminderAt": null,
+    "createdAt": "2026-11-18T15:00:00.000Z",
+    "updatedAt": "2026-11-18T15:00:00.000Z",
+    "archivedAt": null,
+    "projectName": "Cedar deck, 14 x 16",
+    "clientName": "Daniel Okafor",
+    "balanceCents": 487808,
+    "hasPdf": true
+   },
+   "payments": [],
+   "events": [
+    {
+     "id": "ie1",
+     "type": "sent",
+     "actor": "contractor",
+     "detail": null,
+     "createdAt": "2026-11-18T15:00:00.000Z"
+    },
+    {
+     "id": "ie2",
+     "type": "viewed",
+     "actor": "customer",
+     "detail": null,
+     "createdAt": "2026-11-19T01:12:00.000Z"
+    }
+   ],
+   "html": "<div class=\"inv\"><h2 class=\"doc-title\">Cedar deck, 14 x 16</h2>\n<div class=\"sub\">Invoice No. <strong>INV-2026-041</strong> · Issued November 18, 2026 · Due: December 3, 2026 · Net 15 days</div>\n<div class=\"meta\"><div><div class=\"party-label\">From</div><div class=\"party-name\">Northline Renovations Ltd.</div><div class=\"party-line\">220 Bank St</div><div class=\"party-line\">Ottawa, ON, K2P 1X4</div><div class=\"party-line\">Email: office@example.invalid</div><div class=\"party-line\">Phone: 613-555-0142</div><div class=\"party-line\">GST/HST No.: 123456789 RT0001</div></div><div><div class=\"party-label\">Bill to</div><div class=\"party-name\">Daniel Okafor</div><div class=\"party-line\">48 Linden Ave</div><div class=\"party-line\">Ottawa, ON, K1S 3H9</div><div class=\"party-line\">Email: client@example.invalid</div></div></div>\n<table class=\"kv\"><tr><th>Job site</th><td>48 Linden Ave, Ottawa ON K1S 3H9</td></tr><tr><th>Payment term</th><td>40% when framing is complete</td></tr></table>\n<div class=\"table-wrap\"><table class=\"grid\"><thead><tr><th>Description</th><th class=\"num\">Qty</th><th class=\"num\">Unit price</th><th class=\"num\">Amount</th></tr></thead><tbody><tr><td>Progress billing: framing, joists and ledger complete (40% of contract)</td><td class=\"num\">1</td><td class=\"num\">$4,736.00</td><td class=\"num\">$4,736.00</td></tr></tbody></table></div>\n<table class=\"totals\"><tr><th scope=\"row\">Subtotal</th><td class=\"num\">$4,736.00</td></tr><tr><th scope=\"row\">Less statutory holdback (10%)</th><td class=\"num\">− $473.60</td></tr><tr class=\"muted\"><th scope=\"row\">Taxable amount</th><td class=\"num\">$4,736.00</td></tr><tr><th scope=\"row\">HST 13% <span style=\"color:#6b7280\">(123456789 RT0001)</span></th><td class=\"num\">$615.68</td></tr><tr class=\"total\"><th scope=\"row\">Total due</th><td class=\"num\">$4,878.08</td></tr></table>\n<p class=\"note\">The statutory holdback is retained as required by the applicable construction lien legislation and will be invoiced, with the applicable taxes, at the end of the lien period.</p>\n<div class=\"box\"><h3>How to pay</h3><div>Interac e-Transfer to <strong>pay@example.invalid</strong></div><div>Cheque payable to <strong>Northline Renovations Ltd.</strong></div><div class=\"note\">Please quote the invoice number as the payment reference.</div></div>\n<div class=\"note\"><strong>Notes:</strong> 10% holdback retained under Ontario's Construction Act, released after the lien period.</div>\n<p class=\"thanks\">Thank you for your business.</p></div>",
+   "css": "\n.inv { font-family: system-ui,-apple-system,\"Segoe UI\",sans-serif; color:#111827; font-size:14px; line-height:1.5; position:relative; }\n.inv .wm { position:absolute; right:0; top:0; font-size:12px; font-weight:800; letter-spacing:0.12em; padding:4px 10px; border-radius:6px; border:2px solid currentColor; }\n.inv .wm.draft { color:#92400e; } .inv .wm.void { color:#991b1b; } .inv .wm.paid { color:#047857; } .inv .wm.overdue { color:#b91c1c; } .inv .wm.partially_paid { color:#1d4ed8; }\n.inv h1, .inv h2.doc-title { font-size:24px; margin:0 0 2px; letter-spacing:-0.01em; }\n.inv .sub { color:#6b7280; font-size:13px; margin-bottom:20px; }\n.inv .meta { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }\n.inv .party-label { font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#6b7280; margin-bottom:2px; }\n.inv .party-name { font-weight:700; font-size:15px; }\n.inv .party-line { font-size:12.5px; color:#374151; }\n.inv table.kv { font-size:13px; border-collapse:collapse; margin-bottom:16px; }\n.inv table.kv th { text-align:left; color:#6b7280; font-weight:600; padding:2px 16px 2px 0; font-size:12px; white-space:nowrap; }\n.inv table.kv td { padding:2px 0; }\n.inv table.grid { width:100%; border-collapse:collapse; font-size:13px; margin:8px 0 12px; }\n.inv table.grid th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#6b7280; border-bottom:1px solid #d1d5db; padding:6px 8px; }\n.inv table.grid td { padding:7px 8px; border-bottom:1px solid #f3f4f6; vertical-align:top; }\n.inv table.grid .num { text-align:right; white-space:nowrap; }\n.inv table.totals { width:100%; max-width:360px; margin-left:auto; border-collapse:collapse; font-size:13.5px; }\n.inv table.totals td, .inv table.totals th { padding:5px 8px; font-weight:inherit; text-align:left; }\n.inv table.totals th { color:inherit; }\n.inv table.totals tr.total td, .inv table.totals tr.total th { font-weight:800; font-size:16px; border-top:2px solid #111827; background:#f9fafb; }\n.inv table.totals tr.muted td, .inv table.totals tr.muted th { color:#6b7280; }\n.inv table.totals tr.balance td, .inv table.totals tr.balance th { font-weight:700; color:#047857; }\n.inv .box { background:#f5f3ff; border:1px solid #ede9fe; border-radius:10px; padding:12px 16px; margin:20px 0 8px; font-size:13px; }\n.inv .box h2, .inv .box h3 { margin:0 0 6px; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:#5b21b6; }\n.inv .note { font-size:12px; color:#5b5f6b; margin-top:8px; }\n.inv .thanks { margin-top:18px; color:#374151; font-size:13px; }\n.inv .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }\n@media (max-width: 480px) {\n  .inv .meta { grid-template-columns:1fr; gap:12px; }\n  .inv table.grid th, .inv table.grid td { padding:6px 4px; font-size:12px; }\n  .inv table.totals { max-width:none; }\n}\n",
+   "publicUrl": "https://quoteai.ca/i/sample",
+   "reminderDays": [
+    3,
+    7,
+    14
+   ]
+  },
+  "contract": {
+   "contract": {
+    "id": "ct_deck",
+    "quoteId": "q_deck",
+    "clientId": "c_q_deck",
+    "projectId": "j_deck",
+    "kind": "contract",
+    "parentContractId": null,
+    "changeOrderId": null,
+    "contractNumber": "C-2026-027",
+    "status": "signed",
+    "province": "ON",
+    "language": "en",
+    "templateKey": "ON",
+    "document": {
+     "templateKey": "ON",
+     "templateVersion": 1,
+     "language": "en",
+     "title": "Construction & Renovation Services Agreement",
+     "sections": [
+      {
+       "key": "parties",
+       "heading": "1. Parties",
+       "body": "",
+       "kind": "data",
+       "editable": false
+      },
+      {
+       "key": "scope",
+       "heading": "2. Scope of Work",
+       "body": "Build a 14 x 16 ft ground-level deck at the rear of the house, attached to the house with a flashed ledger board.\n- Six concrete footings below frost depth, pressure-treated 2x8 joists at 16 in. on centre\n- 5/4 x 6 western red cedar decking with hidden fasteners\n- Cedar railing on three sides and one 4-step stair to grade\nPermit drawings and the City of Ottawa building permit are included. Staining is not included.",
+       "kind": "ai",
+       "editable": true
+      },
+      {
+       "key": "price",
+       "heading": "3. Contract Price",
+       "body": "The Customer agrees to pay the Contractor the Contract Price of **$13,379.20** ($11,840.00 before applicable taxes) for the Work, as detailed in the price table below. The Contract Price is a fixed price for the Work described in Section 2 and may only be changed by a written change order under Section 6.",
+       "kind": "data",
+       "editable": false
+      },
+      {
+       "key": "payment",
+       "heading": "4. Payment Terms",
+       "body": "Payments are due according to the payment schedule below. Each invoice is payable within the number of days shown from the invoice date. Amounts unpaid after the due date bear interest at 1.5% per month (19.56% per year). The Contractor may suspend the Work while any invoice is more than 10 days overdue, and the schedule will be extended accordingly. A statutory holdback of 10% will be retained from each progress payment and released in accordance with Section 11.\n\nAccepted payment methods: Interac e-Transfer, cheque, or any other method agreed in writing.",
+       "kind": "data",
+       "editable": false
+      },
+      {
+       "key": "schedule",
+       "heading": "5. Schedule",
+       "body": "Work starts on or about November 24, 2026 and takes about two weeks, weather permitting.",
+       "kind": "ai",
+       "editable": true
+      },
+      {
+       "key": "changes",
+       "heading": "6. Changes to the Work",
+       "body": "Any change to the Work (additions, deletions, substitutions, or changes requested by the Customer or required by unforeseen conditions or authorities) must be documented in a written change order stating the change, its price and any effect on the schedule. The Contractor is not obliged to perform changed work until the change order is approved in writing (including electronically) by the Customer. The Contract Price and schedule are adjusted by each approved change order.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "permits",
+       "heading": "7. Permits, Codes and Compliance",
+       "body": "Unless stated otherwise in Section 2, the Contractor will apply for the building permits required for the Work, and the cost of permits and inspection fees is not included in the Contract Price and will be invoiced at cost. The Work will be performed in accordance with the applicable building code and municipal by-laws. The Customer is responsible for obtaining any approvals required from a condominium corporation, landlord or homeowners' association.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "materials",
+       "heading": "8. Materials, Workmanship and Warranty",
+       "body": "The Contractor will supply new materials of the quality described in Section 2 and perform the Work in a good and workmanlike manner. The Contractor warrants its workmanship for **24 months** from substantial completion and will correct defective workmanship reported in writing during that period at no charge. Manufacturers' warranties on materials, fixtures and equipment are passed on to the Customer. This warranty does not cover normal wear, damage caused by others, misuse, lack of maintenance, or materials supplied by the Customer.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "site",
+       "heading": "9. Site Conditions and Access",
+       "body": "The Customer will give the Contractor reasonable access to the site during working hours, provide water and electricity, and remove or protect personal property in the work area. If the Contractor discovers conditions that could not reasonably have been anticipated (including hidden damage, asbestos, mould, structural deficiencies, or non-compliant existing work), the Contractor will notify the Customer, and any additional work will be handled as a change order under Section 6. The Contractor will keep the site reasonably clean and remove construction debris at completion.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "insurance",
+       "heading": "10. Insurance and Workers' Compensation",
+       "body": "The Contractor maintains commercial general liability insurance of at least $2,000,000 per occurrence and is registered in good standing with WSIB (or covers its workers as required by law) and will provide proof on request. The Customer is responsible for insuring the property and its contents. Neither party is liable to the other for indirect or consequential losses.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "holdback",
+       "heading": "11. Holdback and Liens",
+       "body": "In accordance with the *Construction Act* (Ontario), the Customer will retain a holdback of 10% of the value of the Work from each payment. The holdback becomes payable 60 days after publication of the certificate of substantial performance (or completion of the Work if no certificate is published), provided no liens have been preserved. The Contractor's rights under the *Construction Act*, including the right to register a lien, are not waived by this Agreement.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "consumer",
+       "heading": "12. Cancellation Rights",
+       "body": "This Agreement was not entered into at the Customer's residence or away from the Contractor's place of business. Nothing in this Agreement limits any right the Customer may have under the consumer protection legislation of Ontario.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "termination",
+       "heading": "13. Termination",
+       "body": "Either party may terminate this Agreement by written notice if the other party materially breaches it and fails to remedy the breach within ten (10) days of written notice. If the Customer terminates for convenience or without cause, the Customer will pay for all Work performed and materials ordered up to the termination date, plus reasonable demobilization costs. On termination the Contractor will leave the site in a safe condition.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "disputes",
+       "heading": "14. Disputes and Governing Law",
+       "body": "The parties will first try to resolve any dispute through good-faith discussion. If unresolved within 30 days, either party may refer the dispute to mediation before commencing court proceedings, except for lien or urgent injunctive matters. This Agreement is governed by the laws of Ontario and the federal laws of Canada applicable therein, and the courts of Ontario have jurisdiction.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "general",
+       "heading": "15. General",
+       "body": "This Agreement, including the quote it is based on (No. Q-2026-114) and any approved change orders, is the entire agreement between the parties and replaces all prior discussions. It may be amended only in writing. If any provision is unenforceable, the rest remains in effect. The Customer may not assign this Agreement without the Contractor's consent. Notices may be given by email to the addresses in Section 1.\n\n**Electronic signature.** The parties agree that this Agreement may be signed electronically and that electronic signatures, and copies of this Agreement, have the same legal effect as original handwritten signatures and paper documents, in accordance with applicable electronic commerce legislation.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "signatures",
+       "heading": "16. Signatures",
+       "body": "By signing below, each party confirms that it has read and understood this Agreement, including the cancellation rights in Section 12, and agrees to be bound by it.",
+       "kind": "data",
+       "editable": false
+      }
+     ]
+    },
+    "variables": {
+     "contractNumber": "C-2026-027",
+     "quoteNumber": "Q-2026-114",
+     "contractor": {
+      "name": "Northline Renovations Ltd.",
+      "address": "220 Bank St",
+      "city": "Ottawa",
+      "province": "ON",
+      "postalCode": "K2P 1X4",
+      "email": "office@example.invalid",
+      "phone": "613-555-0142",
+      "businessNumber": "123456789 RT0001"
+     },
+     "customer": {
+      "name": "Daniel Okafor",
+      "address": "48 Linden Ave",
+      "city": "Ottawa",
+      "province": "ON",
+      "postalCode": "K1S 3H9",
+      "email": "client@example.invalid"
+     },
+     "siteAddress": "48 Linden Ave, Ottawa ON K1S 3H9",
+     "province": "ON",
+     "projectTitle": "Cedar deck, 14 x 16",
+     "priceLines": [
+      {
+       "label": "Footings, framing and ledger",
+       "amount": 4980
+      },
+      {
+       "label": "Cedar decking, railings and stairs",
+       "amount": 6860
+      }
+     ],
+     "discount": null,
+     "subtotal": 11840,
+     "taxLines": [
+      {
+       "code": "HST",
+       "label": "HST",
+       "rate": 13,
+       "amount": 1539.2
+      }
+     ],
+     "taxTotal": 1539.2,
+     "total": 13379.2,
+     "paymentSchedule": {
+      "currency": "CAD",
+      "derived": false,
+      "holdback": {
+       "enabled": true,
+       "percent": 10
+      },
+      "terms": [
+       {
+        "id": "t1",
+        "type": "deposit",
+        "label": "Deposit on signing",
+        "trigger": "on_signing",
+        "amountType": "percent",
+        "value": 20,
+        "dueDays": 7
+       },
+       {
+        "id": "t2",
+        "type": "milestone",
+        "label": "When framing is complete",
+        "trigger": "milestone",
+        "milestoneKey": "framing",
+        "amountType": "percent",
+        "value": 40,
+        "dueDays": 15
+       },
+       {
+        "id": "t3",
+        "type": "completion",
+        "label": "On completion and walkthrough",
+        "trigger": "on_completion",
+        "amountType": "percent",
+        "value": 40,
+        "dueDays": 15
+       }
+      ]
+     },
+     "startDate": "2026-11-24",
+     "estimatedDurationWeeks": 2,
+     "warrantyMonths": 24,
+     "englishRequestedInQuebec": false,
+     "directAgreement": false
+    },
+    "contractValueCents": 1337920,
+    "holdbackEnabled": true,
+    "holdbackPercent": 10,
+    "hasSignedPdf": true,
+    "signedPdfHash": "9f2c41d07ab3e5c8",
+    "unsignedPdfHash": "51b0e9a7c3d2f146",
+    "sentAt": "2026-11-07T16:20:00.000Z",
+    "expiresAt": "2026-12-07T16:20:00.000Z",
+    "signedAt": "2026-11-09T14:05:00.000Z",
+    "voidedAt": null,
+    "voidReason": null,
+    "reminderCount": 0,
+    "createdAt": "2026-11-07T16:00:00.000Z",
+    "updatedAt": "2026-11-09T14:05:00.000Z",
+    "archivedAt": null,
+    "signers": [
+     {
+      "id": "s1",
+      "role": "contractor",
+      "name": "Alex Martin",
+      "email": "office@example.invalid",
+      "status": "signed",
+      "signatureType": "typed",
+      "signedAt": "2026-11-08T19:40:00.000Z",
+      "viewedAt": "2026-11-08T19:40:00.000Z",
+      "declinedAt": null,
+      "declineReason": null,
+      "signatureData": "Alex Martin"
+     },
+     {
+      "id": "s2",
+      "role": "customer",
+      "name": "Daniel Okafor",
+      "email": "client@example.invalid",
+      "status": "signed",
+      "signatureType": "typed",
+      "signedAt": "2026-11-09T14:05:00.000Z",
+      "viewedAt": "2026-11-09T13:58:00.000Z",
+      "declinedAt": null,
+      "declineReason": null,
+      "signatureData": "Daniel Okafor"
+     }
+    ],
+    "events": [
+     {
+      "id": "e1",
+      "type": "sent",
+      "actor": "contractor",
+      "detail": null,
+      "createdAt": "2026-11-07T16:20:00.000Z"
+     },
+     {
+      "id": "e2",
+      "type": "viewed",
+      "actor": "customer",
+      "detail": null,
+      "createdAt": "2026-11-09T13:58:00.000Z"
+     },
+     {
+      "id": "e3",
+      "type": "signed",
+      "actor": "customer",
+      "detail": null,
+      "createdAt": "2026-11-09T14:05:00.000Z"
+     }
+    ]
+   },
+   "html": "<div class=\"contract\"><h2 class=\"doc-title\">Construction &amp; Renovation Services Agreement</h2><div class=\"meta\">Contract No. C-2026-027 · Date: November 7, 2026</div>\n<h2>1. Parties</h2>\n<div class=\"parties\"><div class=\"party\"><div class=\"party-label\">Contractor</div><div class=\"party-name\">Northline Renovations Ltd.</div><div class=\"party-line\">220 Bank St</div><div class=\"party-line\">Ottawa, ON, K2P 1X4</div><div class=\"party-line\">Email: office@example.invalid</div><div class=\"party-line\">Phone: 613-555-0142</div><div class=\"party-line\">GST/HST No.: 123456789 RT0001</div></div><div class=\"party\"><div class=\"party-label\">Customer</div><div class=\"party-name\">Daniel Okafor</div><div class=\"party-line\">48 Linden Ave</div><div class=\"party-line\">Ottawa, ON, K1S 3H9</div><div class=\"party-line\">Email: client@example.invalid</div></div></div>\n<table class=\"kv\"><tr><th>Site address</th><td>48 Linden Ave, Ottawa ON K1S 3H9</td></tr><tr><th>Project</th><td>Cedar deck, 14 x 16</td></tr><tr><th>Based on Quote No.</th><td>Q-2026-114</td></tr></table>\n<h2>2. Scope of Work</h2>\n<p>Build a 14 x 16 ft ground-level deck at the rear of the house, attached to the house with a flashed ledger board.</p>\n<ul><li>Six concrete footings below frost depth, pressure-treated 2x8 joists at 16 in. on centre</li><li>5/4 x 6 western red cedar decking with hidden fasteners</li><li>Cedar railing on three sides and one 4-step stair to grade</li></ul>\n<p>Permit drawings and the City of Ottawa building permit are included. Staining is not included.</p>\n<h2>3. Contract Price</h2>\n<p>The Customer agrees to pay the Contractor the Contract Price of <strong>$13,379.20</strong> ($11,840.00 before applicable taxes) for the Work, as detailed in the price table below. The Contract Price is a fixed price for the Work described in Section 2 and may only be changed by a written change order under Section 6.</p><div class=\"table-wrap\"><table class=\"grid\"><thead><tr><th>Description</th><th class=\"num\">Amount</th></tr></thead><tbody><tr><td>Footings, framing and ledger</td><td class=\"num\">$4,980.00</td></tr><tr><td>Cedar decking, railings and stairs</td><td class=\"num\">$6,860.00</td></tr><tr class=\"sub\"><td>Subtotal (before tax)</td><td class=\"num\">$11,840.00</td></tr><tr><td>HST (13%)</td><td class=\"num\">$1,539.20</td></tr><tr class=\"total\"><td>Contract Price (incl. tax)</td><td class=\"num\">$13,379.20</td></tr></tbody></table></div>\n<h2>4. Payment Terms</h2>\n<p>Payments are due according to the payment schedule below. Each invoice is payable within the number of days shown from the invoice date. Amounts unpaid after the due date bear interest at 1.5% per month (19.56% per year). The Contractor may suspend the Work while any invoice is more than 10 days overdue, and the schedule will be extended accordingly. A statutory holdback of 10% will be retained from each progress payment and released in accordance with Section 11.</p>\n<p>Accepted payment methods: Interac e-Transfer, cheque, or any other method agreed in writing.</p><div class=\"table-wrap\"><table class=\"grid\"><thead><tr><th>Payment</th><th>Due</th><th class=\"num\">%</th><th class=\"num\">Amount</th></tr></thead><tbody><tr><td>1. Deposit on signing</td><td>On signing, net 7 days</td><td class=\"num\">20%</td><td class=\"num\">$2,675.84</td></tr><tr><td>2. When framing is complete</td><td>When the milestone is reached, net 15 days</td><td class=\"num\">40%</td><td class=\"num\">$5,351.68</td></tr><tr><td>3. On completion and walkthrough</td><td>On completion, net 15 days</td><td class=\"num\">40%</td><td class=\"num\">$5,351.68</td></tr></tbody></table></div>\n<h2>5. Schedule</h2>\n<p>Work starts on or about November 24, 2026 and takes about two weeks, weather permitting.</p>\n<h2>6. Changes to the Work</h2>\n<p>Any change to the Work (additions, deletions, substitutions, or changes requested by the Customer or required by unforeseen conditions or authorities) must be documented in a written change order stating the change, its price and any effect on the schedule. The Contractor is not obliged to perform changed work until the change order is approved in writing (including electronically) by the Customer. The Contract Price and schedule are adjusted by each approved change order.</p>\n<h2>7. Permits, Codes and Compliance</h2>\n<p>Unless stated otherwise in Section 2, the Contractor will apply for the building permits required for the Work, and the cost of permits and inspection fees is not included in the Contract Price and will be invoiced at cost. The Work will be performed in accordance with the applicable building code and municipal by-laws. The Customer is responsible for obtaining any approvals required from a condominium corporation, landlord or homeowners' association.</p>\n<h2>8. Materials, Workmanship and Warranty</h2>\n<p>The Contractor will supply new materials of the quality described in Section 2 and perform the Work in a good and workmanlike manner. The Contractor warrants its workmanship for <strong>24 months</strong> from substantial completion and will correct defective workmanship reported in writing during that period at no charge. Manufacturers' warranties on materials, fixtures and equipment are passed on to the Customer. This warranty does not cover normal wear, damage caused by others, misuse, lack of maintenance, or materials supplied by the Customer.</p>\n<h2>9. Site Conditions and Access</h2>\n<p>The Customer will give the Contractor reasonable access to the site during working hours, provide water and electricity, and remove or protect personal property in the work area. If the Contractor discovers conditions that could not reasonably have been anticipated (including hidden damage, asbestos, mould, structural deficiencies, or non-compliant existing work), the Contractor will notify the Customer, and any additional work will be handled as a change order under Section 6. The Contractor will keep the site reasonably clean and remove construction debris at completion.</p>\n<h2>10. Insurance and Workers' Compensation</h2>\n<p>The Contractor maintains commercial general liability insurance of at least $2,000,000 per occurrence and is registered in good standing with WSIB (or covers its workers as required by law) and will provide proof on request. The Customer is responsible for insuring the property and its contents. Neither party is liable to the other for indirect or consequential losses.</p>\n<h2>11. Holdback and Liens</h2>\n<p>In accordance with the <em>Construction Act</em> (Ontario), the Customer will retain a holdback of 10% of the value of the Work from each payment. The holdback becomes payable 60 days after publication of the certificate of substantial performance (or completion of the Work if no certificate is published), provided no liens have been preserved. The Contractor's rights under the <em>Construction Act</em>, including the right to register a lien, are not waived by this Agreement.</p>\n<h2>12. Cancellation Rights</h2>\n<p>This Agreement was not entered into at the Customer's residence or away from the Contractor's place of business. Nothing in this Agreement limits any right the Customer may have under the consumer protection legislation of Ontario.</p>\n<h2>13. Termination</h2>\n<p>Either party may terminate this Agreement by written notice if the other party materially breaches it and fails to remedy the breach within ten (10) days of written notice. If the Customer terminates for convenience or without cause, the Customer will pay for all Work performed and materials ordered up to the termination date, plus reasonable demobilization costs. On termination the Contractor will leave the site in a safe condition.</p>\n<h2>14. Disputes and Governing Law</h2>\n<p>The parties will first try to resolve any dispute through good-faith discussion. If unresolved within 30 days, either party may refer the dispute to mediation before commencing court proceedings, except for lien or urgent injunctive matters. This Agreement is governed by the laws of Ontario and the federal laws of Canada applicable therein, and the courts of Ontario have jurisdiction.</p>\n<h2>15. General</h2>\n<p>This Agreement, including the quote it is based on (No. Q-2026-114) and any approved change orders, is the entire agreement between the parties and replaces all prior discussions. It may be amended only in writing. If any provision is unenforceable, the rest remains in effect. The Customer may not assign this Agreement without the Contractor's consent. Notices may be given by email to the addresses in Section 1.</p>\n<p><strong>Electronic signature.</strong> The parties agree that this Agreement may be signed electronically and that electronic signatures, and copies of this Agreement, have the same legal effect as original handwritten signatures and paper documents, in accordance with applicable electronic commerce legislation.</p>\n<h2>16. Signatures</h2>\n<p>By signing below, each party confirms that it has read and understood this Agreement, including the cancellation rights in Section 12, and agrees to be bound by it.</p><div class=\"signatures\"><div class=\"sig-block\"><div class=\"party-label\">Contractor</div><div class=\"party-name\">Northline Renovations Ltd.</div><div class=\"sig-typed\">Alex Martin</div><div class=\"sig-meta\">Signed by Alex Martin · Signed on November 8, 2026 at 2:40 p.m.</div></div><div class=\"sig-block\"><div class=\"party-label\">Customer</div><div class=\"party-name\">Daniel Okafor</div><div class=\"sig-typed\">Daniel Okafor</div><div class=\"sig-meta\">Signed by Daniel Okafor · Signed on November 9, 2026 at 9:05 a.m.</div></div></div></div>",
+   "css": "\n.contract { font-family: Georgia, \"Times New Roman\", serif; color:#111827; line-height:1.55; font-size:14px; }\n.contract h1, .contract h2.doc-title { font-family: system-ui,-apple-system,sans-serif; font-size:22px; letter-spacing:-0.01em; margin:0 0 4px; }\n.contract .meta { font-family: system-ui,-apple-system,sans-serif; color:#6b7280; font-size:12px; margin-bottom:24px; }\n.contract h2 { font-family: system-ui,-apple-system,sans-serif; font-size:14px; text-transform:uppercase; letter-spacing:0.04em; color:#374151; margin:28px 0 8px; padding-bottom:4px; border-bottom:1px solid #e5e7eb; }\n.contract p { margin:0 0 10px; }\n.contract ul { margin:0 0 10px 20px; padding:0; }\n.contract li { margin:0 0 4px; }\n.contract .parties { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:12px; }\n.contract .party { border:1px solid #e5e7eb; border-radius:8px; padding:12px; }\n.contract .party-label { font-family: system-ui,sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#6b7280; }\n.contract .party-name { font-weight:700; margin:2px 0 4px; }\n.contract .party-line { font-size:12.5px; color:#374151; overflow-wrap:anywhere; }\n.contract table.kv { width:100%; border-collapse:collapse; font-size:13px; margin-bottom:8px; }\n.contract table.kv th { text-align:left; color:#6b7280; font-weight:600; width:30%; padding:4px 0; font-family: system-ui,sans-serif; font-size:12px; }\n.contract table.kv td { padding:4px 0; }\n.contract table.grid { width:100%; border-collapse:collapse; font-size:13px; margin:8px 0 12px; }\n.contract table.grid th { text-align:left; font-family: system-ui,sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#6b7280; border-bottom:1px solid #d1d5db; padding:6px 8px; }\n.contract table.grid td { padding:6px 8px; border-bottom:1px solid #f3f4f6; vertical-align:top; }\n.contract table.grid .num { text-align:right; white-space:nowrap; }\n.contract table.grid tr.sub td { font-weight:600; border-top:1px solid #d1d5db; }\n.contract table.grid tr.total td { font-weight:700; font-size:14px; background:#f9fafb; }\n.contract .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }\n.contract .signatures { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:16px; }\n@media (max-width: 480px) {\n  .contract .parties { grid-template-columns:1fr; }\n  .contract .signatures { grid-template-columns:1fr; gap:16px; }\n  .contract table.grid th, .contract table.grid td { padding:6px 4px; font-size:12px; }\n}\n.contract .sig-block { border-top:1px solid #9ca3af; padding-top:8px; min-height:110px; }\n.contract .sig-empty { color:#6b7280; font-style:italic; margin-top:28px; font-size:12px; }\n.contract .sig-img { max-height:70px; max-width:240px; display:block; margin:6px 0; }\n.contract .sig-typed { font-family: \"Brush Script MT\", \"Segoe Script\", cursive; font-size:28px; margin:8px 0; }\n.contract .sig-meta { font-family: system-ui,sans-serif; font-size:11px; color:#6b7280; }\n.contract .draft-banner { font-family: system-ui,sans-serif; background:#fef3c7; color:#92400e; border:1px solid #fde68a; border-radius:8px; padding:8px 12px; font-size:12px; font-weight:600; margin-bottom:16px; text-align:center; }\n"
+  }
+ },
+ "fr": {
+  "invoice": {
+   "invoice": {
+    "id": "inv_deck_2",
+    "userId": "u_shots",
+    "number": "INV-2026-041",
+    "type": "progress",
+    "status": "viewed",
+    "source": "manual",
+    "language": "fr",
+    "province": "QC",
+    "title": "Terrasse en cèdre 14 x 16",
+    "projectId": "j_deck",
+    "clientId": "c_q_deck",
+    "contractId": "ct_deck",
+    "milestoneId": null,
+    "paymentTermId": "t2",
+    "paymentTermLabel": "40 % à la fin de la charpente",
+    "creditNoteForId": null,
+    "issueDate": "2026-11-18T15:00:00.000Z",
+    "dueDate": "2026-12-03T15:00:00.000Z",
+    "scheduledFor": null,
+    "contractor": {
+     "name": "Construction Boréal inc.",
+     "address": "155, boul. Saint-Joseph",
+     "city": "Gatineau",
+     "province": "QC",
+     "postalCode": "J8Y 3W9",
+     "email": "bureau@example.invalid",
+     "phone": "819-555-0142",
+     "gstHstNumber": "123456789 RT0001",
+     "qstNumber": "1234567890 TQ0001",
+     "licenceNumber": "5678-1234-01"
+    },
+    "customer": {
+     "name": "Mathieu Bélanger",
+     "address": "48, rue des Érables",
+     "city": "Gatineau",
+     "province": "QC",
+     "postalCode": "J9H 4K2",
+     "email": "client@example.invalid"
+    },
+    "siteAddress": "48, rue des Érables, Gatineau QC J9H 4K2",
+    "lines": [
+     {
+      "description": "Facturation progressive : charpente, solives et lambourde terminées (40 % du contrat)",
+      "quantity": 1,
+      "unitCents": 473600,
+      "amountCents": 473600
+     }
+    ],
+    "subtotalCents": 473600,
+    "holdbackPercent": 0,
+    "holdbackCents": 0,
+    "taxableCents": 473600,
+    "taxLines": [
+     {
+      "code": "GST",
+      "label": "TPS",
+      "rate": 5,
+      "amountCents": 23680,
+      "registrationNumber": "123456789 RT0001"
+     },
+     {
+      "code": "QST",
+      "label": "TVQ",
+      "rate": 9.975,
+      "amountCents": 47242,
+      "registrationNumber": "1234567890 TQ0001"
+     }
+    ],
+    "taxCents": 70922,
+    "totalCents": 544522,
+    "paidCents": 0,
+    "notes": "Paiement par Virement Interac à l'adresse ci-dessous.",
+    "paymentInstructions": {
+     "etransferEmail": "pay@example.invalid",
+     "chequePayableTo": "Construction Boréal inc.",
+     "note": null
+    },
+    "sentAt": "2026-11-18T15:00:00.000Z",
+    "viewedAt": "2026-11-19T01:12:00.000Z",
+    "paidAt": null,
+    "voidedAt": null,
+    "voidReason": null,
+    "autoSendAt": null,
+    "reminderCount": 0,
+    "lastReminderAt": null,
+    "createdAt": "2026-11-18T15:00:00.000Z",
+    "updatedAt": "2026-11-18T15:00:00.000Z",
+    "archivedAt": null,
+    "projectName": "Terrasse en cèdre 14 x 16",
+    "clientName": "Mathieu Bélanger",
+    "balanceCents": 544522,
+    "hasPdf": true
+   },
+   "payments": [],
+   "events": [
+    {
+     "id": "ie1",
+     "type": "sent",
+     "actor": "contractor",
+     "detail": null,
+     "createdAt": "2026-11-18T15:00:00.000Z"
+    },
+    {
+     "id": "ie2",
+     "type": "viewed",
+     "actor": "customer",
+     "detail": null,
+     "createdAt": "2026-11-19T01:12:00.000Z"
+    }
+   ],
+   "html": "<div class=\"inv\"><h2 class=\"doc-title\">Terrasse en cèdre 14 x 16</h2>\n<div class=\"sub\">Facture n° <strong>INV-2026-041</strong> · Émise le 18 novembre 2026 · Échéance: 3 décembre 2026 · Net 15 jours</div>\n<div class=\"meta\"><div><div class=\"party-label\">De</div><div class=\"party-name\">Construction Boréal inc.</div><div class=\"party-line\">155, boul. Saint-Joseph</div><div class=\"party-line\">Gatineau, QC, J8Y 3W9</div><div class=\"party-line\">Courriel: bureau@example.invalid</div><div class=\"party-line\">Téléphone: 819-555-0142</div><div class=\"party-line\">N° TPS/TVH: 123456789 RT0001</div><div class=\"party-line\">N° TVQ: 1234567890 TQ0001</div><div class=\"party-line\">N° de licence: 5678-1234-01</div></div><div><div class=\"party-label\">Facturer à</div><div class=\"party-name\">Mathieu Bélanger</div><div class=\"party-line\">48, rue des Érables</div><div class=\"party-line\">Gatineau, QC, J9H 4K2</div><div class=\"party-line\">Courriel: client@example.invalid</div></div></div>\n<table class=\"kv\"><tr><th>Chantier</th><td>48, rue des Érables, Gatineau QC J9H 4K2</td></tr><tr><th>Versement</th><td>40 % à la fin de la charpente</td></tr></table>\n<div class=\"table-wrap\"><table class=\"grid\"><thead><tr><th>Description</th><th class=\"num\">Qté</th><th class=\"num\">Prix unitaire</th><th class=\"num\">Montant</th></tr></thead><tbody><tr><td>Facturation progressive : charpente, solives et lambourde terminées (40 % du contrat)</td><td class=\"num\">1</td><td class=\"num\">4 736,00 $</td><td class=\"num\">4 736,00 $</td></tr></tbody></table></div>\n<table class=\"totals\"><tr><th scope=\"row\">Sous-total</th><td class=\"num\">4 736,00 $</td></tr><tr><th scope=\"row\">TPS 5% <span style=\"color:#6b7280\">(123456789 RT0001)</span></th><td class=\"num\">236,80 $</td></tr><tr><th scope=\"row\">TVQ 9.975% <span style=\"color:#6b7280\">(1234567890 TQ0001)</span></th><td class=\"num\">472,42 $</td></tr><tr class=\"total\"><th scope=\"row\">Total à payer</th><td class=\"num\">5 445,22 $</td></tr></table>\n<div class=\"box\"><h3>Modalités de paiement</h3><div>Virement Interac à <strong>pay@example.invalid</strong></div><div>Chèque à l'ordre de <strong>Construction Boréal inc.</strong></div><div class=\"note\">Veuillez indiquer le numéro de facture comme référence de paiement.</div></div>\n<div class=\"note\"><strong>Notes:</strong> Paiement par Virement Interac à l'adresse ci-dessous.</div>\n<p class=\"thanks\">Merci de votre confiance.</p></div>",
+   "css": "\n.inv { font-family: system-ui,-apple-system,\"Segoe UI\",sans-serif; color:#111827; font-size:14px; line-height:1.5; position:relative; }\n.inv .wm { position:absolute; right:0; top:0; font-size:12px; font-weight:800; letter-spacing:0.12em; padding:4px 10px; border-radius:6px; border:2px solid currentColor; }\n.inv .wm.draft { color:#92400e; } .inv .wm.void { color:#991b1b; } .inv .wm.paid { color:#047857; } .inv .wm.overdue { color:#b91c1c; } .inv .wm.partially_paid { color:#1d4ed8; }\n.inv h1, .inv h2.doc-title { font-size:24px; margin:0 0 2px; letter-spacing:-0.01em; }\n.inv .sub { color:#6b7280; font-size:13px; margin-bottom:20px; }\n.inv .meta { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }\n.inv .party-label { font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#6b7280; margin-bottom:2px; }\n.inv .party-name { font-weight:700; font-size:15px; }\n.inv .party-line { font-size:12.5px; color:#374151; }\n.inv table.kv { font-size:13px; border-collapse:collapse; margin-bottom:16px; }\n.inv table.kv th { text-align:left; color:#6b7280; font-weight:600; padding:2px 16px 2px 0; font-size:12px; white-space:nowrap; }\n.inv table.kv td { padding:2px 0; }\n.inv table.grid { width:100%; border-collapse:collapse; font-size:13px; margin:8px 0 12px; }\n.inv table.grid th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#6b7280; border-bottom:1px solid #d1d5db; padding:6px 8px; }\n.inv table.grid td { padding:7px 8px; border-bottom:1px solid #f3f4f6; vertical-align:top; }\n.inv table.grid .num { text-align:right; white-space:nowrap; }\n.inv table.totals { width:100%; max-width:360px; margin-left:auto; border-collapse:collapse; font-size:13.5px; }\n.inv table.totals td, .inv table.totals th { padding:5px 8px; font-weight:inherit; text-align:left; }\n.inv table.totals th { color:inherit; }\n.inv table.totals tr.total td, .inv table.totals tr.total th { font-weight:800; font-size:16px; border-top:2px solid #111827; background:#f9fafb; }\n.inv table.totals tr.muted td, .inv table.totals tr.muted th { color:#6b7280; }\n.inv table.totals tr.balance td, .inv table.totals tr.balance th { font-weight:700; color:#047857; }\n.inv .box { background:#f5f3ff; border:1px solid #ede9fe; border-radius:10px; padding:12px 16px; margin:20px 0 8px; font-size:13px; }\n.inv .box h2, .inv .box h3 { margin:0 0 6px; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:#5b21b6; }\n.inv .note { font-size:12px; color:#5b5f6b; margin-top:8px; }\n.inv .thanks { margin-top:18px; color:#374151; font-size:13px; }\n.inv .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }\n@media (max-width: 480px) {\n  .inv .meta { grid-template-columns:1fr; gap:12px; }\n  .inv table.grid th, .inv table.grid td { padding:6px 4px; font-size:12px; }\n  .inv table.totals { max-width:none; }\n}\n",
+   "publicUrl": "https://quoteai.ca/i/sample",
+   "reminderDays": [
+    3,
+    7,
+    14
+   ]
+  },
+  "contract": {
+   "contract": {
+    "id": "ct_deck",
+    "quoteId": "q_deck",
+    "clientId": "c_q_deck",
+    "projectId": "j_deck",
+    "kind": "contract",
+    "parentContractId": null,
+    "changeOrderId": null,
+    "contractNumber": "C-2026-027",
+    "status": "signed",
+    "province": "QC",
+    "language": "fr",
+    "templateKey": "QC",
+    "document": {
+     "templateKey": "QC",
+     "templateVersion": 1,
+     "language": "fr",
+     "title": "Contrat d'entreprise – Travaux de construction et de rénovation",
+     "sections": [
+      {
+       "key": "parties",
+       "heading": "1. Parties",
+       "body": "",
+       "kind": "data",
+       "editable": false
+      },
+      {
+       "key": "scope",
+       "heading": "2. Description des travaux",
+       "body": "Construction d'une terrasse de 14 x 16 pi au niveau du sol, à l'arrière de la maison, fixée à la maison par une lambourde avec solin.\n- Six fondations de béton sous la ligne de gel, solives de 2x8 traité à 16 po c/c\n- Planches de cèdre rouge 5/4 x 6 avec attaches invisibles\n- Garde-corps en cèdre sur trois côtés et un escalier de 4 marches\nLes plans et le permis de la Ville de Gatineau sont inclus. La teinture n'est pas incluse.",
+       "kind": "ai",
+       "editable": true
+      },
+      {
+       "key": "price",
+       "heading": "3. Prix du contrat",
+       "body": "Le Client s'engage à payer à l'Entrepreneur le prix du contrat de **13 613,04 $** (11 840,00 $ avant taxes applicables) pour les Travaux, tel que détaillé dans le tableau ci-dessous. Le prix du contrat est un prix forfaitaire pour les Travaux décrits à l'article 2 et ne peut être modifié que par un avenant écrit conformément à l'article 6.",
+       "kind": "data",
+       "editable": false
+      },
+      {
+       "key": "payment",
+       "heading": "4. Modalités de paiement",
+       "body": "Les paiements sont exigibles selon l'échéancier ci-dessous. Chaque facture est payable dans le nombre de jours indiqué à compter de sa date. Les sommes impayées à l'échéance portent intérêt au taux de 1,5 % par mois (19,56 % par année). L'Entrepreneur peut suspendre les Travaux lorsqu'une facture est en souffrance depuis plus de 10 jours, et l'échéancier est prolongé en conséquence.\n\nModes de paiement acceptés : Virement Interac, chèque ou tout autre mode convenu par écrit.",
+       "kind": "data",
+       "editable": false
+      },
+      {
+       "key": "schedule",
+       "heading": "5. Échéancier des travaux",
+       "body": "Les travaux commencent vers le 24 novembre 2026 et durent environ deux semaines, selon la météo.",
+       "kind": "ai",
+       "editable": true
+      },
+      {
+       "key": "changes",
+       "heading": "6. Modifications aux travaux",
+       "body": "Toute modification aux Travaux (ajouts, retraits, substitutions ou changements demandés par le Client ou exigés par des conditions imprévues ou par les autorités) doit faire l'objet d'un avenant écrit précisant la modification, son prix et son effet sur l'échéancier. L'Entrepreneur n'est pas tenu d'exécuter les travaux modifiés tant que l'avenant n'a pas été approuvé par écrit (y compris par voie électronique) par le Client. Le prix du contrat et l'échéancier sont ajustés par chaque avenant approuvé.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "permits",
+       "heading": "7. Permis, codes et conformité",
+       "body": "Sauf indication contraire à l'article 2, l'Entrepreneur présente les demandes de permis de construction requis pour les Travaux; le coût des permis et des frais d'inspection n'est pas compris dans le prix du contrat et sera facturé au prix coûtant. Les Travaux sont exécutés conformément au code du bâtiment applicable et aux règlements municipaux. Le Client est responsable d'obtenir toute approbation requise d'un syndicat de copropriété, d'un propriétaire ou d'une association de propriétaires.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "materials",
+       "heading": "8. Matériaux, exécution et garantie",
+       "body": "L'Entrepreneur fournit des matériaux neufs de la qualité décrite à l'article 2 et exécute les Travaux selon les règles de l'art. L'Entrepreneur garantit la qualité de son exécution pendant **24 mois** à compter de la fin substantielle des Travaux et corrigera sans frais tout vice d'exécution signalé par écrit pendant cette période. Les garanties des fabricants sur les matériaux, appareils et équipements sont transférées au Client. La présente garantie ne couvre pas l'usure normale, les dommages causés par des tiers, le mauvais usage, le défaut d'entretien ni les matériaux fournis par le Client. Les garanties légales prévues par le Code civil du Québec et la Loi sur la protection du consommateur, lorsqu'elles s'appliquent, demeurent en vigueur.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "site",
+       "heading": "9. Conditions du chantier et accès",
+       "body": "Le Client donne à l'Entrepreneur un accès raisonnable au chantier pendant les heures de travail, fournit l'eau et l'électricité et retire ou protège ses biens dans la zone des travaux. Si l'Entrepreneur découvre des conditions qui ne pouvaient raisonnablement être prévues (notamment des dommages cachés, de l'amiante, de la moisissure, des déficiences structurales ou des ouvrages existants non conformes), il en avise le Client et tout travail additionnel est traité par avenant conformément à l'article 6. L'Entrepreneur maintient le chantier raisonnablement propre et enlève les débris de construction à la fin des Travaux.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "insurance",
+       "heading": "10. Assurances et indemnisation des travailleurs",
+       "body": "L'Entrepreneur maintient une assurance responsabilité civile générale d'au moins 2 000 000 $ par sinistre, est inscrit en règle auprès de la CNESST (ou couvre ses travailleurs comme l'exige la loi) et en fournira la preuve sur demande. Le Client est responsable d'assurer l'immeuble et son contenu. Aucune partie n'est responsable envers l'autre des pertes indirectes ou consécutives.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "holdback",
+       "heading": "11. Retenue et privilèges",
+       "body": "Les parties conviennent qu'aucune retenue ne sera déduite des paiements progressifs. Les droits de l'Entrepreneur en vertu du *Code civil du Québec*, y compris l'hypothèque légale des personnes ayant participé à la construction (art. 2724 et s.), ne sont pas abandonnés par le présent contrat.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "consumer",
+       "heading": "12. Droit de résolution",
+       "body": "Le présent contrat n'a pas été conclu à la résidence du Client ni ailleurs qu'à l'établissement de l'Entrepreneur. Aucune disposition du présent contrat ne limite les droits que le Client peut avoir en vertu de la législation sur la protection du consommateur de Québec.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "termination",
+       "heading": "13. Résiliation",
+       "body": "Chaque partie peut résilier le présent contrat par avis écrit si l'autre partie commet un manquement important et n'y remédie pas dans les dix (10) jours suivant un avis écrit. Si le Client résilie sans motif, il paie les Travaux exécutés et les matériaux commandés jusqu'à la date de résiliation, plus les frais raisonnables de démobilisation. À la résiliation, l'Entrepreneur laisse le chantier dans un état sécuritaire.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "disputes",
+       "heading": "14. Différends et droit applicable",
+       "body": "Les parties tentent d'abord de régler tout différend par discussion de bonne foi. À défaut de règlement dans les 30 jours, chaque partie peut soumettre le différend à la médiation avant d'entreprendre des procédures judiciaires, sauf pour les questions de privilège ou d'injonction urgente. Le présent contrat est régi par les lois de Québec et les lois fédérales du Canada qui y sont applicables, et les tribunaux de Québec sont compétents.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "general",
+       "heading": "15. Dispositions générales",
+       "body": "Le présent contrat, y compris la soumission sur laquelle il repose (n° Q-2026-114) et tout avenant approuvé, constitue l'entente complète entre les parties et remplace toutes discussions antérieures. Il ne peut être modifié que par écrit. Si une disposition est inexécutoire, les autres demeurent en vigueur. Le Client ne peut céder le présent contrat sans le consentement de l'Entrepreneur. Les avis peuvent être transmis par courriel aux adresses indiquées à l'article 1.\n\n**Signature électronique.** Les parties conviennent que le présent contrat peut être signé électroniquement et que les signatures électroniques ainsi que les copies du contrat ont la même valeur juridique que les signatures manuscrites originales et les documents papier, conformément à la législation applicable sur le commerce électronique.",
+       "kind": "legal",
+       "editable": false
+      },
+      {
+       "key": "signatures",
+       "heading": "16. Signatures",
+       "body": "En signant ci-dessous, chaque partie confirme avoir lu et compris le présent contrat, y compris le droit de résolution prévu à l'article 12, et accepte d'y être liée.",
+       "kind": "data",
+       "editable": false
+      }
+     ]
+    },
+    "variables": {
+     "contractNumber": "C-2026-027",
+     "quoteNumber": "Q-2026-114",
+     "contractor": {
+      "name": "Construction Boréal inc.",
+      "address": "155, boul. Saint-Joseph",
+      "city": "Gatineau",
+      "province": "QC",
+      "postalCode": "J8Y 3W9",
+      "email": "bureau@example.invalid",
+      "phone": "819-555-0142",
+      "businessNumber": "123456789 RT0001",
+      "licenceNumber": "5678-1234-01"
+     },
+     "customer": {
+      "name": "Mathieu Bélanger",
+      "address": "48, rue des Érables",
+      "city": "Gatineau",
+      "province": "QC",
+      "postalCode": "J9H 4K2",
+      "email": "client@example.invalid"
+     },
+     "siteAddress": "48, rue des Érables, Gatineau QC J9H 4K2",
+     "province": "QC",
+     "projectTitle": "Terrasse en cèdre 14 x 16",
+     "priceLines": [
+      {
+       "label": "Fondations, charpente et lambourde",
+       "amount": 4980
+      },
+      {
+       "label": "Planchers de cèdre, garde-corps et escalier",
+       "amount": 6860
+      }
+     ],
+     "discount": null,
+     "subtotal": 11840,
+     "taxLines": [
+      {
+       "code": "GST",
+       "label": "TPS",
+       "rate": 5,
+       "amount": 592
+      },
+      {
+       "code": "QST",
+       "label": "TVQ",
+       "rate": 9.975,
+       "amount": 1181.04
+      }
+     ],
+     "taxTotal": 1773.04,
+     "total": 13613.04,
+     "paymentSchedule": {
+      "currency": "CAD",
+      "derived": false,
+      "holdback": {
+       "enabled": false,
+       "percent": 10
+      },
+      "terms": [
+       {
+        "id": "t1",
+        "type": "deposit",
+        "label": "Acompte à la signature",
+        "trigger": "on_signing",
+        "amountType": "percent",
+        "value": 20,
+        "dueDays": 7
+       },
+       {
+        "id": "t2",
+        "type": "milestone",
+        "label": "À la fin de la charpente",
+        "trigger": "milestone",
+        "milestoneKey": "framing",
+        "amountType": "percent",
+        "value": 40,
+        "dueDays": 15
+       },
+       {
+        "id": "t3",
+        "type": "completion",
+        "label": "À la fin des travaux et après la visite finale",
+        "trigger": "on_completion",
+        "amountType": "percent",
+        "value": 40,
+        "dueDays": 15
+       }
+      ]
+     },
+     "startDate": "2026-11-24",
+     "estimatedDurationWeeks": 2,
+     "warrantyMonths": 24,
+     "englishRequestedInQuebec": false,
+     "directAgreement": false
+    },
+    "contractValueCents": 1361304,
+    "holdbackEnabled": false,
+    "holdbackPercent": 0,
+    "hasSignedPdf": true,
+    "signedPdfHash": "9f2c41d07ab3e5c8",
+    "unsignedPdfHash": "51b0e9a7c3d2f146",
+    "sentAt": "2026-11-07T16:20:00.000Z",
+    "expiresAt": "2026-12-07T16:20:00.000Z",
+    "signedAt": "2026-11-09T14:05:00.000Z",
+    "voidedAt": null,
+    "voidReason": null,
+    "reminderCount": 0,
+    "createdAt": "2026-11-07T16:00:00.000Z",
+    "updatedAt": "2026-11-09T14:05:00.000Z",
+    "archivedAt": null,
+    "signers": [
+     {
+      "id": "s1",
+      "role": "contractor",
+      "name": "Alexandre Martin",
+      "email": "bureau@example.invalid",
+      "status": "signed",
+      "signatureType": "typed",
+      "signedAt": "2026-11-08T19:40:00.000Z",
+      "viewedAt": "2026-11-08T19:40:00.000Z",
+      "declinedAt": null,
+      "declineReason": null,
+      "signatureData": "Alexandre Martin"
+     },
+     {
+      "id": "s2",
+      "role": "customer",
+      "name": "Mathieu Bélanger",
+      "email": "client@example.invalid",
+      "status": "signed",
+      "signatureType": "typed",
+      "signedAt": "2026-11-09T14:05:00.000Z",
+      "viewedAt": "2026-11-09T13:58:00.000Z",
+      "declinedAt": null,
+      "declineReason": null,
+      "signatureData": "Mathieu Bélanger"
+     }
+    ],
+    "events": [
+     {
+      "id": "e1",
+      "type": "sent",
+      "actor": "contractor",
+      "detail": null,
+      "createdAt": "2026-11-07T16:20:00.000Z"
+     },
+     {
+      "id": "e2",
+      "type": "viewed",
+      "actor": "customer",
+      "detail": null,
+      "createdAt": "2026-11-09T13:58:00.000Z"
+     },
+     {
+      "id": "e3",
+      "type": "signed",
+      "actor": "customer",
+      "detail": null,
+      "createdAt": "2026-11-09T14:05:00.000Z"
+     }
+    ]
+   },
+   "html": "<div class=\"contract\"><h2 class=\"doc-title\">Contrat d'entreprise – Travaux de construction et de rénovation</h2><div class=\"meta\">Contrat n° C-2026-027 · Date: 7 novembre 2026</div>\n<h2>1. Parties</h2>\n<div class=\"parties\"><div class=\"party\"><div class=\"party-label\">Entrepreneur</div><div class=\"party-name\">Construction Boréal inc.</div><div class=\"party-line\">155, boul. Saint-Joseph</div><div class=\"party-line\">Gatineau, QC, J8Y 3W9</div><div class=\"party-line\">Courriel: bureau@example.invalid</div><div class=\"party-line\">Téléphone: 819-555-0142</div><div class=\"party-line\">N° TPS/TVH: 123456789 RT0001</div><div class=\"party-line\">N° de licence: 5678-1234-01</div></div><div class=\"party\"><div class=\"party-label\">Client</div><div class=\"party-name\">Mathieu Bélanger</div><div class=\"party-line\">48, rue des Érables</div><div class=\"party-line\">Gatineau, QC, J9H 4K2</div><div class=\"party-line\">Courriel: client@example.invalid</div></div></div>\n<table class=\"kv\"><tr><th>Adresse du chantier</th><td>48, rue des Érables, Gatineau QC J9H 4K2</td></tr><tr><th>Projet</th><td>Terrasse en cèdre 14 x 16</td></tr><tr><th>Selon la soumission n°</th><td>Q-2026-114</td></tr></table>\n<h2>2. Description des travaux</h2>\n<p>Construction d'une terrasse de 14 x 16 pi au niveau du sol, à l'arrière de la maison, fixée à la maison par une lambourde avec solin.</p>\n<ul><li>Six fondations de béton sous la ligne de gel, solives de 2x8 traité à 16 po c/c</li><li>Planches de cèdre rouge 5/4 x 6 avec attaches invisibles</li><li>Garde-corps en cèdre sur trois côtés et un escalier de 4 marches</li></ul>\n<p>Les plans et le permis de la Ville de Gatineau sont inclus. La teinture n'est pas incluse.</p>\n<h2>3. Prix du contrat</h2>\n<p>Le Client s'engage à payer à l'Entrepreneur le prix du contrat de <strong>13 613,04 $</strong> (11 840,00 $ avant taxes applicables) pour les Travaux, tel que détaillé dans le tableau ci-dessous. Le prix du contrat est un prix forfaitaire pour les Travaux décrits à l'article 2 et ne peut être modifié que par un avenant écrit conformément à l'article 6.</p><div class=\"table-wrap\"><table class=\"grid\"><thead><tr><th>Description</th><th class=\"num\">Montant</th></tr></thead><tbody><tr><td>Fondations, charpente et lambourde</td><td class=\"num\">4 980,00 $</td></tr><tr><td>Planchers de cèdre, garde-corps et escalier</td><td class=\"num\">6 860,00 $</td></tr><tr class=\"sub\"><td>Sous-total (avant taxes)</td><td class=\"num\">11 840,00 $</td></tr><tr><td>TPS (5%)</td><td class=\"num\">592,00 $</td></tr><tr><td>TVQ (9.975%)</td><td class=\"num\">1 181,04 $</td></tr><tr class=\"total\"><td>Prix du contrat (taxes incluses)</td><td class=\"num\">13 613,04 $</td></tr></tbody></table></div>\n<h2>4. Modalités de paiement</h2>\n<p>Les paiements sont exigibles selon l'échéancier ci-dessous. Chaque facture est payable dans le nombre de jours indiqué à compter de sa date. Les sommes impayées à l'échéance portent intérêt au taux de 1,5 % par mois (19,56 % par année). L'Entrepreneur peut suspendre les Travaux lorsqu'une facture est en souffrance depuis plus de 10 jours, et l'échéancier est prolongé en conséquence.</p>\n<p>Modes de paiement acceptés : Virement Interac, chèque ou tout autre mode convenu par écrit.</p><div class=\"table-wrap\"><table class=\"grid\"><thead><tr><th>Versement</th><th>Échéance</th><th class=\"num\">%</th><th class=\"num\">Montant</th></tr></thead><tbody><tr><td>1. Acompte à la signature</td><td>À la signature, net 7 jours</td><td class=\"num\">20%</td><td class=\"num\">2 722,61 $</td></tr><tr><td>2. À la fin de la charpente</td><td>À l'atteinte du jalon, net 15 jours</td><td class=\"num\">40%</td><td class=\"num\">5 445,22 $</td></tr><tr><td>3. À la fin des travaux et après la visite finale</td><td>À la fin des travaux, net 15 jours</td><td class=\"num\">40%</td><td class=\"num\">5 445,22 $</td></tr></tbody></table></div>\n<h2>5. Échéancier des travaux</h2>\n<p>Les travaux commencent vers le 24 novembre 2026 et durent environ deux semaines, selon la météo.</p>\n<h2>6. Modifications aux travaux</h2>\n<p>Toute modification aux Travaux (ajouts, retraits, substitutions ou changements demandés par le Client ou exigés par des conditions imprévues ou par les autorités) doit faire l'objet d'un avenant écrit précisant la modification, son prix et son effet sur l'échéancier. L'Entrepreneur n'est pas tenu d'exécuter les travaux modifiés tant que l'avenant n'a pas été approuvé par écrit (y compris par voie électronique) par le Client. Le prix du contrat et l'échéancier sont ajustés par chaque avenant approuvé.</p>\n<h2>7. Permis, codes et conformité</h2>\n<p>Sauf indication contraire à l'article 2, l'Entrepreneur présente les demandes de permis de construction requis pour les Travaux; le coût des permis et des frais d'inspection n'est pas compris dans le prix du contrat et sera facturé au prix coûtant. Les Travaux sont exécutés conformément au code du bâtiment applicable et aux règlements municipaux. Le Client est responsable d'obtenir toute approbation requise d'un syndicat de copropriété, d'un propriétaire ou d'une association de propriétaires.</p>\n<h2>8. Matériaux, exécution et garantie</h2>\n<p>L'Entrepreneur fournit des matériaux neufs de la qualité décrite à l'article 2 et exécute les Travaux selon les règles de l'art. L'Entrepreneur garantit la qualité de son exécution pendant <strong>24 mois</strong> à compter de la fin substantielle des Travaux et corrigera sans frais tout vice d'exécution signalé par écrit pendant cette période. Les garanties des fabricants sur les matériaux, appareils et équipements sont transférées au Client. La présente garantie ne couvre pas l'usure normale, les dommages causés par des tiers, le mauvais usage, le défaut d'entretien ni les matériaux fournis par le Client. Les garanties légales prévues par le Code civil du Québec et la Loi sur la protection du consommateur, lorsqu'elles s'appliquent, demeurent en vigueur.</p>\n<h2>9. Conditions du chantier et accès</h2>\n<p>Le Client donne à l'Entrepreneur un accès raisonnable au chantier pendant les heures de travail, fournit l'eau et l'électricité et retire ou protège ses biens dans la zone des travaux. Si l'Entrepreneur découvre des conditions qui ne pouvaient raisonnablement être prévues (notamment des dommages cachés, de l'amiante, de la moisissure, des déficiences structurales ou des ouvrages existants non conformes), il en avise le Client et tout travail additionnel est traité par avenant conformément à l'article 6. L'Entrepreneur maintient le chantier raisonnablement propre et enlève les débris de construction à la fin des Travaux.</p>\n<h2>10. Assurances et indemnisation des travailleurs</h2>\n<p>L'Entrepreneur maintient une assurance responsabilité civile générale d'au moins 2 000 000 $ par sinistre, est inscrit en règle auprès de la CNESST (ou couvre ses travailleurs comme l'exige la loi) et en fournira la preuve sur demande. Le Client est responsable d'assurer l'immeuble et son contenu. Aucune partie n'est responsable envers l'autre des pertes indirectes ou consécutives.</p>\n<h2>11. Retenue et privilèges</h2>\n<p>Les parties conviennent qu'aucune retenue ne sera déduite des paiements progressifs. Les droits de l'Entrepreneur en vertu du <em>Code civil du Québec</em>, y compris l'hypothèque légale des personnes ayant participé à la construction (art. 2724 et s.), ne sont pas abandonnés par le présent contrat.</p>\n<h2>12. Droit de résolution</h2>\n<p>Le présent contrat n'a pas été conclu à la résidence du Client ni ailleurs qu'à l'établissement de l'Entrepreneur. Aucune disposition du présent contrat ne limite les droits que le Client peut avoir en vertu de la législation sur la protection du consommateur de Québec.</p>\n<h2>13. Résiliation</h2>\n<p>Chaque partie peut résilier le présent contrat par avis écrit si l'autre partie commet un manquement important et n'y remédie pas dans les dix (10) jours suivant un avis écrit. Si le Client résilie sans motif, il paie les Travaux exécutés et les matériaux commandés jusqu'à la date de résiliation, plus les frais raisonnables de démobilisation. À la résiliation, l'Entrepreneur laisse le chantier dans un état sécuritaire.</p>\n<h2>14. Différends et droit applicable</h2>\n<p>Les parties tentent d'abord de régler tout différend par discussion de bonne foi. À défaut de règlement dans les 30 jours, chaque partie peut soumettre le différend à la médiation avant d'entreprendre des procédures judiciaires, sauf pour les questions de privilège ou d'injonction urgente. Le présent contrat est régi par les lois de Québec et les lois fédérales du Canada qui y sont applicables, et les tribunaux de Québec sont compétents.</p>\n<h2>15. Dispositions générales</h2>\n<p>Le présent contrat, y compris la soumission sur laquelle il repose (n° Q-2026-114) et tout avenant approuvé, constitue l'entente complète entre les parties et remplace toutes discussions antérieures. Il ne peut être modifié que par écrit. Si une disposition est inexécutoire, les autres demeurent en vigueur. Le Client ne peut céder le présent contrat sans le consentement de l'Entrepreneur. Les avis peuvent être transmis par courriel aux adresses indiquées à l'article 1.</p>\n<p><strong>Signature électronique.</strong> Les parties conviennent que le présent contrat peut être signé électroniquement et que les signatures électroniques ainsi que les copies du contrat ont la même valeur juridique que les signatures manuscrites originales et les documents papier, conformément à la législation applicable sur le commerce électronique.</p>\n<h2>16. Signatures</h2>\n<p>En signant ci-dessous, chaque partie confirme avoir lu et compris le présent contrat, y compris le droit de résolution prévu à l'article 12, et accepte d'y être liée.</p><div class=\"signatures\"><div class=\"sig-block\"><div class=\"party-label\">Entrepreneur</div><div class=\"party-name\">Construction Boréal inc.</div><div class=\"sig-typed\">Alexandre Martin</div><div class=\"sig-meta\">Signé par Alexandre Martin · Signé le 8 novembre 2026 à 14 h 40</div></div><div class=\"sig-block\"><div class=\"party-label\">Client</div><div class=\"party-name\">Mathieu Bélanger</div><div class=\"sig-typed\">Mathieu Bélanger</div><div class=\"sig-meta\">Signé par Mathieu Bélanger · Signé le 9 novembre 2026 à 09 h 05</div></div></div></div>",
+   "css": "\n.contract { font-family: Georgia, \"Times New Roman\", serif; color:#111827; line-height:1.55; font-size:14px; }\n.contract h1, .contract h2.doc-title { font-family: system-ui,-apple-system,sans-serif; font-size:22px; letter-spacing:-0.01em; margin:0 0 4px; }\n.contract .meta { font-family: system-ui,-apple-system,sans-serif; color:#6b7280; font-size:12px; margin-bottom:24px; }\n.contract h2 { font-family: system-ui,-apple-system,sans-serif; font-size:14px; text-transform:uppercase; letter-spacing:0.04em; color:#374151; margin:28px 0 8px; padding-bottom:4px; border-bottom:1px solid #e5e7eb; }\n.contract p { margin:0 0 10px; }\n.contract ul { margin:0 0 10px 20px; padding:0; }\n.contract li { margin:0 0 4px; }\n.contract .parties { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:12px; }\n.contract .party { border:1px solid #e5e7eb; border-radius:8px; padding:12px; }\n.contract .party-label { font-family: system-ui,sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#6b7280; }\n.contract .party-name { font-weight:700; margin:2px 0 4px; }\n.contract .party-line { font-size:12.5px; color:#374151; overflow-wrap:anywhere; }\n.contract table.kv { width:100%; border-collapse:collapse; font-size:13px; margin-bottom:8px; }\n.contract table.kv th { text-align:left; color:#6b7280; font-weight:600; width:30%; padding:4px 0; font-family: system-ui,sans-serif; font-size:12px; }\n.contract table.kv td { padding:4px 0; }\n.contract table.grid { width:100%; border-collapse:collapse; font-size:13px; margin:8px 0 12px; }\n.contract table.grid th { text-align:left; font-family: system-ui,sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#6b7280; border-bottom:1px solid #d1d5db; padding:6px 8px; }\n.contract table.grid td { padding:6px 8px; border-bottom:1px solid #f3f4f6; vertical-align:top; }\n.contract table.grid .num { text-align:right; white-space:nowrap; }\n.contract table.grid tr.sub td { font-weight:600; border-top:1px solid #d1d5db; }\n.contract table.grid tr.total td { font-weight:700; font-size:14px; background:#f9fafb; }\n.contract .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }\n.contract .signatures { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:16px; }\n@media (max-width: 480px) {\n  .contract .parties { grid-template-columns:1fr; }\n  .contract .signatures { grid-template-columns:1fr; gap:16px; }\n  .contract table.grid th, .contract table.grid td { padding:6px 4px; font-size:12px; }\n}\n.contract .sig-block { border-top:1px solid #9ca3af; padding-top:8px; min-height:110px; }\n.contract .sig-empty { color:#6b7280; font-style:italic; margin-top:28px; font-size:12px; }\n.contract .sig-img { max-height:70px; max-width:240px; display:block; margin:6px 0; }\n.contract .sig-typed { font-family: \"Brush Script MT\", \"Segoe Script\", cursive; font-size:28px; margin:8px 0; }\n.contract .sig-meta { font-family: system-ui,sans-serif; font-size:11px; color:#6b7280; }\n.contract .draft-banner { font-family: system-ui,sans-serif; background:#fef3c7; color:#92400e; border:1px solid #fde68a; border-radius:8px; padding:8px 12px; font-size:12px; font-weight:600; margin-bottom:16px; text-align:center; }\n"
+  }
+ }
+}

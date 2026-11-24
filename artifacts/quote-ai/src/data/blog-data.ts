@@ -455,46 +455,143 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>quoteai writes an itemized quote like this with Ontario HST applied and sends it as a PDF, keeping the rebate as a note. For the wider structure of a winning quote, see <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>, and for heat pump jobs, <a href="/quotes/hvac-technician/">HVAC quote templates</a>.</p>
 `,
   "google-business-profile-guide-for-tradespeople": `
-<p>For local trades — electricians, plumbers, painters, landscapers — a well-optimized Google Business Profile is often the single highest-return marketing asset available, and it's free. Here's how to set one up properly.</p>
+<p>The profile is free, but Google sets the rules, and a profile that breaks them can be suspended. Every rule below links to Google's own Business Profile Help page, which is the final word when Google changes something.</p>
 
-<h2>Getting the basics right</h2>
+<h2>Check that you qualify, and pick the right profile type</h2>
+<p>Google's guidelines allow a profile for a business that <a href="https://support.google.com/business/answer/3038177" rel="noopener">either has a physical location customers can visit or travels to customers where they are</a>. Most trades are the second kind: a service-area business. The same guidelines rule out a virtual office (a rented address you don't work from) and P.O. boxes, and allow one profile per business.</p>
+<p>If clients don't come to you, don't show your address. The guidelines say a service-area business <a href="https://support.google.com/business/answer/3038177" rel="noopener">should hide its business address from customers</a>, and Google's service-area page goes further: if you don't serve customers at your business address, <a href="https://support.google.com/business/answer/9157481" rel="noopener">remove the address from your profile</a>. Show an address only if the location is staffed and receives customers during your stated hours.</p>
+
+<h2>Business name: what's on your truck, nothing more</h2>
+<p>The name must match the name you use in the real world: on signage, invoices and your website. Google states that adding <a href="https://support.google.com/business/answer/3038177" rel="noopener">unnecessary information to the name isn't permitted and could result in suspension</a>. The banned extras include marketing taglines, phone numbers, service descriptions and location details. "Lantern Creek Plumbing" is fine; "Lantern Creek Plumbing | 24/7 Emergency Plumber Ottawa" is not.</p>
+
+<h2>Categories: one accurate primary, a few extras at most</h2>
+<p>Google asks you to choose a <a href="https://support.google.com/business/answer/7249669" rel="noopener">primary category that best describes your business</a>, using a specific category from its list; you can't create your own. Additional categories are for distinct departments or services, and Google says not to select a category for every product or service. The same page warns that adding or editing a category can trigger a new verification, so settle categories before you verify.</p>
+
+<h2>Service areas: up to 20, by place</h2>
+<p>You can list <a href="https://support.google.com/business/answer/9157481" rel="noopener">up to 20 service areas by city, postal code or other area</a>. You can't set a radius, and the boundary of your overall area shouldn't be more than about 2 hours of driving from where the business is based. List the places you want work in, not every town you could reach.</p>
+
+<h2>Verification: Google picks the method</h2>
+<p>Your photos and videos only appear on Google <a href="https://support.google.com/business/answer/6103862" rel="noopener">after the profile is verified</a>. Google lists phone or text codes, email, a live video call, a video recording and a mailed postcard as methods, and states that <a href="https://support.google.com/business/answer/7107242" rel="noopener">verification methods are automatically determined by Google and can't be changed</a>. Postcard codes expire after 30 days, and verification reviews can take up to 5 business days. For a video, be ready to show the lettered van, tools and stock, and proof that you manage the business.</p>
+
+<h2>Hours, phone and website</h2>
 <ul>
-  <li><strong>Business name</strong> — use your actual registered business name, not a keyword-stuffed version (Google penalizes this)</li>
-  <li><strong>Category</strong> — choose the most accurate primary category (e.g., "Electrician," "Plumber," "General contractor") and add relevant secondary categories</li>
-  <li><strong>Service area</strong> — define this accurately; if you don't have a public storefront, set up a service-area business rather than a fixed address</li>
-  <li><strong>Phone number and website</strong> — make sure both are current and match what's on your website and invoices exactly</li>
-  <li><strong>Hours</strong> — keep these updated, especially around holidays; inaccurate hours are a common source of lost calls</li>
+  <li><strong>Hours.</strong> List the <a href="https://support.google.com/business/answer/3038177" rel="noopener">regular hours you are available to customers</a>, and use <a href="https://support.google.com/business/answer/7032839" rel="noopener">special hours</a> for holidays and shutdowns rather than editing your regular hours.</li>
+  <li><strong>Phone.</strong> A number that reaches your business directly, under your control, preferably local rather than a call centre. Premium-rate numbers aren't accepted.</li>
+  <li><strong>Website.</strong> Your own site, not a page that redirects elsewhere. Google's guidelines don't accept a social media page as the website link.</li>
+  <li><strong>Description.</strong> Plain facts about what you do and where, with no links or promotions, and <a href="https://support.google.com/business/answer/7032839" rel="noopener">under 750 characters</a>.</li>
 </ul>
 
-<h2>Photos matter more than most trades think</h2>
-<p>Profiles with regularly updated photos — completed jobs, before/afters, your crew and vehicles — consistently get more engagement than text-only profiles. Aim to add new photos monthly, not just once at setup. Before/after project photos in particular tend to perform well and give potential clients a concrete sense of your work quality.</p>
+<h2>Services, photos and posts</h2>
+<p>Service businesses can list <a href="https://support.google.com/business/answer/9455399" rel="noopener">services with descriptions and prices</a>, picking from Google's suggestions or adding custom ones. Custom service names must not include prices, phone numbers or personal information, and ones that break the policy are rejected automatically. Name services the way clients describe the problem: "Water heater replacement", "Sump pump installation", "Drain camera inspection". If you list prices, keep them current.</p>
+<p>For photos, Google asks for <a href="https://support.google.com/business/answer/6103862" rel="noopener">JPG or PNG files between 10 KB and 5 MB, ideally 720 by 720 pixels</a>, in focus and without heavy filters, showing what the business really looks like. Real job photos (a finished mechanical room, a neat copper run) tell a client more than stock images. Ask before photographing inside a home, and keep addresses and faces out of frame.</p>
+<p><a href="https://support.google.com/business/answer/7342169" rel="noopener">Posts</a> come in three types: updates, offers and events. Google reviews each post against its content policy after you publish, and a post with a phone number that can't be tied to your business may be rejected. Posts older than 6 months are archived unless they have a date range.</p>
 
-<h2>Services and descriptions</h2>
-<p>Fill out the services section in detail rather than leaving it generic. Instead of just "Plumbing," list specific services like "Drain cleaning," "Water heater installation," "Bathroom rough-in plumbing" — this helps your profile surface for more specific searches, which tend to convert better than broad ones.</p>
+<h2>Features that changed: messages and Q&amp;A</h2>
+<p>Don't plan around the chat button. Google ended it: <a href="https://support.google.com/business/answer/14919056" rel="noopener">as of July 31, 2024, chat and call history are no longer available in Business Profile</a>. Clients reach you by the phone number and website you list.</p>
+<p>Q&amp;A is also in flux. Google <a href="https://developers.google.com/my-business/content/qanda/change-log" rel="noopener">discontinued the Q&amp;A API on November 3, 2025</a>, and its Maps help page now says answering questions about places is <a href="https://support.google.com/maps/answer/7421661" rel="noopener">only available in certain countries and regions</a>. If questions appear on your profile, answer them; either way, put the common answers (areas served, emergency calls) in your description and services.</p>
 
-<h2>Posts and updates</h2>
-<p>Google Business Profile allows periodic posts (offers, updates, project highlights). Profiles that post at least a few times a month tend to see better visibility than dormant ones. This doesn't need to be elaborate — a photo from a recent job with a short caption is enough.</p>
+<h2>Reviews and replies</h2>
+<p>Google's tips are short: <a href="https://support.google.com/business/answer/3474122" rel="noopener">be professional and polite, keep it short, don't use replies to offer deals, and never share a reviewer's private information</a>. Incentives for reviews are prohibited. Asking, wording and handling bad reviews are covered in <a href="/blog/how-to-get-more-reviews-as-a-contractor/">how to get more reviews as a contractor</a>.</p>
 
-<h2>Why this connects to your quoting process</h2>
-<p>A strong Google Business Profile generates more inbound calls and requests — which means more quotes going out. If your quoting process is still slow or manual, an increase in leads from local search can quickly turn into a bottleneck rather than a win. Pairing a strong local presence with fast, professional quoting tools ensures the extra leads actually convert into booked jobs — see how this works for <a href="/quotes/general-contractor/">contractors and tradespeople</a>.</p>
+<h2>Owners, managers and who holds the keys</h2>
+<p>Create the profile under a Google account the business controls, not an employee's personal account. Google allows <a href="https://support.google.com/business/answer/3403100" rel="noopener">several owners but one primary owner</a>; managers can edit the profile, reply to reviews and post, but can't add or remove users or delete the profile. If a web designer or marketing firm sets up the profile, make sure you are the primary owner and they are a manager.</p>
+
+<h2>If the profile is suspended</h2>
+<p>Google may <a href="https://support.google.com/business/answer/4569145" rel="noopener">suspend or disable profiles that don't follow its guidelines</a>. The fix is an appeal through Google's appeals tool, signed in to the account that manages the profile. Evidence that helps includes business registration, a business licence, tax certificates and utility bills, with the name and address matching the profile. An appeal can be submitted only once, so fix the cause (often the name, the address or a duplicate profile) first. And Google is explicit: <strong>do not create a new profile for the same business</strong>.</p>
+
+<h2>Local Services Ads are a separate product</h2>
+<p>Local Services Ads are a paid Google program, separate from your free profile. You <a href="https://support.google.com/localservices/answer/6224841" rel="noopener">pay for leads related to your business</a>, they are offered in Canada, and only certain service categories are eligible, with an eligibility check on that page. Screening can include more than the profile does: Google says <a href="https://support.google.com/localservices/answer/6226575" rel="noopener">insurance checks and background checks are required for select users in Canada</a>, and for insurance a signed certificate of insurance is the best document. Judge it like any paid lead source, as in <a href="/blog/how-to-get-more-jobs-as-a-contractor-canada/">how to get more jobs as a contractor</a>.</p>
+
+<h2>Example: a filled profile for a two-person plumbing company in Ottawa</h2>
+<p>Example only. "Lantern Creek Plumbing" is fictional: an owner who is a licensed plumber, one apprentice, one van, working from the owner's home in Ottawa's west end.</p>
+<table>
+  <thead>
+    <tr><th>Field</th><th>What to enter</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Business name</td><td>Lantern Creek Plumbing</td><td>Matches the van, invoices and website; no city or keywords added</td></tr>
+    <tr><td>Business type</td><td>Service-area business, address removed</td><td>Clients don't visit the home office</td></tr>
+    <tr><td>Primary category</td><td>Plumber</td><td>The most specific category for the core business</td></tr>
+    <tr><td>Additional categories</td><td>None at first</td><td>Only for a distinct line of work; edits can trigger re-verification</td></tr>
+    <tr><td>Service areas</td><td>Kanata, Stittsville, Nepean, Barrhaven, Orléans, Gloucester, Manotick</td><td>Places the crew wants work in, under 2 hours' drive and 20 areas</td></tr>
+    <tr><td>Hours</td><td>Mon to Fri 7:30 a.m. to 5:00 p.m.; special hours for statutory holidays</td><td>The hours someone actually answers the phone</td></tr>
+    <tr><td>Phone</td><td>The business mobile, a 613 number</td><td>A local number the owner controls</td></tr>
+    <tr><td>Website</td><td>The company's own site</td><td>Not a Facebook page or a directory listing</td></tr>
+    <tr><td>Description</td><td>Residential repairs and replacements across Ottawa; licensed and insured; written itemized quotes</td><td>Plain facts, no links or promotions, under 750 characters</td></tr>
+    <tr><td>Services</td><td>Water heater replacement; Drain clearing; Sump pump installation; Fixture and faucet replacement; Backflow preventer installation</td><td>Clients' own words; no prices or phone numbers in service names</td></tr>
+    <tr><td>Photos</td><td>Logo, cover photo of the lettered van, 10 to 15 finished-job photos</td><td>Real work in focus, no addresses or faces visible</td></tr>
+    <tr><td>Posts</td><td>One update after a notable job, with a photo</td><td>Keeps the profile current; posts archive after 6 months</td></tr>
+    <tr><td>People and access</td><td>Owner as primary owner; office or marketing help as manager</td><td>The business keeps control if a helper leaves</td></tr>
+  </tbody>
+</table>
+<p>When the profile brings calls, the next step is a fast, clear quote. The <a href="/blog/how-to-quote-a-plumbing-job/">guide to quoting a plumbing job</a> covers that for this trade, and quoteai writes the itemized quote with Ontario's HST and sends it as a PDF from the phone.</p>
 `,
   "how-to-get-more-reviews-as-a-contractor": `
-<p>Reviews are one of the strongest trust signals a potential client evaluates before hiring a tradesperson — often more influential than the price on the quote itself. Yet most contractors do finish-quality work and simply never ask for a review. Here's how to fix that without it feeling awkward.</p>
+<p>Getting reviews is mostly a habit: ask clearly, at the right time, with a link that opens the review box, and do it on every job. The rest of the job is staying inside the rules: Google's review policies, the Competition Act, and Canada's anti-spam law for the emails and texts you send.</p>
 
-<h2>Ask at the right moment</h2>
-<p>The best time to ask for a review is immediately after the client has expressed satisfaction — right at project completion, when the value of the work is freshest and most visible. Waiting weeks after the job wraps up dramatically lowers response rates, simply because the moment has passed and it's no longer top of mind.</p>
+<h2>Ask at handover, not weeks later</h2>
+<p>The best moment is the final walkthrough, when the client has just seen the finished work, signed off any deficiencies and confirmed they're satisfied. Ask in person first ("Would you be willing to write a short review? I'll text you the link tonight"), then send the link the same day.</p>
+<p>Two times not to ask: while a deficiency or a change-order dispute is still open, and as a condition of anything. If the final payment is outstanding, settle it first; asking for a review and payment in the same message muddles both. The <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">guide to collecting payment from clients</a> covers that sequence, and open extras belong in a <a href="/blog/how-to-handle-change-orders-contractors/">signed change order</a> before anyone writes a review about them.</p>
 
-<h2>Make it as easy as possible</h2>
-<p>Friction kills review requests. Rather than saying "please leave us a review," send a direct link to your Google Business Profile review page via text or email — most clients are happy to leave a quick review but won't go searching for where to do it. A short message like: <em>"Thanks again for having us out — if you have a minute, a quick review here would really help us out: [link]"</em> performs far better than a vague request.</p>
+<h2>Send a direct link</h2>
+<p>Google gives every verified profile a review link and QR code. From your Business Profile, choose <a href="https://support.google.com/business/answer/16816815" rel="noopener">Read reviews, then Get more reviews</a>, and copy the link. The QR code can currently only be generated in a computer browser, not on a phone, so download it once and print it on a leave-behind card or the back of your invoice. Setting up the profile itself is covered in our <a href="/blog/google-business-profile-guide-for-tradespeople/">Google Business Profile guide for tradespeople</a>.</p>
 
-<h2>Timing tools that help</h2>
-<p>Some contractors build a review request into their standard invoice or final-payment message, so it becomes a routine step rather than something to remember separately. Automating this — even something as simple as a saved text template sent after final payment clears — noticeably increases the number of reviews collected over time.</p>
+<h2>What Google prohibits</h2>
+<p>Google's contribution policy sets three rules that catch contractors most often:</p>
+<ul>
+  <li><strong>No incentives.</strong> You can't <a href="https://support.google.com/contributionpolicy/answer/7400114" rel="noopener">offer payment, discounts, or free goods or services in exchange for posting any review</a>, or in exchange for changing or removing one. "Ten percent off your next service call for a review" is out, and so is a draw for a gift card among reviewers.</li>
+  <li><strong>No cherry-picking.</strong> The same policy bars businesses from trying to <a href="https://support.google.com/contributionpolicy/answer/7400114" rel="noopener">discourage or prohibit negative reviews, or selectively solicit positive reviews</a>. This is what marketers call "review gating": sending a satisfaction survey first and passing the Google link only to people who answer "very satisfied". The fix is simple: send the same request to every client on every finished job.</li>
+  <li><strong>No conflicts of interest.</strong> Google removes content based on a conflict of interest, and notes that this <a href="https://support.google.com/contributionpolicy/answer/7400114" rel="noopener">may include current or former employment</a>. Your apprentice, your spouse and your supplier rep should not be reviewing the business. The policy also bars reviews posted from several accounts by or at the request of one person.</li>
+</ul>
 
-<h2>Responding to reviews (including negative ones)</h2>
-<p>Responding to reviews, positive or negative, signals to future clients that you're actively engaged with your business reputation. For a negative review, a calm, professional response addressing the specific concern (without getting defensive) often does more for your credibility with future clients than the negative review itself does damage.</p>
+<h2>Canadian law applies too</h2>
+<p>Breaking Google's rules can cost you the reviews. Misleading reviews can also be a legal problem. The Competition Bureau has said that <a href="https://www.canada.ca/en/competition-bureau/news/2024/01/online-reviews-posted-by-employees-businesses-could-be-liable.html" rel="noopener">anyone who writes or permits writing reviews that give a false or misleading impression could be liable under the Competition Act</a>. Employees who review their employer or its competitors must disclose the connection, and if they can't disclose it, they shouldn't post. The Bureau recommends that businesses train staff on this and keep a compliance program to catch misleading employee reviews.</p>
+<p>The Bureau's <a href="https://competition-bureau.canada.ca/en/deceptive-marketing-practices-digest-volume-1" rel="noopener">Deceptive Marketing Practices Digest on online reviews</a> adds that a review can mislead when there is an undisclosed material connection between the reviewer and the business, even if the review is honest, and it warns about reputation or "SEO" firms that pay third parties to post fake reviews.</p>
 
-<h2>Why review volume compounds</h2>
-<p>Beyond trust-building, review count and recency are factors in local search visibility — profiles with a steady stream of recent reviews tend to be favoured over ones with a handful of old reviews, even if the older reviews are excellent. Treating review collection as an ongoing part of your workflow (rather than a one-time push) pays off steadily over time, especially when paired with fast, professional quoting that gets clients to "yes" in the first place — see tools built for <a href="/quotes/freelance/">independent tradespeople and freelancers</a>.</p>
+<h2>Emails and texts: Canada's Anti-Spam Legislation</h2>
+<p>Review requests usually go by email or text, so think about CASL (<a href="https://laws-lois.justice.gc.ca/eng/acts/E-1.6/index.html" rel="noopener">S.C. 2010, c. 23</a>). The law covers commercial electronic messages, which the federal anti-spam site describes as messages that <a href="https://ised-isde.canada.ca/site/canada-anti-spam-legislation/en" rel="noopener">encourage participation in a commercial activity</a>. The guidance doesn't single out review requests, but a request that also promotes your services ("book your spring tune-up") plainly fits, so the simplest habit is to send review requests the way the rules require for commercial messages:</p>
+<ul>
+  <li><strong>Consent.</strong> Express consent is a yes, verbal or written, and lasts until withdrawn. Implied consent from a business relationship <a href="https://ised-isde.canada.ca/site/canada-anti-spam-legislation/en/getting-consent-send-email" rel="noopener">may be valid for up to 2 years, or 6 months for an inquiry</a>. A client whose job you just finished is in that window; a line on your quote or contract asking permission to send follow-ups gives you express consent as well. Record when.</li>
+  <li><strong>Identification.</strong> The guidance says to <a href="https://ised-isde.canada.ca/site/canada-anti-spam-legislation/en/getting-consent-send-email" rel="noopener">clearly identify yourself and your business</a> in the message; include the business name and how to reach you.</li>
+  <li><strong>Unsubscribe.</strong> Include a way to opt out and act on it <a href="https://ised-isde.canada.ca/site/canada-anti-spam-legislation/en/getting-consent-send-email" rel="noopener">within 10 business days, at no cost to the recipient</a>.</li>
+  <li><strong>Texts count.</strong> The rules are <a href="https://ised-isde.canada.ca/site/canada-anti-spam-legislation/en/texting-good-client-relations" rel="noopener">technology neutral</a>, so they apply to texts as well as email, and a client who replies STOP must not get another reminder.</li>
+</ul>
+<p>Send one request and at most one reminder. A client who ignores both has answered.</p>
+
+<h2>Replying to reviews, including the bad ones</h2>
+<p>Google's advice for replies: <a href="https://support.google.com/business/answer/3474122" rel="noopener">be professional and polite, keep it short, don't use the reply to offer deals, never share a reviewer's private information, and apologize when appropriate</a>. Write for the next client reading it.</p>
+<p>For a negative review: read it twice, check the job file, and wait until you're calm. Acknowledge the specific complaint, state the facts briefly without quoting prices, addresses or private details, and offer a direct way to resolve it. If the review breaks Google's policies (it's about a different business, it's abusive, or it came from a competitor), you can flag it. Google is clear that you <a href="https://support.google.com/business/answer/4596773" rel="noopener">shouldn't report a review just because you disagree with it</a>, that it doesn't get involved in disputes between businesses and customers, and that only reviews that violate policy are removed. If a flagged review stays up, there is a one-time appeal through the Reviews Management Tool.</p>
+
+<h2>Other platforms</h2>
+<p>Your Google profile is not the only place a client may read about you.</p>
+<ul>
+  <li><strong>HomeStars.</strong> Reviews are generally tied to a job posted and hired through the platform. HomeStars also <a href="https://homestars.com/review-guidelines" rel="noopener">accepts reviews from up to five customers hired outside the platform</a>, requested through your account and published only after you provide a copy of the paid invoice. Incentivised reviews are removed, and replies must stay factual and leave out the homeowner's personal information.</li>
+  <li><strong>Facebook.</strong> Business Pages can <a href="https://www.facebook.com/help/548274415377576" rel="noopener">turn Recommendations on or off</a>; turning them off removes the rating and reviews from your Page. Recommendations follow Facebook's Community Standards, and you can <a href="https://www.facebook.com/help/439579999521224" rel="noopener">report one that doesn't</a>.</li>
+</ul>
+<p>Send clients one link, not three, so reviews build up in one place.</p>
+
+<h2>Example: a review-request flow for a renovation crew</h2>
+<p>Example only. Adjust the timing to your trade; a service call wraps up in an hour, a basement renovation over months.</p>
+<table>
+  <thead>
+    <tr><th>When</th><th>Channel</th><th>Message</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>At signing</td><td>Quote or contract</td><td>A checkbox: "You may email or text us about this job, including follow-ups and a review request." Record the date.</td></tr>
+    <tr><td>Final walkthrough</td><td>In person</td><td>"We ask every client for a short review. Would you be willing? I'll send the link tonight."</td></tr>
+    <tr><td>Same evening</td><td>Text</td><td>"Hi, thanks for having us on the basement. If you have a minute, here is the link for a Google review: [link]. Honest feedback helps us, good or bad. Lantern Creek Renovations, 613-555-0100. Reply STOP to opt out."</td></tr>
+    <tr><td>5 to 7 days later, only if no review</td><td>Email</td><td>One short reminder with the same link, the business name, contact details and an unsubscribe line. No offer or discount attached.</td></tr>
+    <tr><td>Within a few days of any review</td><td>Google reply</td><td>A short, personal reply (samples below).</td></tr>
+  </tbody>
+</table>
+<p>The text names the business and offers an opt-out because of CASL, says "good or bad" because selective requests break Google's policy, and offers nothing in return because incentives are prohibited.</p>
+<p><strong>Example reply to a positive review:</strong></p>
+<blockquote>Thanks for the review. The low ceiling around the ductwork made the drywall slow going, so we're glad the bulkheads turned out the way you pictured. Enjoy the new space.</blockquote>
+<p><strong>Example reply to a negative review:</strong></p>
+<blockquote>We're sorry the cleanup on your last day fell short. You're right that drywall dust was left in the laundry room, and that isn't our standard. We've changed our end-of-job checklist so the last walkthrough covers every room we worked in. We'd like to come back and clean it properly at no charge; please call the office at the number on your invoice so we can book a time.</blockquote>
+<p>The positive reply is specific to the job, so it reads as written by a person. The negative one admits what was true, says what changed, and moves the conversation off the review page without sharing any of the client's details.</p>
+<p>A job that starts from a clear, itemized quote is less likely to end in an argument about extras; quoteai writes that quote with your province's taxes and sends it as a PDF. For where reviews fit among your lead sources, see <a href="/blog/how-to-get-more-jobs-as-a-contractor-canada/">how to get more jobs as a contractor</a>.</p>
+<p>This is general information, not legal advice.</p>
 `,
   "free-quote-template-for-contractors-canada": `
 <p>If you search for a "free quote template" you'll find hundreds of generic US documents with no mention of GST, HST or QST. A Canadian contractor quote has to do more: show the right tax for your province, protect you on scope, and be clear enough that the client can say yes without calling you three times. Here is the structure that works, section by section.</p>
@@ -534,60 +631,135 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>That is the gap <a href="/pricing/">quoteai's free quoting</a> is built for: you describe the job, it builds the itemized quote with the right Canadian taxes, and you send a professional PDF from your phone. If you are comparing approaches, see <a href="/compare/">how quoteai compares with other quoting software</a>, or read the full guide on <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>.</p>
 `,
   "how-to-collect-payment-from-clients-contractor-canada": `
-<p>Doing the work is only half the job. Waiting 45 days for the last 30% of a project drains cash and wastes your evenings. Most late payment is preventable with better terms set before the job starts.</p>
+<p>Collecting money is decided mostly before the first tool comes off the truck. The deposit, the billing schedule, what counts as a complete invoice and what happens when a payment is late should all be written into the quote and contract the client signs. After that, getting paid is a matter of following your own paperwork.</p>
 
-<h2>Set payment terms in the quote</h2>
-<p>Put the deposit, the schedule and the due date on the quote, so the client agrees to them when they accept. A line such as "20% deposit on acceptance, 40% at rough-in completion, 40% on completion; invoices due on receipt" removes ambiguity.</p>
-
-<h2>Always take a deposit</h2>
-<p>A deposit covers materials, books your crew and shows commitment. For small repairs it can be modest. For custom or special-order work it should cover the order. Check your province's rules on deposits for home renovation contracts.</p>
-
-<h2>Bill in stages on larger jobs</h2>
-<p>Progress billing ties payments to visible milestones (demolition done, rough-in inspected, drywall complete). It keeps your cash flow healthy and gives the client a clear sense of progress.</p>
-
-<h2>Send the invoice the same day</h2>
-<p>Invoices sent late get paid late. Send the invoice at the moment the work is accepted, with the amount, taxes, due date and ways to pay. Make paying easy: e-transfer, card or bank payment with a link they can tap.</p>
-
-<h2>Follow up politely and on schedule</h2>
+<h2>Deposits: what each province lets you take</h2>
+<p>A deposit pays for special-order materials and holds the slot on your schedule. How much you can ask for, and when, depends on where you work and how the contract was signed.</p>
 <ul>
-  <li><strong>Day before due</strong>: a friendly reminder.</li>
-  <li><strong>Day after due</strong>: a short text or email with the invoice attached.</li>
-  <li><strong>Seven days late</strong>: a call.</li>
-  <li><strong>Beyond that</strong>: a written notice, then your formal options.</li>
+  <li><strong>Ontario.</strong> The province's <a href="https://www.ontario.ca/page/guide-home-renovation-and-roofing-businesses" rel="noopener">guide for home renovation and roofing businesses</a> recommends that deposits be no more than 10% of the total project cost. The same guide explains the 10-day cooling-off period for contracts signed at the customer's home: if the customer cancels in that window, you must refund the deposit within 15 days of their notice.</li>
+  <li><strong>Québec.</strong> A contractor who sells, installs or repairs doors and windows, thermal insulation, or roofing or exterior wall covering at the client's home is treated as an itinerant merchant, even when the client asked for the visit (<a href="https://www.opc.gouv.qc.ca/en/consumer/topic/itinerant-sale/cancelling/doing-business-renovation-contractor" rel="noopener">Office de la protection du consommateur</a>). The client then has 10 days to cancel, and the RBQ's page on <a href="https://www.rbq.gouv.qc.ca/en/vous-etes/citoyen/travaux-de-renovation/signing-a-renovation-contract/" rel="noopener">signing a renovation contract</a> notes that the merchant cannot ask for a deposit during that period. Plan your material orders around it.</li>
+  <li><strong>Alberta.</strong> If you sign home renovation contracts away from your place of business and accept money before the work is finished, you need a <a href="https://www.alberta.ca/prepaid-contracting-licence" rel="noopener">prepaid contracting business licence</a> from the province. Contracts between contractors and subcontractors are exempt.</li>
 </ul>
+<p>Wherever you work, tie the deposit to something concrete ("covers the vanity and tile, ordered on receipt") and credit it on a named invoice, so the client can see where it went.</p>
 
-<h2>Know your lien rights</h2>
-<p>Construction lien rules differ by province, with strict deadlines that vary (for example Ontario's Construction Act and Quebec's legal hypothec regime). If a client stops paying, check your province's deadlines quickly and consider legal advice, because missing the window can cost you the right.</p>
+<h2>Progress billing that matches the work</h2>
+<p>On anything longer than a few days, bill at milestones the client can see and an inspector can confirm: demolition done, rough-ins passed, drywall closed, substantial completion. Avoid calendar dates alone, because a delay that is not your fault then becomes an argument about money. Put the schedule in the contract (see <a href="/blog/how-to-write-a-contractor-contract-canada/">how to write a contractor contract</a>), and when scope changes, bill the extra on its own signed change order rather than folding it into the next stage (<a href="/blog/how-to-handle-change-orders-contractors/">handling change orders</a>).</p>
 
-<h2>Make it routine</h2>
-<p>Contractors who get paid on time do the same steps every time. Tools such as <a href="/quotes/general-contractor/">quoting and invoicing software built for contractors</a> keep the quote, the invoice and the follow-up in one place, so nothing relies on memory. If you are starting from scratch, see <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a> with payment terms included.</p>
+<h2>Prompt payment: where the law sets the deadline</h2>
+<p>Several jurisdictions now set payment deadlines for construction work by statute, built around a "proper invoice".</p>
+<ul>
+  <li><strong>Ontario.</strong> Under the <a href="https://www.ontario.ca/laws/statute/90c30" rel="noopener">Construction Act</a>, proper invoices go to the owner monthly unless the contract says otherwise (s. 6.3). The owner must pay within 28 days of receiving a proper invoice, unless within 14 days it gives you a notice of non-payment in the prescribed form, stating the amount it won't pay and all of its reasons; the undisputed part is still due on day 28 (s. 6.4). A proper invoice must include your name and address, the invoice date and the period or milestone it covers, the contract or purchase order it relates to, a description of the work with quantities where appropriate, the amount and payment terms, and who to pay (s. 6.1). Unpaid amounts bear interest at the prejudgment rate, or the contract rate if that is higher (s. 6.9).</li>
+  <li><strong>Alberta.</strong> The <a href="https://www.alberta.ca/prompt-payment-rules-for-construction-industry" rel="noopener">Prompt Payment and Construction Lien Act</a> applies the same 28-day and 14-day timelines to contracts made since August 29, 2022, and its proper invoice must include a statement that it is intended to be a proper invoice.</li>
+  <li><strong>Saskatchewan.</strong> Prompt payment took effect on <a href="https://www.saskatchewan.ca/government/news-and-media/2022/march/01/legislation-to-protect-contractors-takes-effect-today" rel="noopener">March 1, 2022</a> for new contracts, with owners paying within 28 days of a proper invoice.</li>
+  <li><strong>Federal projects.</strong> The <a href="https://laws-lois.justice.gc.ca/eng/acts/F-7.7/page-1.html" rel="noopener">Federal Prompt Payment for Construction Work Act</a> (in force December 9, 2023) covers work on federal construction projects: payment within 28 days of a proper invoice, with a 21-day window for a notice of non-payment.</li>
+  <li><strong>British Columbia.</strong> The Construction Prompt Payment Act received Royal Assent on November 27, 2025 but, according to the <a href="https://www2.gov.bc.ca/gov/content/governments/infrastructure/prompt-payment-legislation" rel="noopener">province's prompt payment page</a>, is not yet in force.</li>
+</ul>
+<p>Even where you are not sure the statute applies to a small residential job, writing every invoice as if it were a proper invoice costs nothing and removes the easiest excuse for paying late.</p>
+
+<h2>Example: billing a $40,000 renovation in Ontario</h2>
+<p>Example only, with assumed figures: a $40,000 (before tax) basement bathroom and laundry renovation in Toronto, signed at the contractor's office. Deposit of 10% on signing, credited on the last stage invoice. The owner retains the 10% holdback that the <a href="https://www.ontario.ca/laws/statute/90c30" rel="noopener">Construction Act</a> requires (s. 22). HST is 13% in Ontario (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA GST/HST rates</a>).</p>
+<table>
+  <thead>
+    <tr><th>Invoice</th><th>Work value</th><th>Less holdback 10%</th><th>Less deposit</th><th>Net before HST</th><th>HST 13%</th><th>Amount due</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Deposit, on signing</td><td>$4,000.00</td><td></td><td></td><td>$4,000.00</td><td>$520.00</td><td>$4,520.00</td></tr>
+    <tr><td>1. Demolition and framing complete</td><td>$10,000.00</td><td>$1,000.00</td><td></td><td>$9,000.00</td><td>$1,170.00</td><td>$10,170.00</td></tr>
+    <tr><td>2. Plumbing and electrical rough-ins passed inspection</td><td>$12,000.00</td><td>$1,200.00</td><td></td><td>$10,800.00</td><td>$1,404.00</td><td>$12,204.00</td></tr>
+    <tr><td>3. Drywall, waterproofing and tile complete</td><td>$10,000.00</td><td>$1,000.00</td><td></td><td>$9,000.00</td><td>$1,170.00</td><td>$10,170.00</td></tr>
+    <tr><td>4. Fixtures, trim, substantial completion</td><td>$8,000.00</td><td>$800.00</td><td>$4,000.00</td><td>$3,200.00</td><td>$416.00</td><td>$3,616.00</td></tr>
+    <tr><td>Holdback release</td><td></td><td></td><td></td><td>$4,000.00</td><td>$520.00</td><td>$4,520.00</td></tr>
+    <tr><td><strong>Total</strong></td><td><strong>$40,000.00</strong></td><td></td><td></td><td><strong>$40,000.00</strong></td><td><strong>$5,200.00</strong></td><td><strong>$45,200.00</strong></td></tr>
+  </tbody>
+</table>
+<p>Why it is set up this way:</p>
+<ul>
+  <li>The deposit stays inside Ontario's recommended 10% and is credited on a named invoice, so there is no argument at the end about whether it was "extra".</li>
+  <li>Stage 2 is triggered by a passed inspection, which a client cannot dispute the way they can dispute "about half done".</li>
+  <li>The holdback is shown on every invoice so the client sees exactly what they are keeping and why. On a job with no certificate of substantial performance, your lien expires 60 days after the contract is completed or abandoned unless you preserve it (s. 31), and the owner can release the holdback once lien rights have expired. Ask your accountant how HST on the deposit and the holdback should be recorded; the table simply charges it as each amount is billed.</li>
+</ul>
+<p>The <a href="/tools/holdback-calculator/">holdback calculator</a> and the <a href="/tools/sales-tax-calculator/">sales tax calculator</a> will check figures like these for your own job.</p>
+
+<h2>Interest on overdue accounts</h2>
+<p>If you intend to charge interest, it has to be in the signed contract and on the invoice. Write it as a yearly rate. Under section 4 of the federal <a href="https://laws-lois.justice.gc.ca/eng/acts/I-15/page-1.html" rel="noopener">Interest Act</a>, a written contract that states interest only as a rate per month (or any period under a year) cannot recover more than 5% a year unless it also states the equivalent yearly rate. "Overdue balances bear interest at X% per year, calculated monthly" is the safe form.</p>
+
+<h2>When a client stops paying</h2>
+<ol>
+  <li><strong>Check the clock.</strong> Lien deadlines are short and they do not wait for negotiations. In Ontario, a contractor's lien must be preserved within 60 days (s. 31) and then perfected, by starting an action and registering a certificate of action, within 90 days after the last day it could have been preserved (s. 36). In British Columbia, the <a href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/97045_01" rel="noopener">Builders Lien Act</a> allows a claim of lien to be filed no later than 45 days after the certificate of completion, or after the contract or improvement is completed or abandoned (s. 20), and also requires a 10% holdback (s. 4). Write the dates down the day the work stops.</li>
+  <li><strong>Send a written demand</strong> with the invoice, the contract clause, the amount, a date to pay and what you will do if it is not paid.</li>
+  <li><strong>Pick the forum by amount.</strong> Ontario's Small Claims Court hears claims up to <a href="https://www.ontariocourts.ca/scj/areas-of-law/small-claims-court/" rel="noopener">$50,000</a>. In British Columbia, the <a href="https://civilresolutionbc.ca/solution-explorer/small-claims/" rel="noopener">Civil Resolution Tribunal</a> handles most small claims up to $5,000 and Provincial Court small claims cover cases up to <a href="https://www2.gov.bc.ca/gov/content/justice/courthouse-services/small-claims" rel="noopener">$35,000</a>. Above those limits, or when a lien is in play, talk to a construction lawyer early.</li>
+</ol>
+
+<h2>Make the invoice easy to pay</h2>
+<p>Send each stage invoice the day the milestone is reached, with the contract reference, the milestone, the holdback, the tax and the due date, and offer a payment method the client can use from their phone. Keep a fixed reminder routine (a note before the due date, another the day after, then a call) so chasing money is a habit and not a mood. The same discipline keeps your cash forecast honest: see <a href="/blog/contractor-cash-flow-management-canada/">contractor cash flow management</a>. quoteai turns an accepted quote into itemized invoices with the province's taxes and sends them as PDFs, which keeps the quote, the stages and the invoices in step.</p>
+
+<p><em>This is general information, not legal or tax advice. Check the Act for your province and get advice on your specific contract.</em></p>
 `,
   "contractor-insurance-canada-what-you-need": `
-<p>This is general information, not insurance or legal advice. Requirements differ by province, trade and client, so confirm details with a licensed broker. But every Canadian contractor should understand the main types of coverage, because clients, general contractors and property managers increasingly ask for proof of insurance before you start.</p>
+<p>Two different things get called "insurance" on a job site. One is private: the liability, tools and vehicle policies you buy through a broker. The other is public: workers' compensation, run by a provincial board, which construction businesses must carry by law in most cases. GCs and property managers will ask for proof of both before you start.</p>
 
-<h2>Commercial general liability (CGL)</h2>
-<p>CGL covers third-party injury and property damage caused by your work, such as a water leak damaging a client's floor. Many clients and general contractors require limits of $2 million, and commonly ask to be named as an additional insured. It is the baseline policy for most trades.</p>
+<h2>Commercial general liability: the policy every client asks about</h2>
+<p>Commercial general liability (CGL) responds when your work injures someone who is not your worker, or damages property that is not yours: the drill bit that finds a water line, the ladder that marks a hardwood floor, the visitor who trips over your cords. Three questions matter more than the brochure:</p>
+<ul>
+  <li><strong>Does it include completed operations?</strong> A fitting can weep for a month before the ceiling stains. Ask whether claims that arise after the job is finished are covered.</li>
+  <li><strong>What does it do about your own work?</strong> Many wordings exclude the cost of redoing your own faulty work and cover only the damage it causes to other property. Know which side of that line you are on before you promise a warranty.</li>
+  <li><strong>What limit do your contracts require?</strong> The insurance clause in the subcontract or vendor agreement sets it. Read that clause before you quote: raising a limit or adding an additional insured takes time.</li>
+</ul>
+<p>The certificate of insurance a client receives is a summary, not the policy: named insured, insurer, dates, limits and any additional insured. If the name on it does not match the name on your contract, expect it back.</p>
 
-<h2>Tools and equipment coverage</h2>
-<p>Tools are expensive and are a frequent theft target. Standard CGL does not cover them. Tools and equipment coverage handles theft, damage and loss, including from vehicles and job sites.</p>
+<h2>Tools, equipment and the truck</h2>
+<p>CGL covers damage to other people's property, not your own. A tools and equipment policy (often called a floater) covers theft and damage to your gear; ask how it treats tools left in a locked vehicle overnight, tools stored on site, and rented equipment. For the truck, tell your insurer how it is really used: tools and materials aboard, driving between sites, employees at the wheel. Find out before a claim whether the policy matches.</p>
 
-<h2>Commercial vehicle insurance</h2>
-<p>Using a personal auto policy for business driving can create a denied claim. If you drive to job sites with tools and materials, ask your broker whether you need commercial coverage.</p>
+<h2>Professional liability and bonds</h2>
+<p>If you are paid for advice or design, not only installation, look at professional liability (errors and omissions): design-build renovators, contractors who size HVAC systems, anyone who inspects and reports for a fee.</p>
+<p>A bond is not insurance for you. A surety guarantees your performance or your payments to the owner, and if it pays out, it looks to you to repay it under the indemnity agreement you signed. In Ontario, a contractor on a public contract (with the Crown, a municipality or a broader public sector organization) above the prescribed amount must furnish both a performance bond and a labour and material payment bond (<a href="https://www.ontario.ca/laws/statute/90c30" rel="noopener">Ontario Construction Act, s. 85.1</a>). In Québec, a licensed contractor must provide licence security to the Régie du bâtiment: the RBQ lists $20,000 for specialized subclasses and $40,000 for general subclasses (<a href="https://www.rbq.gouv.qc.ca/en/licence/offering-financial-guarantees/licence-security/obtain-licence-security/" rel="noopener">RBQ: obtain licence security</a>), and in February 2026 it published draft regulations that would raise those amounts to $30,000 and $60,000 (<a href="https://www.rbq.gouv.qc.ca/salle-de-presse/les-nouvelles/nouvelles-detail/item/2026-02-25-qualification-professionnelle-des-entrepreneurs-publication-pour-commentaires-de-deux-projets-de-reglement" rel="noopener">RBQ news release, 2026-02-25</a>). Check the current amount before you renew.</p>
 
-<h2>Workers' compensation (WSIB, WorkSafeBC, CNESST and others)</h2>
-<p>Provincial workers' compensation boards cover workplace injuries, and in many provinces it is mandatory for construction firms with employees, and sometimes for subcontractors. Penalties and unexpected assessments for being unregistered can be steep. Check your provincial board.</p>
+<h2>Workers' compensation: who has to be covered</h2>
+<h3>Ontario (WSIB)</h3>
+<p>Construction has expanded compulsory coverage: independent operators, sole proprietors, some partners and some executive officers working in construction must have WSIB coverage, with or without employees, and a business has 10 calendar days from hiring its first employee to register (<a href="https://www.wsib.ca/en/businesses/registration-and-coverage/expanded-compulsory-coverage-construction-industry" rel="noopener">WSIB: expanded compulsory coverage in construction</a>). There is an exemption for home renovation work done directly for the person who lives in an existing private residence, or their family member, but it does not apply to subcontractors hired by a contractor (<a href="https://www.wsib.ca/en/operational-policy-manual/expanded-compulsory-coverage-construction" rel="noopener">WSIB policy: expanded compulsory coverage in construction</a>). In practice, the day you take work from a GC, you need coverage.</p>
+<h3>British Columbia (WorkSafeBC)</h3>
+<p>All employers must have WorkSafeBC coverage unless exempt, and an employer includes anyone who hires workers or unregistered subcontractors (<a href="https://www.worksafebc.com/en/insurance/need-coverage/who-needs-coverage" rel="noopener">WorkSafeBC: who needs coverage</a>). Proprietors and partners can be registered for their workers but decline Personal Coverage for themselves, and WorkSafeBC warns that whoever hires them may then be open to a lawsuit if that owner is hurt (<a href="https://www.worksafebc.com/en/insurance/need-coverage/who-needs-coverage/contractors-subcontractors" rel="noopener">WorkSafeBC: contractors and subcontractors</a>). Expect GCs to ask.</p>
+<h3>Québec (CNESST)</h3>
+<p>You must register with the CNESST if you hire at least one worker, full or part time, and have an establishment in Québec, and you have 60 days from your first worker's first day to do it (<a href="https://www.cnesst.gouv.qc.ca/fr/demarches-formulaires/employeurs/inscription-cnesst" rel="noopener">CNESST: inscription</a>). Construction work in Québec also brings the RBQ licence and the construction industry's own rules, covered on our <a href="/provinces/quebec/">Québec page</a>.</p>
+<h3>Alberta (WCB-Alberta)</h3>
+<p>For most industries, coverage is required by law. Owners and directors can add optional personal coverage, and WCB-Alberta notes that without it the owner is not protected from a lawsuit if a worker, contractor or subcontractor is injured (<a href="https://www.wcb.ab.ca/insurance-and-premiums/types-of-coverage/coverage-for-contractors-and-subcontractors.html" rel="noopener">WCB-Alberta: coverage for contractors and subcontractors</a>).</p>
 
-<h2>Professional liability / errors and omissions</h2>
-<p>If you design, inspect or advise, such as building consultants and some renovation firms, professional liability covers claims that your advice or design caused a loss.</p>
+<h2>Why GCs ask for clearances</h2>
+<p>A clearance is the board's confirmation that your account is in good standing. GCs want it because, without one, your unpaid premiums can become theirs:</p>
+<ul>
+  <li><strong>Ontario:</strong> a principal must get a clearance before construction work begins and keep one in effect for the whole job, and starting without one is an offence for both the principal and the contractor. Without a clearance, the principal may be liable for the contractor's obligations to the WSIB up to the labour portion of the contract. A clearance is valid for up to 90 days and is renewable (<a href="https://www.wsib.ca/en/operational-policy-manual/clearance-certificate-construction" rel="noopener">WSIB policy: clearance certificate in construction</a>).</li>
+  <li><strong>British Columbia:</strong> to be relieved of a subcontractor's unpaid premiums, the hiring firm needs a clearance letter addressed to it, showing the sub was active and in good standing for the entire contract (<a href="https://www.worksafebc.com/en/insurance/why-clearance-letter" rel="noopener">WorkSafeBC: why do I need a clearance letter</a>).</li>
+  <li><strong>Québec:</strong> the donneur d'ouvrage can be held responsible for a contractor's unpaid CNESST premiums, calculated on the labour cost of the contract (<a href="https://www.cnesst.gouv.qc.ca/fr/demarches-formulaires/employeurs/assurance-sante-securite-travail/gestion-dossier-dassurance/conformite/paiement-cotisation-due-autre-employeur" rel="noopener">CNESST: paiement de la cotisation due par un autre employeur</a>). The Attestation de conformité, requested at the end of each contract, releases them, and if they request it you have 14 days to approve or contest the contract details (<a href="https://www.cnesst.gouv.qc.ca/fr/demarches-formulaires/employeurs/assurance-sante-securite-travail/gestion-dossier-dassurance/conformite/services-verification-conformite" rel="noopener">CNESST: services de vérification de conformité</a>).</li>
+  <li><strong>Alberta:</strong> a hirer without a clearance letter may be liable for an unpaid contractor's premiums, and WCB-Alberta advises getting one before hiring and before releasing payment (<a href="https://www.wcb.ab.ca/insurance-and-premiums/clearance-letters/" rel="noopener">WCB-Alberta: clearance letters</a>).</li>
+</ul>
+<p>That is why a GC may hold your final payment until a fresh clearance comes through. If you are the one hiring, the same rules run in your direction: see <a href="/blog/how-to-hire-and-pay-subcontractors-canada/">how to hire and pay subcontractors</a>.</p>
 
-<h2>Builder's risk, surety bonds and others</h2>
-<p>Larger projects may require builder's risk, performance bonds or bid bonds. Ask early when bidding on commercial or public work.</p>
+<h2>Example: the compliance file a GC or property manager will ask for</h2>
+<p>Example only: which documents a client asks for, and the limits it requires, come from its own contract. Keep current copies in one folder so you can answer the same day.</p>
+<table>
+  <thead>
+    <tr><th>Document</th><th>Issued by</th><th>What the other side checks</th><th>Keep it current</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Certificate of insurance (CGL)</td><td>Your broker or insurer</td><td>Legal name matches the contract; limits meet the contract; dates cover the job; client named as additional insured if required</td><td>New certificate at each renewal and for each client that must be named</td></tr>
+    <tr><td>WSIB clearance certificate (Ontario)</td><td>WSIB</td><td>Valid before work starts and for the whole job</td><td>Valid up to 90 days; renew before it lapses</td></tr>
+    <tr><td>WorkSafeBC clearance letter (BC)</td><td>WorkSafeBC, addressed to the hirer</td><td>Active and in good standing for the contract period</td><td>Hirer requests before start and after the work</td></tr>
+    <tr><td>Attestation de conformité (Québec)</td><td>CNESST</td><td>Releases the donneur d'ouvrage from your unpaid premiums</td><td>End of each contract; answer within 14 days if asked to validate</td></tr>
+    <tr><td>WCB-Alberta clearance letter</td><td>WCB-Alberta</td><td>Who is covered and whether the account is in good standing</td><td>Before hiring and before final payment</td></tr>
+    <tr><td>RBQ licence number and licence security (Québec)</td><td>RBQ; your surety</td><td>Licence subclass covers the work</td><td>Keep the security in force; notify the RBQ if you change surety</td></tr>
+    <tr><td>Bond (when the contract calls for one)</td><td>Your surety</td><td>Bond form and amount match the contract</td><td>Per project</td></tr>
+  </tbody>
+</table>
+<p>Why it is built this way:</p>
+<ul>
+  <li>The clearance rows have dates, not a yes or no: an expired clearance protects no one, so a lapsed one counts as none.</li>
+  <li>Tools and vehicle policies are left off because they protect you, not the client. They belong in your own file.</li>
+</ul>
 
-<h2>Show proof on your quotes</h2>
-<p>Including "Fully insured and licensed" along with your licence number and insurer on a quote reassures homeowners and speeds up approval on commercial jobs. It also helps justify a price above the cheapest bid. See <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a> for where credentials fit.</p>
-
-<h2>Budget it as overhead</h2>
-<p>Insurance, vehicle costs and tools are part of your overhead and must be recovered in your pricing. If you are unsure how, read <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>.</p>
+<h2>Put it on the quote, and in the price</h2>
+<p>Showing your insurer, your WSIB or WorkSafeBC account and, in Québec, your RBQ licence number on the quote answers the first question a careful client asks; the guide to <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">writing a professional quote</a> shows where it fits, and <a href="/blog/how-to-write-a-contractor-contract-canada/">how to write a contractor contract</a> covers the insurance clause itself. quoteai keeps those details on every itemized quote it sends as a PDF.</p>
+<p>Premiums, bonds and board assessments are overhead. Spread them over your billable hours the same way as the truck and the phone; <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a> walks through the calculation, and <a href="/blog/how-to-hire-your-first-employee-contractor-canada/">hiring your first employee</a> covers what changes when the payroll is no longer only you.</p>
+<p>This is general information, not legal or insurance advice. Confirm coverage with a licensed broker and registration with your provincial board.</p>
 `,
   "kitchen-renovation-cost-canada-2026": `
 <p>The kitchen is the most requested and most misquoted renovation in Canada. Homeowners often set a budget from a TV show, then meet reality at the first quote. These are typical 2026 ranges. Your market, the size of the room and the finishes will move them.</p>
@@ -681,169 +853,347 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Measure each room, add a waste factor (usually 5–10%, more for diagonal or patterned layouts), and list material, labour, underlay, removal, trim and levelling as separate lines. Installers using <a href="/quotes/flooring-installer/">quoting software for flooring installers</a> can do the square-footage maths and taxes automatically.</p>
 `,
   "how-to-write-a-contractor-contract-canada": `
-<p>This is general information, not legal advice. Contract rules differ by province, and home renovation contracts are regulated in some provinces, so ask a lawyer to review your template. Still, most disputes come from the same handful of missing clauses.</p>
+<p>Most renovation disputes are not about workmanship. They are about what was agreed: whether the extra outlet was included, when the second payment was due, whether the client could walk away after the cabinets were ordered. A written contract settles those questions before they come up, and in several provinces the law decides part of what it has to say.</p>
 
-<h2>Quote or contract?</h2>
-<p>A quote is a price offer. Once accepted it can function as a contract, but a written contract adds the detail that protects both sides. Small jobs may only need a clear, signed quote; larger renovation jobs deserve a full contract.</p>
-
-<h2>Clauses to include</h2>
+<h2>What every residential contract should cover</h2>
 <ul>
-  <li><strong>Parties and site</strong>: legal names, addresses, the property.</li>
-  <li><strong>Scope of work</strong>: detailed, with exclusions.</li>
-  <li><strong>Price and taxes</strong>: total, GST/HST/QST, and what is fixed vs allowance.</li>
-  <li><strong>Payment schedule</strong>: deposit, milestones, due dates and late-payment interest. See <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">how to get paid on time</a>.</li>
-  <li><strong>Start and completion dates</strong>: with allowance for weather and material delays.</li>
-  <li><strong>Change orders</strong>: no extra work without written approval and price.</li>
-  <li><strong>Permits and inspections</strong>: who obtains and pays.</li>
-  <li><strong>Insurance and licensing</strong>: see our <a href="/blog/contractor-insurance-canada-what-you-need/">insurance guide</a>.</li>
-  <li><strong>Warranty</strong>: duration and what is not covered.</li>
-  <li><strong>Cancellation</strong>: some provinces give consumers cooling-off rights for home contracts, so check yours.</li>
-  <li><strong>Dispute resolution</strong>: a process before court, such as mediation.</li>
-  <li><strong>Site access, cleanup, and hidden conditions</strong>: who is responsible for what.</li>
+  <li><strong>Parties and site:</strong> your legal business name exactly as licensed, street address, the client's name and the job address.</li>
+  <li><strong>Scope:</strong> the work, materials by grade or product, and exclusions. If you wrote an itemized quote, attach it and refer to it by number.</li>
+  <li><strong>Price and taxes:</strong> the total with GST/HST (and QST in Québec), with any allowances marked.</li>
+  <li><strong>Payment schedule:</strong> deposit, milestones tied to events you can point to, final payment.</li>
+  <li><strong>Schedule, changes, permits and subtrades:</strong> dates and what moves them, how extras get approved (see <a href="/blog/how-to-handle-change-orders-contractors/">handling change orders</a>), who pulls permits and which work is subcontracted.</li>
+  <li><strong>Warranty, cancellation, disputes and insurance:</strong> see <a href="/blog/contractor-insurance-canada-what-you-need/">contractor insurance in Canada</a> for what to carry.</li>
+</ul>
+<p>The provincial rules below add to that list for homeowner contracts.</p>
+
+<h2>Ontario: Consumer Protection Act, 2002</h2>
+<p>Ontario's <a href="https://www.ontario.ca/page/guide-home-renovation-and-roofing-businesses" rel="noopener">guide for home renovation and roofing businesses</a> explains how the <a href="https://www.ontario.ca/laws/statute/02c30" rel="noopener">Consumer Protection Act, 2002</a> applies to contractors. The points that change how you write a contract:</p>
+<ul>
+  <li>Any contract worth more than $50 must be in writing.</li>
+  <li>The contract must generally include your business name, address and contact details; a fair description of the work with materials and an itemized list of products and services; warranties; the total cost and payment terms with all taxes; a work schedule with start and completion dates; any subtrades, who they are and who pays them; a payment schedule including the deposit; and who prepares the work area and cleans up.</li>
+  <li>The province recommends deposits of no more than 10% of the total project cost.</li>
+  <li>If an estimate is part of the contract, you cannot charge more than 10% above it unless the client asks for added or different work and you both sign a change to the contract.</li>
+  <li>A contract signed at the client's home carries a 10-day cooling-off period. The client can cancel for any reason, and you must refund any deposit within 15 days of their notice. If you started work during that period because the client asked you to, you are entitled to reasonable payment for work and materials that cannot be returned.</li>
+  <li>A client who never received a copy of the contract meeting the Act's requirements can cancel most contracts within one year.</li>
+  <li>Section 11 of the Act says any ambiguity in a consumer agreement you provide is interpreted to the client's benefit. Vague scope wording costs you, not them.</li>
+</ul>
+<p>In practice: hand over a signed copy the same day, and hold special orders until the cooling-off period ends unless the client asks in writing to start. More Ontario specifics are on our <a href="/provinces/ontario/">Ontario page</a>.</p>
+
+<h2>British Columbia: direct sales contracts</h2>
+<p>In BC, the <a href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/04002_00" rel="noopener">Business Practices and Consumer Protection Act</a> sets rules for direct sales contracts. Consumer Protection BC's <a href="https://www.consumerprotectionbc.ca/consumer-help/consumer-information-door-door-sales/" rel="noopener">door-to-door sales page</a> describes them as contracts over $50 before taxes signed during a visit from a door-to-door sales agent. For those contracts:</p>
+<ul>
+  <li>The client has 10 days after receiving a copy to cancel for any reason, in writing. Without a copy, the contract is not binding.</li>
+  <li>The deposit should not exceed $100 or 10% of the total price, whichever is smaller. A larger down payment, or missing required information, lets the client cancel within one year.</li>
+  <li>Since August 1, 2026, door-to-door sales of furnaces, heat pumps and air conditioners, water heaters and water treatment systems, solar panel systems, duct cleaning, home security systems, and energy or window audits are banned, subject to exceptions such as an invitation from the homeowner.</li>
 </ul>
 
-<h2>Common mistakes</h2>
-<ul>
-  <li>Verbal agreements on extras</li>
-  <li>Fixed price with no clause for hidden conditions</li>
-  <li>No end date or no consequences for delays</li>
-  <li>No signature, or a signature from only one spouse or owner</li>
-</ul>
+<h2>Québec: RBQ licence and itinerant merchants</h2>
+<p>The RBQ's page on <a href="https://www.rbq.gouv.qc.ca/en/vous-etes/citoyen/travaux-de-renovation/signing-a-renovation-contract/" rel="noopener">signing a renovation contract</a> tells homeowners to check that the name on the contract matches the company holding the RBQ licence exactly, and that the licence number is shown. It also recommends showing your NEQ and your GST and QST numbers, and breaking the price down by labour, materials, subcontractors and other costs.</p>
+<p>A contractor who signs at the client's home a contract to sell, install or repair doors and windows, thermal insulation, or roofing or exterior wall covering is an itinerant merchant under the Consumer Protection Act, even when the client invited them. The Office de la protection du consommateur says the client can then cancel <a href="https://www.opc.gouv.qc.ca/en/consumer/topic/itinerant-sale/cancelling/doing-business-renovation-contractor" rel="noopener">within 10 days of receiving a signed copy</a>, even if work has started, and any payment must be refunded <a href="https://www.opc.gouv.qc.ca/en/consumer/good-service/housing-renovation/home-renovations/renovation-work/cancelling-contract/in-person-contract" rel="noopener">within 15 days of the notice</a>. The RBQ adds that the contract must be in writing, that you need an OPC itinerant merchant permit, and that you must wait 10 days before starting work and cannot ask for a deposit in that period, with some exceptions. See our <a href="/provinces/quebec/">Québec page</a> for licensing details.</p>
 
-<h2>Make it part of your process</h2>
-<p>A quote that includes terms and an electronic acceptance, produced with <a href="/quotes/general-contractor/">quoting software for general contractors</a>, gives you a consistent, signed record every time. For the quote itself, read <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>.</p>
+<h2>Alberta: prepaid contracting licence</h2>
+<p>Alberta requires a <a href="https://www.alberta.ca/prepaid-contracting-licence" rel="noopener">prepaid contracting business licence</a> if you solicit, negotiate or conclude contracts for work on private dwellings in person away from your place of business and take money before the work is done. The application includes a security and a copy of your standard contract.</p>
+<p>Alberta's fact sheet on <a href="https://open.alberta.ca/publications/writing-a-pre-paid-or-direct-sales-contract" rel="noopener">writing a prepaid or direct sales contract</a> lists what section 35 of the Consumer Protection Act requires: the parties, the date and place signed, a description of the work, itemized prices, a total at least as prominent as the item prices, payment terms, the start date, both signatures, the quality or type of materials, and a Buyer's Right to Cancel statement copied exactly from the regulation, with the 10-day cancellation right in at least 12-point type. The contract cannot stop the client from posting online reviews, waive their rights under the Act, or let you enforce an arbitration clause.</p>
+
+<h2>Holdback belongs in the payment schedule</h2>
+<p>Ontario's <a href="https://www.ontario.ca/laws/statute/90c30" rel="noopener">Construction Act</a> requires each payer on a contract under which a lien may arise to retain a basic holdback of 10% of the price of the services or materials supplied (section 22). BC's <a href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/97045_01" rel="noopener">Builders Lien Act</a> requires a 10% holdback of the greater of the value of the work provided and the payments made (section 4). Write it into the schedule so the last payment surprises no one, and check the release timing in the Act before promising a date. The <a href="/tools/holdback-calculator/">holdback calculator</a> does the arithmetic per payment.</p>
+
+<h2>Example wording: an annotated clause set</h2>
+<p>The following is example wording for an Ontario bathroom renovation signed at the client's home, to show what each clause needs to pin down. It is not a legal template; have a lawyer review your own contract before you use it.</p>
+<ol>
+  <li><strong>Scope.</strong> "The work is described in Quote Q-1042 dated 3 March, attached and forming part of this contract. Work not listed in Q-1042 is excluded." <em>Why: one version of the scope, not two.</em></li>
+  <li><strong>Price and taxes.</strong> "Contract price $18,400.00 plus HST at 13% ($2,392.00), total $20,792.00. The vanity is an allowance of $1,200.00 before tax; the client pays or is credited the difference." <em>Why: Ontario expects the total with all taxes, and an allowance tells the client which number can move. The HST rate is from the <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA's GST/HST rates page</a>.</em></li>
+  <li><strong>Payment schedule.</strong> "Deposit $2,079.20 (10%) on signing. $9,356.40 when the plumbing and electrical rough-in pass inspection. $7,277.20 on substantial completion. Holdback of $2,079.20 retained under the Construction Act and paid when the holdback period ends." <em>Why: each payment is tied to an event, and the four amounts add up to the total.</em></li>
+  <li><strong>Changes.</strong> "No work outside the scope will be done without a written change order stating the work, price, tax and effect on the completion date, signed by both parties." <em>Why: this is how you charge for extras without running into the 10% estimate rule.</em></li>
+  <li><strong>Delays.</strong> "Start 14 April; completion 16 May. Dates move by the length of any delay caused by permit or inspection scheduling, material back-orders outside the contractor's control, or concealed conditions requiring a change order. The contractor will notify the client in writing within two business days of such a delay." <em>Why: named causes plus a notice duty beat "subject to delays".</em></li>
+  <li><strong>Warranty.</strong> "Workmanship warranted for one year from completion. Manufacturer warranties pass to the client. The warranty does not cover damage from misuse or alterations by others." <em>Why: the term is your choice; state it and its limits.</em></li>
+  <li><strong>Cancellation.</strong> "You may cancel this contract within 10 days of receiving a signed copy, for any reason, by written notice to the address above. Any deposit will be refunded within 15 days of your notice." <em>Why: it restates the Ontario cooling-off right in plain words. In Alberta, use the regulation's exact statement instead.</em></li>
+</ol>
+<p>For the quote the scope clause points to, see <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>; quoteai writes it itemized, with the province's taxes, as a PDF you can attach.</p>
+
+<p><em>This is general information about Ontario, British Columbia, Québec and Alberta rules, not legal advice.</em></p>
 `,
   "how-to-handle-change-orders-contractors": `
-<p>Scope creep is one of the biggest quiet profit killers in contracting. "Can you just also..." turns into two days of unpaid work. A change order process fixes it without making you sound difficult.</p>
+<p>Extras rarely go unpaid because the client refuses to pay. They go unpaid because nobody wrote down the price before the work was done, and by the final invoice the client remembers a favour and you remember a day of labour. A change order is the page that stops that conversation from happening.</p>
 
-<h2>What is a change order?</h2>
-<p>A change order is a short written agreement that changes the scope, price or schedule of an accepted job. It records what changed, what it costs and how it affects the end date.</p>
-
-<h2>Why extras go unpaid</h2>
+<h2>When you need one</h2>
+<p>Write a change order any time the signed scope, price or completion date is about to move. In practice that means:</p>
 <ul>
-  <li>The request was verbal and memories differ later.</li>
-  <li>You did not want to bring up money in the moment.</li>
-  <li>The original scope was vague, so nobody agrees what counts as extra.</li>
-  <li>The price was only calculated at the end.</li>
+  <li><strong>The client asks for added or different work:</strong> another pot light, a niche in the shower, a different tile.</li>
+  <li><strong>The client deletes work.</strong> A credit is a change too, and writing it down protects you when they later ask why the hallway was not painted.</li>
+  <li><strong>You open a wall or floor and find something the contract did not price:</strong> rot, unsupported framing, old wiring that cannot be reconnected.</li>
+  <li><strong>The client's decision moves the schedule:</strong> a late selection, a product they want that is back-ordered.</li>
 </ul>
+<p>What does not need one: work that was in the scope all along, and fixing your own estimating miss. If you under-measured the tile, that is your cost, not the client's change.</p>
 
-<h2>A simple process</h2>
+<h2>What the form must state</h2>
+<p>Ontario's <a href="https://www.ontario.ca/page/guide-home-renovation-and-roofing-businesses" rel="noopener">guide for home renovation and roofing businesses</a> tells contractors that changes in the middle of a project must be documented and communicated in writing, showing how they affect the price, scheduling and completion dates, and that both you and the client sign the changed contract. Alberta's advice to homeowners on <a href="https://www.alberta.ca/hiring-contractor" rel="noopener">hiring a contractor</a> says the same thing from the other side: any change should have the client's written approval and a signed statement from the contractor giving the increase or reduction in cost. A form that meets both reads like this:</p>
+<ul>
+  <li><strong>Reference:</strong> the contract or quote number, the change order number, and the date.</li>
+  <li><strong>Reason:</strong> client request, or the condition found, with a pointer to the photos.</li>
+  <li><strong>Scope delta:</strong> exactly what is added and what is removed, in the same itemized style as the original quote.</li>
+  <li><strong>Price:</strong> each line, the subtotal, the tax line at the province's rate, and the change total.</li>
+  <li><strong>Revised contract total:</strong> the previous total plus or minus this change, so nobody has to add up five change orders at the end.</li>
+  <li><strong>Time impact:</strong> working days added, and the new completion date. If there is no impact, say "none".</li>
+  <li><strong>Payment:</strong> when this amount is due, usually with the next progress payment.</li>
+  <li><strong>Signatures and dates</strong> from both parties, before the work starts.</li>
+</ul>
+<p>The tax line matters. A change order is part of the contract price, and the GST/HST or QST applies to it the same way it applies to the original work. The <a href="/tools/sales-tax-calculator/">sales tax calculator</a> gives you the line for any province.</p>
+
+<h2>The Ontario 10% rule</h2>
+<p>Section 10 of Ontario's <a href="https://www.ontario.ca/laws/statute/02c30" rel="noopener">Consumer Protection Act, 2002</a> says that if a consumer agreement includes an estimate, you cannot charge more than 10% above it. If you do, the client can require you to do the work at the estimated price. The same section lets you and the client amend the price when the client requires additional or different goods or services.</p>
+<p>That is the whole case for change orders in Ontario. A renovation that grows by 15% through signed change orders is fine: each change amended the agreement. A renovation that grows by 15% through extras agreed in the driveway and added to the final invoice puts the whole overrun at risk: charge more than 10% over the estimate and the client can insist on the estimated price. The rule also means a concealed condition is safest handled as a written change, signed before you fix it, rather than absorbed into an overrun you plan to explain later. For how an estimate differs from a fixed quote in the first place, see <a href="/blog/quote-vs-estimate-vs-invoice-difference/">quote vs estimate vs invoice</a>.</p>
+
+<h2>Make the contract do half the work</h2>
+<p>A change order is easier to ask for when the contract already says you will. The changes clause in your contract should state that no work outside the scope is done without a written change order showing the work, price, tax and time impact, signed by both parties. Our guide to <a href="/blog/how-to-write-a-contractor-contract-canada/">writing a contractor contract</a> has example wording. With that clause signed, "let me write that up before I start" is not a negotiating move; it is the procedure the client already agreed to.</p>
+<p>Add a concealed-conditions sentence too: that conditions hidden behind finished surfaces are not included in the price, and that if found, you will stop, show the client, and price the remedy as a change order.</p>
+
+<h2>Allowances are not change orders</h2>
+<p>An allowance is a placeholder amount in the contract for something the client has not chosen yet: a vanity, light fixtures, tile. When the client picks a $1,650 vanity against a $1,200 allowance, the $450 difference is an allowance adjustment that the contract already provides for. It does not change the scope.</p>
+<p>Record it anyway, on a short adjustment line or the next progress invoice, with the tax on the difference. Where allowances turn into changes is when the selection changes the work: a vessel sink that needs a different drain height, a heavy fixture that needs blocking. The product cost is an adjustment; the extra labour is a change order.</p>
+
+<h2>Concealed conditions: document before you fix</h2>
+<p>When you open up a floor and find rot, the client was not there when you found it. Your photos are their only view, so take them as if someone will question them later:</p>
 <ol>
-  <li><strong>Pause</strong>: "Happy to do that, let me send you a quick price."</li>
-  <li><strong>Price it</strong>: labour, materials, markup and any schedule impact.</li>
-  <li><strong>Send it in writing</strong>: text, email or PDF with a clear description and total including tax.</li>
-  <li><strong>Get approval</strong>: a reply, signature or electronic acceptance.</li>
-  <li><strong>Do the work, then invoice it</strong>: as its own line or on the next progress invoice.</li>
+  <li>Photograph the area before you start demolition, then again as soon as the condition is exposed, before you remove anything more.</li>
+  <li>Include a tape measure or a known object in the frame so the size is clear.</li>
+  <li>Take a wide shot that shows where in the house it is, and close-ups of the damage.</li>
+  <li>Keep the photos with their date and time, in the job file, and reference them on the change order.</li>
+  <li>If you can, show the client in person or by video call before you write the price.</li>
 </ol>
+<p>Then stop work in that area until the change order is signed. Waiting half a day costs less than a dispute over the final payment. Track the hours separately too, so your <a href="/blog/how-to-track-job-costs-contractors/">job costing</a> shows what the surprise actually cost.</p>
 
-<h2>Sample wording</h2>
-<p><em>"Change order #2: Add two pot lights in the hallway, including drywall patching and paint touch-up. Additional cost: $640 plus tax. Adds one day to the schedule. Approved by: ______ Date: ______"</em></p>
+<h2>Example: a filled change-order form</h2>
+<p>Example only, with assumed prices. Contract C-1042 (Ontario bathroom renovation, original total $20,792.00 including HST). Change order 2, dated 22 April. Reason: water-damaged subfloor and two damaged joists found under the old tub after removal; photos 14 to 19 in the job file.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Cut out and dispose of water-damaged subfloor</td><td>32</td><td>sq ft</td><td>$6.50</td><td>$208.00</td></tr>
+    <tr><td>Sister damaged floor joists with new 2x8, glued and bolted</td><td>2</td><td>each</td><td>$185.00</td><td>$370.00</td></tr>
+    <tr><td>Install 3/4 in. tongue-and-groove plywood subfloor, glued and screwed</td><td>32</td><td>sq ft</td><td>$9.00</td><td>$288.00</td></tr>
+    <tr><td><strong>Subtotal</strong></td><td></td><td></td><td></td><td><strong>$866.00</strong></td></tr>
+    <tr><td>HST (Ontario, 13%)</td><td></td><td></td><td></td><td>$112.58</td></tr>
+    <tr><td><strong>Change order total</strong></td><td></td><td></td><td></td><td><strong>$978.58</strong></td></tr>
+  </tbody>
+</table>
+<p>Below the table: revised contract total $21,770.58. Time impact: 2 working days; completion moves from 16 May to 20 May. Payment: due with the substantial-completion payment. Signed and dated by both parties before the repair starts.</p>
+<p>The HST rate is from the <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA's GST/HST rates page</a>. Why it is written this way:</p>
+<ul>
+  <li>Each line is priced by quantity, the same way the original quote was, so the client can see the subfloor area matches the photos.</li>
+  <li>The reason and photo numbers sit above the table, because "why is this extra" is the first question the client will ask.</li>
+  <li>The revised total and new completion date are stated outright, so the next progress invoice matches what was signed.</li>
+</ul>
+<p>Price change-order work with the same markup logic as the original job; interrupted work usually carries more setup per hour, not less. See <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a> for the method. quoteai can write a change like this as an itemized quote with the province's tax and send it as a PDF for the client to accept before you start.</p>
 
-<h2>Price extras properly</h2>
-<p>Extras are often interrupted work with setup time, so apply at least the same markup as the original job, and often more. For the arithmetic, see <a href="/tools/markup-margin-calculator/">markup vs margin</a> and <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>.</p>
-
-<h2>Put the rule in your contract and quote</h2>
-<p>One sentence handles most arguments: "Work outside the scope described will be quoted separately and approved in writing before it begins." Painters, renovators and electricians can generate change quotes in seconds using <a href="/quotes/painter/">quoting software for painters</a> and similar tools, then keep everything in one history. See also <a href="/blog/how-to-write-a-contractor-contract-canada/">how to write a contractor contract</a>.</p>
+<p><em>This is general information about Ontario and Alberta guidance, not legal advice.</em></p>
 `,
   "how-to-hire-and-pay-subcontractors-canada": `
-<p>This is general information, not legal or tax advice. Rules on employment status, workers' compensation and holdbacks vary by province, so confirm with your accountant and your provincial board. Here are the practical basics for contractors who bring in other trades.</p>
+<p>Bringing in another trade solves a scheduling problem and creates four paperwork problems: whether the person is really a subcontractor, whether their workers' compensation is in good standing, how the payment flows down with holdback and sales tax, and the year-end T5018 slip. Each one is cheaper to settle before the sub starts than after.</p>
 
-<h2>Subcontractor or employee?</h2>
-<p>The Canada Revenue Agency looks at the real working relationship: who controls how and when the work is done, who supplies tools, whether the person can hire helpers, and whether they take financial risk. Calling someone a subcontractor does not make them one. Misclassification can lead to back payroll deductions, EI and CPP assessments and penalties.</p>
-
-<h2>Before you hire</h2>
+<h2>Is this person a subcontractor at all?</h2>
+<p>The label in your agreement does not decide it. The CRA looks at the actual working relationship, and a payer's wish that a worker be self-employed does not make it so (<a href="https://www.canada.ca/en/revenue-agency/services/tax/canada-pension-plan-cpp-employment-insurance-ei-rulings/employee-self-employed.html" rel="noopener">CRA: employment status, employee or self-employed</a>). The longer CRA guide <a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4110/employee-self-employed.html" rel="noopener">Employee or Self-employed (RC4110)</a> walks through each factor, and the CRA also publishes guidance specific to construction workers (<a href="https://www.canada.ca/en/revenue-agency/services/tax/canada-pension-plan-cpp-employment-insurance-ei-rulings/cpp-ei-explained/canada-pension-plan-employment-insurance-explained-1.html" rel="noopener">CRA: construction workers</a>). The points that come up on real jobs:</p>
 <ul>
-  <li><strong>Proof of liability insurance</strong>: ask for a certificate and be named as additional insured where possible.</li>
-  <li><strong>Workers' compensation clearance</strong>: in many provinces you can be liable if a sub is not registered. Ask for a clearance certificate.</li>
-  <li><strong>Licences and certifications</strong>: especially for electrical, gas and plumbing work.</li>
-  <li><strong>GST/HST registration</strong>: so you can claim input tax credits where eligible.</li>
-  <li><strong>References and past work</strong>: call two previous customers.</li>
+  <li><strong>Control.</strong> Giving a sub the drawings and specifications does not by itself mean you control how the work is done. Telling them which hours to work, in what order, under your supervision, points the other way.</li>
+  <li><strong>Tools.</strong> Bringing small hand tools is not a strong sign either way. Owning and maintaining the major equipment is.</li>
+  <li><strong>Helpers.</strong> A self-employed sub can hire helpers or send someone else. An employee has to do the work personally.</li>
+  <li><strong>Pay and risk.</strong> A self-employed worker is usually paid by the job and can make or lose money on it. Hourly or daily pay with no risk looks like employment.</li>
+  <li><strong>A business of their own.</strong> A business licence, a separate bank account, liability insurance and supplier accounts all point to self-employment.</li>
+</ul>
+<p>If the contract is formed in Québec, the Civil Code applies and the CRA uses a different, three-step approach (<a href="https://www.canada.ca/en/revenue-agency/services/tax/canada-pension-plan-cpp-employment-insurance-ei-rulings/employee-self-employed/determine-employment-status.html" rel="noopener">CRA: determine the employment status</a>). Either you or the worker can ask the CRA for a CPP/EI ruling when it is unclear.</p>
+<p>Workers' compensation boards apply their own tests. WorkSafeBC, for example, says a contractor who supplies only labour, or labour and minor materials such as nails or drywall tape, or works regular hours for you on an ongoing basis, is likely your worker, and you would owe their premiums (<a href="https://www.worksafebc.com/en/insurance/need-coverage/who-needs-coverage/contractors-subcontractors" rel="noopener">WorkSafeBC: contractors and subcontractors</a>). If the answer is "employee", read <a href="/blog/how-to-hire-your-first-employee-contractor-canada/">hiring your first employee</a> instead.</p>
+
+<h2>What the subcontract should say</h2>
+<p>It can be two pages, but it should exist before the sub's first day. Cover:</p>
+<ul>
+  <li><strong>Scope</strong> tied to the drawings or your quote to the owner, with what is excluded, and who supplies which materials.</li>
+  <li><strong>Price and payment terms</strong>: how often they invoice, what an invoice must show (business name, GST/HST number, description), how much you hold back and when it is released.</li>
+  <li><strong>Changes</strong> only on a signed change order, priced before the work; the <a href="/blog/how-to-handle-change-orders-contractors/">change order guide</a> has the form.</li>
+  <li><strong>Insurance and workers' compensation</strong>: the liability certificate you need, a valid clearance before the start date, and a fresh one before final payment.</li>
+  <li><strong>Schedule, site rules, safety, clean-up and warranty</strong> on their portion, so defects come back to them, not only to you.</li>
+  <li><strong>Information for the T5018</strong>: their legal name, address and business number or SIN, collected up front.</li>
+</ul>
+<p>For the clauses themselves, see <a href="/blog/how-to-write-a-contractor-contract-canada/">how to write a contractor contract</a>.</p>
+
+<h2>Clearance before day one</h2>
+<p>If your sub does not pay its workers' compensation premiums, the board can come to you. In Ontario, the principal who hires a contractor for construction work must obtain a WSIB clearance before the work begins and keep one in effect throughout; starting without it is an offence for both of you, and without one you may be liable for the sub's unpaid amounts up to the labour portion of the subcontract (<a href="https://www.wsib.ca/en/operational-policy-manual/clearance-certificate-construction" rel="noopener">WSIB policy: clearance certificate in construction</a>). WSIB clearances are valid for up to 90 days, and the maximum fine for a conviction under the Act is $100,000 (<a href="https://www.wsib.ca/en/clearancefaqs" rel="noopener">WSIB: questions and answers on clearances</a>).</p>
+<p>In British Columbia, protection from a sub's unpaid premiums requires a clearance letter addressed to you, confirming the sub was active and in good standing for the entire contract; WorkSafeBC says to get one before and after the work (<a href="https://www.worksafebc.com/en/insurance/why-clearance-letter" rel="noopener">WorkSafeBC: why do I need a clearance letter</a>). Québec and Alberta work the same way in principle; the <a href="/blog/contractor-insurance-canada-what-you-need/">contractor insurance guide</a> covers the CNESST attestation and WCB-Alberta clearances.</p>
+
+<h2>Holdback and prompt payment flow down</h2>
+<p>In Ontario, every payer on a contract or subcontract under which a lien may arise must retain a holdback of 10% of the price of the services or materials as they are supplied (<a href="https://www.ontario.ca/laws/statute/90c30" rel="noopener">Ontario Construction Act, s. 22</a>). The owner holds back from you, and you hold back from your sub. The same Act sets the clock: the owner pays a proper invoice within 28 days of receiving it unless it gives a notice of non-payment (s. 6.4), and a contractor who is paid must pay each sub whose work was in that invoice within seven days (s. 6.5). If you dispute part of a sub's work, the Act's notice of non-payment is how you do it. Other provinces have their own lien and holdback statutes; the <a href="/tools/holdback-calculator/">holdback calculator</a> handles the arithmetic.</p>
+
+<h2>GST/HST on sub invoices</h2>
+<p>Before you claim input tax credits on a sub's invoice, check the GST/HST number they gave you in the CRA's <a href="https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-businesses/confirming-a-gst-hst-account-number.html" rel="noopener">GST/HST Registry</a>. The CRA's documentation rules scale with the invoice: from $100 the invoice must show the supplier's registration number and the tax charged, and from $500 it must also show your name, a brief description and the payment terms (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/calculate-prepare-report/input-tax-credit.html" rel="noopener">CRA: input tax credits</a>). A sub who is not registered charges no GST/HST, so there is no credit to claim.</p>
+<p>Holdback has a tax wrinkle: when a holdback is required by law or by the written contract, the tax on the held-back amount is payable on the earlier of the day it is paid out and the day the holdback period expires (<a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/19-1/real-property-gst-hst.html" rel="noopener">CRA GST/HST Memorandum 19-1, para. 82</a>). Agree with your subs and your accountant how invoices will show it.</p>
+
+<h2>The T5018 slip</h2>
+<p>The Contract Payment Reporting System applies to you if all three conditions hold: more than 50% of your business income comes from construction, you paid Canadian-resident subcontractors for construction services, and your payments to a sub in the year were more than $500, not counting GST/HST (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/completing-filing-information-returns/t5018-slip-statement-contract-payments.html" rel="noopener">CRA: T5018 slip</a>). The same page says:</p>
+<ul>
+  <li>Payments for goods only are not reported.</li>
+  <li>The amount you report includes GST/HST and PST, and it goes in the year it is paid, so a holdback released in March is next year's number.</li>
+  <li>You can report on a calendar year or on your fiscal period.</li>
+  <li>The slip carries the sub's business number or SIN; your own account number goes only on the CRA's copy.</li>
+</ul>
+<p>The return is due six months after the end of the reporting period you chose (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/file-information-returns-slip-summaries/when-to-file.html" rel="noopener">CRA: when to file information returns</a>).</p>
+
+<h2>Example: one month of sub payments, with the T5018 fields</h2>
+<p>Example only: an Ontario renovation contractor's November record. Names are placeholders and amounts are assumptions. HST is 13% in Ontario (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA: GST/HST rates by province</a>). Holdback here is 10% of the pre-tax value of work.</p>
+<table>
+  <thead>
+    <tr><th>Subcontractor</th><th>BN or SIN on file</th><th>GST/HST # checked</th><th>Clearance valid to</th><th>Value of work</th><th>HST</th><th>Holdback</th><th>Paid in Nov.</th><th>Paid this year, incl. tax</th><th>T5018</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Drywall sub (corporation)</td><td>BN</td><td>Yes</td><td>Jan. 20</td><td>$8,000.00</td><td>$1,040.00</td><td>$800.00</td><td>$8,240.00</td><td>$31,240.00</td><td>Yes</td></tr>
+    <tr><td>Electrical sub (sole proprietor)</td><td>BN</td><td>Yes</td><td>Dec. 15</td><td>$3,200.00</td><td>$416.00</td><td>$320.00</td><td>$3,296.00</td><td>$3,296.00</td><td>Yes</td></tr>
+    <tr><td>Caulking sub (not GST/HST registered)</td><td>SIN</td><td>Not registered</td><td>Dec. 2</td><td>$400.00</td><td>$0.00</td><td>$40.00</td><td>$360.00</td><td>$360.00</td><td>Not yet</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td><strong>$11,600.00</strong></td><td><strong>$1,456.00</strong></td><td><strong>$1,160.00</strong></td><td><strong>$11,896.00</strong></td><td></td><td></td></tr>
+  </tbody>
+</table>
+<p>How to read it:</p>
+<ul>
+  <li>"Paid in Nov." is value of work plus HST, minus holdback ($8,000 + $1,040 &minus; $800 = $8,240). The holdback goes on a separate list with its release date.</li>
+  <li>The caulking sub is under the $500 test so far this year, but the column runs all year: one more visit and the slip is required.</li>
+  <li>Only the HST on the two registered subs' invoices can be claimed as an input tax credit.</li>
+  <li>The clearance column is a date, because a lapsed clearance protects no one. The electrical sub's runs out mid-December, so a fresh one is needed before the next payment.</li>
 </ul>
 
-<h2>Put it in writing</h2>
-<p>A subcontract should cover scope, price, schedule, payment terms, change orders, insurance, warranty on their work and how defects are fixed. It does not need to be long, but it must exist. Use the same change-order discipline you use with clients: <a href="/blog/how-to-handle-change-orders-contractors/">our change order guide</a> explains how.</p>
-
-<h2>Paying subs</h2>
-<ul>
-  <li>Pay on the agreed schedule. Reliable payment is how you keep good subs.</li>
-  <li>Check holdback rules in your province, since some require withholding a percentage until completion.</li>
-  <li>Track payments by job so you know your true margin.</li>
-  <li>Issue year-end slips where required, such as T5018 for construction subcontractor payments in many cases.</li>
-</ul>
-
-<h2>Price subs into your quote</h2>
-<p>Sub costs should carry markup for coordination, risk and your warranty on the whole job. Include them as clear line items in the quote, which quoting software for <a href="/quotes/general-contractor/">general contractors</a> handles together with materials and labour. See also <a href="/tools/markup-margin-calculator/">markup vs margin</a>.</p>
+<h2>Price subs into your own quote</h2>
+<p>A sub's price is your cost, not your price. You coordinate them, carry the holdback, finance the gap between paying them and being paid, and stand behind their work under your warranty. Mark it up like any other cost; the <a href="/tools/markup-margin-calculator/">markup and margin calculator</a> shows what a given markup leaves you. On the quote to the owner, show the sub's work as its own priced lines so a change to their scope is easy to trace; quoteai lays those lines out with the province's taxes in the PDF it sends.</p>
+<p>This is general information, not legal or tax advice. Confirm your situation with an accountant, your provincial workers' compensation board and, for holdback disputes, a construction lawyer.</p>
 `,
   "how-to-scale-a-contracting-business-canada": `
-<p>Many contractors reach a ceiling: more work than they can do alone, but hiring feels risky. Scaling is not about working more hours. It is about building a business that makes money when you are not holding the tool. Here is a realistic path.</p>
+<p>Growing a trade business means selling more hours than one person can work. The hard part is not finding those hours: it is making sure each new one pays for itself plus the overhead it drags in. The stages below follow the usual path from owner on the tools to owner running crews, with the decisions that come up at each step.</p>
 
-<h2>1. Fix your pricing first</h2>
-<p>Growing an unprofitable business just creates a larger unprofitable business. Know your true hourly cost including overhead, apply a margin, and stop underpricing. See <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a> and <a href="/tools/markup-margin-calculator/">markup vs margin</a>.</p>
+<h2>The trap: revenue without margin</h2>
+<p>Before adding anyone, look at what each job leaves you after labour, materials and overhead. A business that loses a little on every job does not fix that by doing more jobs: it loses more, and needs more cash to do it, because wages and materials are paid before clients pay you. Growth widens that gap. A bigger crew means a bigger payroll every two weeks, more materials bought on account and more invoices waiting to be paid.</p>
+<p>So the first growth step is knowing your numbers per job. If you don't yet compare estimate against actual on every job, start with <a href="/blog/how-to-track-job-costs-contractors/">how to track job costs</a>, and plan the cash side with the <a href="/blog/contractor-cash-flow-management-canada/">cash flow guide</a>. The capacity example at the end of this article shows how revenue can double while the owner's share shrinks.</p>
 
-<h2>2. Systemize the office work</h2>
-<p>If you are the only one who can quote, invoice, schedule and chase payments, you cannot step away. Standardize:</p>
+<h2>Stage 1: solo, with the office in the truck</h2>
+<p>At this stage you are estimator, crew and bookkeeper. Two habits make the next stage possible: a quoting routine that produces the same itemized format every time, so someone else can learn it later (see <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>), and a job record for every job: address, scope, hours, materials, photos, invoice. quoteai writes the itemized quote with your province's taxes and sends it as a PDF, which keeps that record in one place from the first job.</p>
+
+<h2>Stage 2: first help, subcontractor or employee</h2>
+<p>The first extra pair of hands is usually either a subcontractor for specific work or an employee who works under your direction. The label you choose doesn't decide it. The Canada Revenue Agency's guide <a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4110/employee-self-employed.html" rel="noopener">Employee or Self-employed (RC4110)</a> explains that the CRA looks at the parties' intent and then at the facts: the level of control the payer has, who provides the tools and equipment, whether the worker can subcontract or hire assistants, the worker's financial risk, responsibility for investment and management, and opportunity for profit. In Québec, the same guide describes a different set of factors. A "sub" who works only for you, on your schedule, with your tools, may be an employee in the CRA's eyes.</p>
 <ul>
-  <li>A repeatable quoting process (see <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">sending quotes in 5 minutes</a>)</li>
-  <li>Invoice and deposit rules</li>
-  <li>Job checklists and photo requirements</li>
-  <li>A single place for client and job information</li>
+  <li><strong>Subcontractors</strong> suit work outside your trade or peaks you can't predict. You pay per job, they carry their own tools, insurance and workers' compensation account. Setting them up properly is covered in <a href="/blog/how-to-hire-and-pay-subcontractors-canada/">how to hire and pay subcontractors</a>.</li>
+  <li><strong>An employee</strong> suits steady work in your own trade, where you want control over how and when it is done and someone you can train. Payroll account, source deductions, workers' compensation and the real hourly cost are in <a href="/blog/how-to-hire-your-first-employee-contractor-canada/">how to hire your first employee</a>.</li>
 </ul>
 
-<h2>3. Hire for the constraint</h2>
-<p>Hire where you are the bottleneck. For many, the first hire is a helper or apprentice who frees up your billable hours. Next may be a lead hand, then admin help. Understand payroll, source deductions, WSIB or provincial coverage before you start. If you use subs, read <a href="/blog/how-to-hire-and-pay-subcontractors-canada/">hiring subcontractors</a>.</p>
+<h2>Stage 3: systems before the second crew</h2>
+<p>With two or three people, the business stops fitting in your head. Before adding a second crew, three systems need to work without you:</p>
+<ul>
+  <li><strong>Quoting:</strong> a price list with current labour rates, standard line items for your common jobs and a validity period on every quote, so a lead hand could price a simple job the way you would.</li>
+  <li><strong>Scheduling:</strong> a shared calendar that shows who is where, what materials are due and which inspections are booked. The <a href="/blog/construction-project-management-small-contractors/">job site management guide</a> covers sequencing, daily logs and closeout.</li>
+  <li><strong>Job costing:</strong> hours logged against each job daily, materials receipts attached to the job, and a weekly look at jobs running over.</li>
+</ul>
 
-<h2>4. Protect cash flow</h2>
-<p>Growth eats cash: more materials, more payroll, slower receivables. Take deposits, bill in stages and invoice fast. See <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">how to get paid on time</a>.</p>
+<h2>Business structure: sole proprietor or corporation</h2>
+<p>Ontario's business guide on <a href="https://www.ontario.ca/page/business/start/decide-ownership-structure" rel="noopener">deciding on an ownership structure</a> calls the sole proprietorship the easiest and most common way to start a business, and sets out the trade-off. It is easy and inexpensive to set up and its income is taxed at your personal rate, but you are responsible for all debts and losses, and creditors can take personal assets. A corporation is a legal entity separate from you, with limited liability, but it costs more to set up, its tax rules are more complex and it requires annual filings and corporate records. You can incorporate federally or provincially, and the same page notes that a sole proprietorship not using the owner's own name has to register that name.</p>
+<p>Limited liability has limits in practice: lenders and suppliers can ask owners of small corporations for personal guarantees, and insurance still matters. Ontario's guide says to consult a lawyer or professional advisor before incorporating, and the decision usually turns on income level and tax planning, which is a question for an accountant.</p>
 
-<h2>5. Create lead flow you control</h2>
-<p>Referrals are great but unpredictable. Add a Google Business Profile, reviews, and service pages. See the <a href="/blog/google-business-profile-guide-for-tradespeople/">Google profile guide</a> and <a href="/blog/how-to-get-more-reviews-as-a-contractor/">review guide</a>.</p>
+<h2>GST/HST registration</h2>
+<p>Growth often pushes a solo operator past the small-supplier limit. The CRA's page on <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/when-register-charge.html" rel="noopener">when to register for and start charging the GST/HST</a> says you stay a small supplier while you don't exceed $30,000 in taxable sales over four consecutive calendar quarters. If you exceed $30,000 in a single quarter, you must charge tax on the sale that took you over and register. If you exceed it over four quarters but not in one, you stop being a small supplier at the end of the month after that quarter. One large job in a busy quarter can trigger the single-quarter rule.</p>
 
-<h2>6. Choose your jobs</h2>
-<p>Not every job is worth taking. Track margin by job type and say no (or price higher) to low-margin, high-stress work. Specialize where you win.</p>
+<h2>Licensing as the work grows</h2>
+<p>Taking on bigger or different work can need a different licence. In Québec, the Régie du bâtiment du Québec issues licences by subclass, and a general contractor's licence covers work in one or more of <a href="https://www.rbq.gouv.qc.ca/en/licence/determining-your-licence-subclasses/general-contractor-subclasses/" rel="noopener">11 general contractor subclasses</a>, including 1.2 (small buildings), 1.3 (all buildings) and 1.9 (building mechanicals). A contractor licensed for small buildings who starts bidding larger ones needs to check the subclass first. <a href="https://www.rbq.gouv.qc.ca/en/licence-6/modifying-a-licence/adding-a-class-or-a-subclass/" rel="noopener">Adding a subclass</a> means applying to modify the licence, writing examinations for subclasses in Schedules I and II, and allowing processing time: the RBQ says it processes a complete application within 60 days. Plumbing and electrical subclasses go through the Corporation des maîtres mécaniciens en tuyauterie du Québec and the Corporation des maîtres électriciens du Québec.</p>
+<p>Other provinces license by trade rather than by subclass. In Ontario, for example, the Electrical Safety Authority states that anyone hired to do electrical work in a home <a href="https://esasafe.com/compliance/what-you-need-to-know/" rel="noopener">must by law be a Licensed Electrical Contractor</a>. If growth means adding a service outside your trade, check who is allowed to do it before you quote it.</p>
 
-<h2>7. Manage risk</h2>
-<p>Bigger crews mean bigger exposure. Keep contracts, insurance and change orders tight: <a href="/blog/how-to-write-a-contractor-contract-canada/">contract checklist</a>, <a href="/blog/contractor-insurance-canada-what-you-need/">insurance guide</a>.</p>
+<h2>Seasonal work and winter planning</h2>
+<p>Exterior trades lose months to winter, and some interior and HVAC trades see their own lulls. A crew makes this sharper: an employee's wage keeps running when the work stops. Plan the slow months during the busy ones:</p>
+<ul>
+  <li><strong>Sell slow-season work in advance.</strong> Book interior painting, bathrooms or basements for the quiet months while clients are already talking to you.</li>
+  <li><strong>Add recurring work.</strong> Annual inspections, tune-ups, maintenance visits and, where it fits, snow-related services.</li>
+  <li><strong>Add a related service you are qualified for</strong>, such as a roofer adding eavestrough repair or a painter adding drywall repair.</li>
+  <li><strong>Market before demand comes back.</strong> Update photos and your profile, ask recent clients for reviews and follow up on quotes that went quiet.</li>
+  <li><strong>Use quiet weeks on the business:</strong> update the price list, review job costs, service equipment, train the crew.</li>
+  <li><strong>Hold cash back</strong> from busy months to cover payroll and overhead through the slow ones.</li>
+</ul>
 
-<h2>Tools that scale with you</h2>
-<p>The right software keeps quotes, jobs, crew and invoices in one place so growth does not mean more paperwork. See quoteai for <a href="/quotes/general-contractor/">general contractors</a>.</p>
+<h2>Example: crew size, billable hours and what is left</h2>
+<p>Example only. Assumptions: 1,800 paid hours a year per person; the owner bills 60% of their hours while working on the tools, 50% when also running a crew and none when running two crews; employees bill 75%; a blended billing rate of $85 an hour; each employee costs $35 an hour with payroll costs; part-time office help costs $30,000 a year; materials are left out because they pass through. Change any of these to your own figures.</p>
+<table>
+  <thead>
+    <tr><th>Crew</th><th>Billable hours per year</th><th>Labour revenue at $85/h</th><th>Employee cost</th><th>Overhead</th><th>Left for owner pay and profit</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Owner alone</td><td>1,080</td><td>$91,800</td><td>$0</td><td>$30,000</td><td>$61,800</td></tr>
+    <tr><td>Owner + 1 employee</td><td>2,430</td><td>$206,550</td><td>$63,000</td><td>$40,000</td><td>$103,550</td></tr>
+    <tr><td>Owner + 2 employees</td><td>3,600</td><td>$306,000</td><td>$126,000</td><td>$50,000</td><td>$130,000</td></tr>
+    <tr><td>Owner off the tools, 4 employees in two crews, part-time office help</td><td>5,400</td><td>$459,000</td><td>$282,000</td><td>$70,000</td><td>$107,000</td></tr>
+  </tbody>
+</table>
+<p>The last row is the trap in numbers. Revenue is more than double the second row, yet less is left than with two employees, because the owner's own billable hours disappear and office help and overhead arrive. The step only pays if the rate rises, utilisation stays up or the owner's time goes into selling better-margin work. Utilisation is the sensitive figure: in the last row, each 5 points of lost utilisation across four employees is 360 hours, or $30,600 of revenue at the same cost.</p>
+<p>This is general information, not legal or tax advice. For your structure, registration and licensing, check the official sources linked above and talk to an accountant or lawyer in your province.</p>
 `,
   "how-to-track-job-costs-contractors": `
-<p>Many contractors know their bank balance but not which jobs made money. Job costing means comparing what you quoted to what you actually spent. It is the fastest way to improve your next quote.</p>
+<p>The bank balance at year end tells you whether the business made money. It does not tell you which jobs made it, which lost it, or which line of your estimate is wrong every time. Job costing answers those questions by recording every cost against the job and the estimate line it belongs to, then comparing the two while the job is still running and again when it closes.</p>
 
-<h2>What to track on every job</h2>
+<h2>Start with cost codes that match your estimate</h2>
+<p>A cost code is just a short label for a type of work or cost: 01 Demolition, 02 Disposal, 08 Tile labour. Their only job is to let you put the estimate and the actual cost side by side, so the codes must be the same ones your estimate is built from. If you quote a bathroom as twelve lines, track it on the same twelve lines.</p>
 <ul>
-  <li><strong>Labour hours</strong> by person (including your own)</li>
-  <li><strong>Materials</strong> with receipts, returns and waste</li>
-  <li><strong>Subcontractor costs</strong></li>
-  <li><strong>Equipment and rentals</strong></li>
-  <li><strong>Travel, disposal and permits</strong></li>
-  <li><strong>Change orders</strong> and approved extras (see <a href="/blog/how-to-handle-change-orders-contractors/">our guide</a>)</li>
+  <li><strong>Keep the list short.</strong> Short enough that the crew can pick the right code without asking. If a code is never used, delete it; if people keep guessing, merge two.</li>
+  <li><strong>Split labour from materials</strong> on the lines where both happen, because they go wrong for different reasons: hours overrun on site, materials overrun at the counter.</li>
+  <li><strong>Give subcontractors their own codes.</strong> A fixed-price sub should land exactly on estimate; when it doesn't, you want to see why.</li>
+  <li><strong>Add a code for each change order</strong> so extra work and its cost stay out of the original lines.</li>
 </ul>
 
-<h2>Estimate vs actual</h2>
-<p>For each job, put the quoted number next to the actual cost in the same categories. The difference is where you learn. If painting prep always runs 30% over, your quote is wrong, not your crew.</p>
+<h2>Capture labour the day it happens</h2>
+<p>Hours written up from memory on a Friday are guesses, and labour is the line where guesses cost the most. Have each person log hours by job and cost code every day, on a phone or a paper sheet in the truck. Price the hours at your loaded rate (wage plus vacation pay, CPP, EI, workers' compensation and non-billable time), not the bare wage; the <a href="/tools/labour-rate-calculator/">labour rate calculator</a> works that rate out. Count your own hours too. An owner's unpaid evening on site is still a cost of the job, and leaving it out makes a job look better than it was.</p>
 
-<h2>Allocate overhead honestly</h2>
-<p>Insurance, vehicles, software, admin and your own unpaid time belong in the cost of doing business. Spread them across jobs as a percentage or hourly rate so a "profitable" job is actually profitable.</p>
-
-<h2>Simple tracking system</h2>
+<h2>Record committed costs, not only paid ones</h2>
+<p>A cost is committed when you have agreed to it: a purchase order to the supplier, a signed subcontract, a special order. It hits the job before the invoice arrives. If you only count bills already paid, the job looks healthy right up to the month the plumber's invoice lands. For each open job keep three figures per cost code:</p>
 <ol>
-  <li>Create a job file or folder for every accepted quote.</li>
-  <li>Log hours daily on a phone, not on Friday from memory.</li>
-  <li>Photograph receipts on the spot and tag them to the job.</li>
-  <li>Review each job at completion: quoted vs actual, margin and notes.</li>
+  <li><strong>Cost to date:</strong> labour logged plus invoices received.</li>
+  <li><strong>Committed:</strong> purchase orders and subcontracts agreed but not yet invoiced.</li>
+  <li><strong>Estimate to complete:</strong> your honest view of what is still to be spent.</li>
 </ol>
+<p>Their sum is the forecast final cost. Compare it to the estimate every week on a running job, not at the end.</p>
 
-<h2>Warning signs</h2>
+<h2>Know when to stop and write a change order</h2>
+<p>A variance is either your estimate being wrong or the job changing. They need different responses. If tile labour runs long on a standard layout, that is your estimate, and the lesson goes into the next quote. If the floor comes up and the subfloor is rotten, the scope has changed. The moment a line's forecast passes its estimate because of something that was not in the quote, stop work on that item, write it up and get it signed before you go on. Costs spent before the client agrees are the hardest to recover. See <a href="/blog/how-to-handle-change-orders-contractors/">how to handle change orders</a> for the form and the wording.</p>
+
+<h2>Example: job-cost sheet for a bathroom renovation</h2>
+<p>Example only, with assumed figures. A full bathroom renovation quoted at $19,500 before tax, with one signed change order for $900 to replace a rotten section of subfloor. Labour is costed at an assumed loaded rate of $55 an hour. The job is closed, so committed costs and estimate to complete are zero.</p>
+<table>
+  <thead>
+    <tr><th>Code</th><th>Item</th><th>Estimate</th><th>Actual</th><th>Variance</th><th>Note</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>01</td><td>Demolition labour</td><td>$880 (16 h)</td><td>$1,100 (20 h)</td><td>+$220</td><td>Tile set on mortar bed, slower removal</td></tr>
+    <tr><td>02</td><td>Disposal bin</td><td>$450</td><td>$450</td><td>$0</td><td></td></tr>
+    <tr><td>03</td><td>Plumbing subcontract</td><td>$3,200</td><td>$3,200</td><td>$0</td><td>Fixed price</td></tr>
+    <tr><td>04</td><td>Electrical subcontract</td><td>$1,400</td><td>$1,400</td><td>$0</td><td>Fixed price</td></tr>
+    <tr><td>05</td><td>Waterproofing and backer materials</td><td>$620</td><td>$690</td><td>+$70</td><td>Extra membrane roll</td></tr>
+    <tr><td>06</td><td>Tile materials</td><td>$1,850</td><td>$1,980</td><td>+$130</td><td>Waste on large-format cuts</td></tr>
+    <tr><td>07</td><td>Tile labour</td><td>$2,200 (40 h)</td><td>$2,860 (52 h)</td><td>+$660</td><td>Niche and large-format leveling</td></tr>
+    <tr><td>08</td><td>Fixtures (vanity, toilet, valve trim)</td><td>$2,400</td><td>$2,400</td><td>$0</td><td></td></tr>
+    <tr><td>09</td><td>Drywall and paint labour</td><td>$660 (12 h)</td><td>$770 (14 h)</td><td>+$110</td><td></td></tr>
+    <tr><td>10</td><td>Drywall and paint materials</td><td>$280</td><td>$260</td><td>-$20</td><td></td></tr>
+    <tr><td>11</td><td>Consumables</td><td>$150</td><td>$210</td><td>+$60</td><td>Blades, thinset top-up</td></tr>
+    <tr><td>CO-1</td><td>Subfloor repair (change order)</td><td>$0</td><td>$640</td><td>+$640</td><td>Billed at $900, signed before work</td></tr>
+    <tr><td></td><td><strong>Total cost</strong></td><td><strong>$14,090</strong></td><td><strong>$15,960</strong></td><td><strong>+$1,870</strong></td><td></td></tr>
+    <tr><td></td><td><strong>Revenue before tax</strong></td><td><strong>$19,500</strong></td><td><strong>$20,400</strong></td><td><strong>+$900</strong></td><td>Contract plus CO-1</td></tr>
+    <tr><td></td><td><strong>Gross margin</strong></td><td><strong>$5,410 (27.7%)</strong></td><td><strong>$4,440 (21.8%)</strong></td><td><strong>-$970</strong></td><td></td></tr>
+  </tbody>
+</table>
+<p>What the sheet says:</p>
 <ul>
-  <li>Materials cost creeping above your estimate</li>
-  <li>Labour hours consistently exceeding the plan</li>
-  <li>Many unbilled extras</li>
-  <li>Jobs that finish late and tie up crews</li>
+  <li>The change order did its job: the subfloor cost $640 and was billed at $900, so the surprise added margin instead of eating it.</li>
+  <li>Almost all of the loss is labour on the original scope: 18 more hours than estimated, 12 of them in tile. That is an estimating problem. Next time, price large-format tile and niches from your actual hours per square foot on this job, not from a general bathroom figure. The <a href="/blog/how-to-quote-a-tiling-job/">tiling quote guide</a> covers how to build those lines.</li>
+  <li>Material variances are small and explainable. They do not need a price change, just a slightly larger waste allowance on large-format tile.</li>
 </ul>
 
-<h2>Use the results</h2>
-<p>Update your price list and markup using real data. See <a href="/tools/markup-margin-calculator/">markup vs margin</a>. Software that links the quote to the job and invoice, like quoteai for <a href="/quotes/general-contractor/">general contractors</a>, makes the comparison automatic instead of a weekend project.</p>
+<h2>WIP and over- or under-billing, in plain terms</h2>
+<p>On longer jobs, compare what you have billed with what you have actually earned. A simple way to measure earned value is by cost: if you have spent 60% of the estimated cost, treat the job as 60% complete.</p>
+<p>Example: a $40,000 job with an estimated cost of $30,000 and $18,000 spent so far is 60% complete, so it has earned $24,000. If you have billed $30,000, you are <strong>over-billed</strong> by $6,000: the cash is ahead of the work, and that money is already owed back to the job as labour and materials. If you have billed only $18,000, you are <strong>under-billed</strong> by $6,000: you are financing the client, and the next invoice is late. A schedule of open jobs showing contract, estimated cost, cost to date, percent complete, earned, billed and the difference is all a work-in-progress (WIP) report is. Under-billing across several jobs at once is one of the quickest ways to run short of cash; see <a href="/blog/contractor-cash-flow-management-canada/">contractor cash flow management</a>.</p>
+
+<h2>Keep the records</h2>
+<p>Timesheets, supplier invoices, subcontractor bills, purchase orders and change orders are also your tax records. The CRA's general rule is that you keep required records and supporting documents for six years from the end of the last tax year they relate to (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/keeping-records/where-keep-your-records-long-request-permission-destroy-them-early.html" rel="noopener">CRA: where to keep your records and for how long</a>). Filing them by job and cost code serves both purposes at once.</p>
+
+<h2>Use the history to price the next job</h2>
+<p>After every job, spend fifteen minutes on the sheet: what ran over, why, and what the quote should have said. Update your production rates (hours per fixture, per square foot of tile, per sheet of drywall) and material allowances from the actuals, then rebuild your price from the corrected costs, overhead and margin, as in <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>. Check the result with the <a href="/tools/markup-margin-calculator/">markup and margin calculator</a> so a 21.8% job is not mistaken for a 27.7% one. When each quote in quoteai is itemized on the same lines you track, comparing quoted to actual is a matter of reading two columns.</p>
+
+<p><em>This is general information, not tax or accounting advice. Ask your accountant how job costs and work in progress should be reported for your business.</em></p>
 `,
   "reduce-material-costs-contractors-canada": `
 <p>Materials commonly make up a third to half of a job's cost, and their prices move. Small improvements here go straight to profit. These ten habits help without compromising the finished work.</p>
@@ -882,77 +1232,137 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Outdated unit prices quietly erode margin. Tools like <a href="/pricing/">quoteai</a> let you update your rates once and have every new quote use them.</p>
 `,
   "construction-project-management-small-contractors": `
-<p>Big construction firms have project managers and expensive software. Small contractors have a phone and a truck. You do not need enterprise tools, but you do need a simple system, because most delays and disputes come from missing information, not bad work.</p>
+<p>On a small renovation, delays often come from a vanity that is still on back order after demolition, a plumber booked the day before the rough-in is ready, an inspection nobody requested, or a client who didn't know a decision was due. A light system that a two- or three-person crew can keep up from a phone handles all of these.</p>
 
-<h2>1. A clear plan before day one</h2>
+<h2>Build the schedule around inspections and lead times</h2>
+<p>Start with what you don't control, inspections and deliveries. Treat every required inspection as a milestone on the schedule, with the work before it as a deadline. The City of Toronto's page on <a href="https://www.toronto.ca/services-payments/building-construction/building-permit/after-you-apply-for-a-building-permit/building-inspections/about-building-inspections/when-to-call-for-inspection-of-small-buildings/" rel="noopener">when to call for inspections of small buildings</a> is a good model of what a municipality expects on a house or small commercial job under Part 9 of the Ontario Building Code:</p>
 <ul>
-  <li>Scope and exclusions agreed in writing</li>
-  <li>Start date, milestones and target finish</li>
-  <li>Materials ordered with lead times confirmed</li>
-  <li>Permits and inspections booked</li>
+  <li>you notify the inspector when the project is ready for each required inspection, and inspections take place within the next two business days of the date you request;</li>
+  <li>plumbing rough-in (water supply, drains, waste and vents) is inspected at completion and ready for testing, and there is a final plumbing inspection when fixtures are installed;</li>
+  <li>the stamped permit plans must be on site, and anything covered before it has passed inspection has to be uncovered;</li>
+  <li>property owners must book a final inspection to close the permit, and the page warns that open permits can complicate a future sale or permit application.</li>
 </ul>
+<p>Your municipality's list will differ in detail, so read it when the permit is issued and put each inspection on the calendar. Electrical work runs on a separate track in Ontario: the Electrical Safety Authority says that <a href="https://esasafe.com/compliance/what-you-need-to-know/" rel="noopener">having a building permit isn't the same as filing an electrical notification</a>, that you may need both; the Licensed Electrical Contractor files the notification and requests the inspection.</p>
+<p>For materials, make one list with a "needed on site by" date for each item, and confirm stock or a delivery date before you set the start date. On a bathroom, that means the vanity, toilet, shower valve and trim, tile, membrane and any glass that is measured after tile. Don't open walls until the long-lead items are in hand or confirmed.</p>
 
-<h2>2. Schedule the crew and trades</h2>
-<p>Overlapping trades are the top cause of idle time. Sequence work so the next trade arrives when the last one finishes, and confirm the day before by text.</p>
+<h2>Sequence trades by ready conditions, not dates alone</h2>
+<p>Give each trade a date and the condition that must be true before they arrive: "plumber Thursday, once the floor is open and new blocking is in." Confirm the day before, by text, with the address, the time and what is ready. If the condition isn't met, move the trade before they drive over rather than paying for a wasted visit or losing their next open day.</p>
+<p>Keep one sequence for the job and share it with everyone on it: protection and demolition, framing, rough-ins, rough-in inspections, close-up, finishes, fixtures, final inspections.</p>
 
-<h2>3. Keep a daily log</h2>
-<p>Two minutes at the end of the day: who worked, what was done, what was delivered, any issues. When a client or inspector asks "when did that happen?" you have the answer.</p>
+<h2>Site meetings that take fifteen minutes</h2>
+<p>Hold a pre-start meeting with the homeowner before day one. Cover access and keys, parking, work hours, dust protection, which washroom the crew may use, where materials are stored and, most important, the dates by which the client must make each remaining decision (tile, paint colour, fixture finish). Write the answers down and send them the same day.</p>
+<p>On jobs longer than a week, a short weekly meeting on site with the lead hand and any trade starting that week keeps everyone on the same sequence. Write down what was decided and who does what by when.</p>
 
-<h2>4. Photograph everything</h2>
-<p>Before, during and after, especially anything that will be covered by drywall or flooring. Photos protect you in disputes and build trust.</p>
+<h2>Daily logs and photos</h2>
+<p>A daily log takes two minutes at the end of the day and answers questions months later: date, who was on site and for how long, work done, deliveries received, inspections and results, problems, and anything the client asked for. Log hours against the job so the same record feeds your job costing.</p>
+<p>Photograph before work starts (including existing damage), every rough-in before it is covered, every inspection sticker or report, and the finished work. Tag photos by date and room; rough-in photos settle later questions about what is behind the wall.</p>
 
-<h2>5. Communicate proactively</h2>
-<p>Clients get anxious when they hear nothing. A short update every couple of days (what is done, what is next, anything needed from them) prevents most complaints.</p>
+<h2>Safety obligations are a project task</h2>
+<p>Some safety paperwork is due before work begins, so it goes on the schedule. In Ontario, the Regulation for Construction Projects, <a href="https://www.ontario.ca/laws/regulation/910213" rel="noopener">O. Reg. 213/91</a>, sets several requirements a small contractor can trip over:</p>
+<ul>
+  <li><strong>Registration (section 5).</strong> Before beginning work at a project, each constructor and employer engaged in construction completes an approved registration form, and the constructor keeps each employer's form at the project while that employer is working there.</li>
+  <li><strong>Notice of project (section 6).</strong> The constructor must notify the Ministry before beginning work if, among other conditions, the total cost of labour and materials is expected to exceed $50,000, or the work is the erection or structural alteration of a building more than two storeys or more than 7.5 metres high, or a trench a person may enter is more than 1.2 metres deep and over 30 metres long. The form can be filed at the nearest Ministry office or electronically, and if the work will take no more than 14 days, the information can be given to an inspector by fax or phone. The completed form must be posted conspicuously at the project or be available there for an inspector.</li>
+  <li><strong>Trenches (section 7).</strong> Where section 6 does not apply but there is a trench more than 1.2 metres deep that a worker may enter, the constructor must notify the nearest Ministry office before work begins.</li>
+</ul>
+<p>Add up labour and materials at the quote stage, not on start day: a larger renovation package or an addition can cross the $50,000 line. Other provinces have their own occupational health and safety rules.</p>
 
-<h2>6. Handle changes in writing</h2>
-<p>Every change goes through a short written approval. See <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>.</p>
+<h2>Keep the homeowner informed</h2>
+<p>Silence causes a lot of friction on a renovation. Send a short update at a regular time, such as every Friday afternoon: what got done, what happens next week, any inspection booked, and any decision or payment due from the client. When the client asks for something different, put it through a written change order before the work is done; see <a href="/blog/how-to-handle-change-orders-contractors/">how to handle change orders</a>. The <a href="/blog/how-to-write-a-contractor-contract-canada/">contractor contract guide</a> covers the clauses that set this up.</p>
 
-<h2>7. Safety and compliance</h2>
-<p>Know your province's occupational health and safety requirements, keep toolbox talk records and make sure insurance and coverage are in order: <a href="/blog/contractor-insurance-canada-what-you-need/">insurance guide</a>.</p>
+<h2>Closing out the job</h2>
+<ul>
+  <li><strong>Deficiency list.</strong> Walk the finished work with the client, write down every item, agree a date to fix them and get a signature or written confirmation when they are done.</li>
+  <li><strong>Permits and certificates.</strong> Book the final inspections so the permit is closed, and give the client the ESA Certificate of Acceptance or your province's equivalent where electrical work was done.</li>
+  <li><strong>Warranty package.</strong> Your own workmanship warranty in writing (what it covers, for how long, how to reach you), manufacturer warranties and registration cards, and care instructions for finishes such as grout sealer or a glass shower.</li>
+  <li><strong>Final invoice.</strong> Send it the day the deficiencies are signed off, matching the contract and any change orders. Where holdback applies, the <a href="/tools/holdback-calculator/">holdback calculator</a> works out the amount. For chasing late payment, see <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">how to collect payment from clients</a>.</li>
+</ul>
+<p>Price the work in the same itemized format from the start, and the final invoice is easy to check against it: quoteai writes the itemized quote with your province's taxes and sends it as a PDF.</p>
 
-<h2>8. Finish with a punch list</h2>
-<p>Walk the site with the client, list remaining items, fix them, and get sign-off. Then invoice and ask for a review: <a href="/blog/how-to-get-more-reviews-as-a-contractor/">review guide</a>.</p>
-
-<h2>Keep it in one place</h2>
-<p>The more your quotes, jobs, crew schedule and invoices are connected, the less you retype and forget. See <a href="/quotes/general-contractor/">quoteai for general contractors</a> and <a href="/quotes/renovation-contractor/">for renovation contractors</a>.</p>
+<h2>Example: a two-week bathroom renovation schedule</h2>
+<p>Example only. Assumptions: a main-floor bathroom in a house in Toronto; the tub is replaced with a tiled shower and the drain is relocated, so a building permit with plumbing inspections has been issued; a Licensed Electrical Contractor adds a fan and new lighting and files the ESA notification; every fixture and the tile are on site before day 1; ten working days, Monday to Friday. Actual inspection dates depend on when the inspector can attend.</p>
+<table>
+  <thead>
+    <tr><th>Day</th><th>Task</th><th>Trade</th><th>Inspection / milestone</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1 (Mon)</td><td>Floor and hallway protection, dust barrier, demolition to studs, remove tub</td><td>Own crew</td><td>Pre-start walk with homeowner; all materials checked against the order list</td></tr>
+    <tr><td>2 (Tue)</td><td>Framing changes, blocking for vanity and grab bar, subfloor repair</td><td>Carpenter</td><td>Photos of existing conditions logged</td></tr>
+    <tr><td>3 (Wed)</td><td>Drain relocation, supply lines, shower valve rough-in</td><td>Plumber</td><td>Plumbing rough-in ready for testing; inspection requested</td></tr>
+    <tr><td>4 (Thu)</td><td>Fan, lighting and receptacle rough-in, fan duct to exterior</td><td>Electrician (LEC)</td><td>Electrician requests ESA inspection</td></tr>
+    <tr><td>5 (Fri)</td><td>Clean-up; no close-up work</td><td>Own crew</td><td>City plumbing rough-in inspection (target); rough-in photos of every wall; Friday update to homeowner</td></tr>
+    <tr><td>6 (Mon)</td><td>Insulation where an exterior wall was opened, cement board, shower pan</td><td>Own crew</td><td>Close-up only after rough-in inspections are passed</td></tr>
+    <tr><td>7 (Tue)</td><td>Waterproofing membrane, drywall on ceiling and dry walls</td><td>Own crew</td><td>Shower flood test before tile</td></tr>
+    <tr><td>8 (Wed)</td><td>Floor and shower wall tile</td><td>Tile setter</td><td>Homeowner confirms grout colour (decision due by day 6)</td></tr>
+    <tr><td>9 (Thu)</td><td>Grout and sealer, drywall finishing, prime and paint</td><td>Tile setter, painter</td><td>Glass shower door measured</td></tr>
+    <tr><td>10 (Fri)</td><td>Set toilet and vanity, shower trim, fan, fixtures and devices</td><td>Plumber, electrician</td><td>Final plumbing inspection requested; deficiency walk-through with homeowner</td></tr>
+  </tbody>
+</table>
+<p>Why it is built this way: day 5 is kept free of close-up work because the walls can't be closed until the rough-ins pass, so an inspection that slips a day costs a morning, not a reopened wall. The grout decision is due before tile starts. The glass is measured after tile to fit the finished opening, so the shower door arrives after the two weeks; say so at the pre-start meeting.</p>
+<p>This is general information, not legal advice. Check the current regulation and your municipality's inspection requirements for each project.</p>
 `,
   "contractor-cash-flow-management-canada": `
-<p>A job can be profitable on paper and still leave you short on payday. Contractors pay for materials and crews up front and get paid later. That gap is cash flow, and it is the most common reason otherwise good trade businesses fail.</p>
+<p>Profit and cash are different numbers. Profit is what a job leaves you once every bill is counted. Cash is what is in the account on the Thursday payroll goes out. A contracting business pays wages every two weeks, pays its supplier at month end and remits payroll deductions on a fixed date, while clients pay on milestones and the holdback arrives weeks after the last day on site. Managing cash flow means seeing those dates in advance and arranging them so the account never goes below zero.</p>
 
-<h2>Why cash runs short</h2>
+<h2>Where the gap comes from</h2>
 <ul>
-  <li>Materials and payroll go out before the client pays</li>
-  <li>Final payments and holdbacks are delayed</li>
-  <li>Taxes (GST/HST/QST remittances, payroll deductions) arrive in lumps</li>
-  <li>Seasonal slowdowns reduce income while fixed costs continue</li>
+  <li><strong>Labour is paid first.</strong> Your crew is paid for the hours of a stage before you can invoice that stage.</li>
+  <li><strong>Materials are bought before they are installed.</strong> Special orders are often paid before the job starts.</li>
+  <li><strong>Clients pay on their schedule.</strong> In Ontario, Alberta and Saskatchewan, prompt payment law gives an owner 28 days after a proper invoice to pay, so a stage finished on the 1st may not be paid until the end of the month. The details are in <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">how to get paid on time</a>.</li>
+  <li><strong>The holdback comes last.</strong> On Ontario jobs the owner keeps 10% of the value of work done (<a href="https://www.ontario.ca/laws/statute/90c30" rel="noopener">Construction Act</a>, s. 22) until lien rights expire, which for a contractor is 60 days after completion if no certificate of substantial performance is published (s. 31). That is part of your margin sitting in someone else's account for two months or more.</li>
+  <li><strong>Taxes leave in lumps.</strong> HST collected over a quarter or a year goes out in one payment, and payroll deductions go out monthly.</li>
 </ul>
 
-<h2>1. Forecast 13 weeks ahead</h2>
-<p>A simple spreadsheet is enough: expected payments in, known bills out, week by week. It shows a shortfall weeks before it hurts.</p>
+<h2>Know your tax dates and keep the tax money apart</h2>
+<p>The GST/HST you collect belongs to the government from the moment the client pays. The CRA assigns your filing period from your annual taxable supplies: annual at $1,500,000 or less, quarterly above that up to $6,000,000, and monthly above $6,000,000, and you can elect to file more often (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/gst-hst-account/change-account.html" rel="noopener">CRA: change your GST/HST account</a>). Monthly and quarterly returns and payments are due one month after the period ends. Most annual filers must file and pay three months after their fiscal year-end; a sole proprietor with a December 31 year-end pays by April 30 and files by June 15 (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/file-gst-hst-return/reporting-requirements-deadlines.html" rel="noopener">CRA: reporting requirements and deadlines</a>). An annual filer whose net tax for the previous year was $3,000 or more may also have to pay quarterly instalments (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/pay-instalment/need-to-pay-by-instalments.html" rel="noopener">CRA: GST/HST instalments</a>).</p>
+<p>Annual filing is the trap. It feels like a year of extra cash, and then one large cheque falls due in the spring, often just before the busy season starts. The fix is mechanical: open a second business account and move the tax portion of every client payment into it the day the payment lands. In Ontario that is 13/113 of each HST-included payment (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA GST/HST rates</a>); the <a href="/tools/sales-tax-calculator/">sales tax calculator</a> will split any amount for your province. BDC makes the same point about keeping a separate business account for business money (<a href="https://www.bdc.ca/en/articles-tools/money-finance/manage-finances/making-most-working-capital" rel="noopener">BDC: making the most of working capital</a>).</p>
+<p>If you have employees, source deductions are another fixed date. For a regular remitter, the CRA's due date is the 15th day of the month after the month you paid your employees (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/remitting-source-deductions/how-when-remit-due-dates.html" rel="noopener">CRA: when to remit</a>). Put it in the forecast as a line of its own, not as part of payroll.</p>
 
-<h2>2. Get paid sooner</h2>
-<p>Take deposits, bill in stages and invoice the same day. See <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">how to get paid on time</a>.</p>
+<h2>Build a rolling forecast</h2>
+<p>BDC recommends a 13-week rolling cash flow forecast, updated at the start of every week, because it gives much tighter visibility than the cash line in a monthly budget (<a href="https://www.bdc.ca/en/articles-tools/money-finance/manage-finances/making-projection-coming-year" rel="noopener">BDC: plan your cash flow in the coming year</a>). For a contractor, it needs only a few rows:</p>
+<ul>
+  <li><strong>Cash in:</strong> each invoice by the week you realistically expect payment, not the week you send it. Deposits, stage payments and holdback releases on their own lines.</li>
+  <li><strong>Tax set-aside:</strong> the GST/HST portion of each receipt, moved to the tax account.</li>
+  <li><strong>Cash out:</strong> net payroll on pay weeks, source deductions on the 15th, supplier statements on their due date, subcontractors, and fixed costs (truck, insurance, phone, software, rent).</li>
+  <li><strong>Closing balance:</strong> the only number that matters. Any week it goes negative is a problem you can still fix.</li>
+</ul>
 
-<h2>3. Set tax money aside</h2>
-<p>GST/HST and QST collected is not your money. Move it to a separate account when each payment arrives, along with an estimate for income tax and payroll remittances. Confirm filing frequency and deadlines with your accountant and the CRA or Revenu Québec.</p>
+<h2>Example: an eight-week forecast</h2>
+<p>Example only, with assumed figures. A three-person renovation company in Ontario with three jobs on the go, operating account only (HST is moved to a separate tax account as it arrives). Assumptions: payroll of $7,200 net every second week; source deductions of $3,900 due the week of the 15th; a supplier statement of $9,500 due at month end in week 5; an electrical sub of $4,000 in week 6; fixed costs averaged at $900 a week; client payments shown HST-included at 13%.</p>
+<table>
+  <thead>
+    <tr><th>Week</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Opening balance</td><td>14,000</td><td>23,100</td><td>15,000</td><td>15,200</td><td>7,100</td><td>11,700</td><td>-400</td><td>-1,200</td></tr>
+    <tr><td>Client payments (incl. HST)</td><td>11,300</td><td>0</td><td>5,650</td><td>0</td><td>16,950</td><td>0</td><td>4,520</td><td>11,300</td></tr>
+    <tr><td>HST moved to tax account</td><td>-1,300</td><td>0</td><td>-650</td><td>0</td><td>-1,950</td><td>0</td><td>-520</td><td>-1,300</td></tr>
+    <tr><td>Payroll (net)</td><td>0</td><td>-7,200</td><td>0</td><td>-7,200</td><td>0</td><td>-7,200</td><td>0</td><td>-7,200</td></tr>
+    <tr><td>Source deductions</td><td>0</td><td>0</td><td>-3,900</td><td>0</td><td>0</td><td>0</td><td>-3,900</td><td>0</td></tr>
+    <tr><td>Supplier statement</td><td>0</td><td>0</td><td>0</td><td>0</td><td>-9,500</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>Subcontractor</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>-4,000</td><td>0</td><td>0</td></tr>
+    <tr><td>Fixed costs</td><td>-900</td><td>-900</td><td>-900</td><td>-900</td><td>-900</td><td>-900</td><td>-900</td><td>-900</td></tr>
+    <tr><td><strong>Closing balance</strong></td><td><strong>23,100</strong></td><td><strong>15,000</strong></td><td><strong>15,200</strong></td><td><strong>7,100</strong></td><td><strong>11,700</strong></td><td><strong>-400</strong></td><td><strong>-1,200</strong></td><td><strong>700</strong></td></tr>
+  </tbody>
+</table>
+<p>Every job in this example is profitable, and the account still goes negative in weeks 6 and 7 because the supplier statement, a sub and two payrolls land between client payments. Seen five weeks ahead, the fixes are simple: invoice the week 8 stage the day it is reached and ask for payment on receipt, move the subcontractor's payment to its contract date if it was early, or draw on a line of credit arranged while the numbers were good. If the week 5 payment slipped by two weeks, the balance would fall below -$15,000 in week 6, which is why receipts go in on the date you expect, not the date you hope.</p>
 
-<h2>4. Understand holdbacks</h2>
-<p>On many construction contracts a percentage is held back until a statutory period passes. Plan for that money to arrive late and check your province's rules.</p>
+<h2>Supplier terms and credit</h2>
+<p>A trade account with 30-day terms lets you buy materials for a stage, install them, invoice and often be paid before the statement is due. Pay those statements on time to keep the terms. BDC notes that a supplier that won't move on price may still offer better payment terms, so ask (<a href="https://www.bdc.ca/en/articles-tools/money-finance/manage-finances/making-most-working-capital" rel="noopener">BDC</a>). For the gaps that remain, BDC describes a line of credit as the usual tool to bridge payables and receivables, and suggests asking your lender for repayment terms that put more principal in the high season and less in the low season (<a href="https://www.bdc.ca/en/articles-tools/money-finance/manage-finances/seasonal-business-cash-flow" rel="noopener">BDC: managing cash flow in a seasonal business</a>). Arrange credit before you need it; lenders are more comfortable when you can show a forecast.</p>
 
-<h2>5. Negotiate supplier terms</h2>
-<p>Net-30 terms on contractor accounts let you buy materials and get paid before the bill is due. Pay on time to keep the privilege.</p>
+<h2>Plan the slow season in the busy one</h2>
+<p>BDC's seasonal guide points out that construction companies often slow down in winter while equipment and overhead costs stay the same. Whatever your slow months are, use the forecast to see the slow stretch coming, then:</p>
+<ul>
+  <li><strong>Book slow-season work while you are busy.</strong> Interior jobs such as basements and bathrooms can be sold in the fall for a winter start, with a confirmed date as the incentive.</li>
+  <li><strong>Add recurring or complementary work.</strong> Maintenance visits, inspections, snow clearing for landscapers, eavestrough and winterizing work for roofers, drywall repair for painters.</li>
+  <li><strong>Go back to quotes that did not close.</strong> A spring quote that stalled can be the winter job; see <a href="/blog/how-to-follow-up-on-quotes-contractors/">following up on quotes</a>.</li>
+  <li><strong>Market before demand arrives.</strong> Update your Google profile and photos ahead of the season (<a href="/blog/google-business-profile-guide-for-tradespeople/">Google Business Profile guide</a>).</li>
+  <li><strong>Set aside cash from every busy-season payment</strong> to cover fixed costs through the slow months, and use the quiet weeks to review job costs and update your prices.</li>
+</ul>
 
-<h2>6. Watch your quote validity and pricing</h2>
-<p>Underpriced jobs drain cash faster than anything else. See <a href="/tools/markup-margin-calculator/">markup vs margin</a>.</p>
+<h2>Find the leak behind a recurring shortfall</h2>
+<p>If the forecast keeps turning negative even when invoices are paid on time, the problem is usually margin, not timing. Compare what each job was quoted at against what it actually cost (<a href="/blog/how-to-track-job-costs-contractors/">tracking job costs</a>), then fix the rates in your next quote (<a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>). quoteai puts the province's tax on every itemized quote and invoice, which makes the tax set-aside a figure you can read off the invoice rather than work out.</p>
 
-<h2>7. Build a buffer</h2>
-<p>Aim for one to three months of fixed costs in reserve, built gradually from a small percentage of every invoice.</p>
-
-<h2>8. Track jobs, not just the bank balance</h2>
-<p>Knowing which jobs are tying up cash helps you chase the right invoices: <a href="/blog/how-to-track-job-costs-contractors/">job cost tracking</a>.</p>
-
-<h2>Keep invoicing automatic</h2>
-<p>Software that turns an accepted quote into a deposit request and invoice removes delays. See quoteai for <a href="/quotes/general-contractor/">general contractors</a>.</p>
+<p><em>This is general information, not tax or financial advice. Confirm your filing period and remittance dates in your CRA account and with your accountant.</em></p>
 `,
   "how-to-quote-a-painting-job": `
 <p>A painting quote is mostly a labour estimate with a materials list attached. The labour is where jobs get lost: prep nobody looked at, a sheen that shows every roller mark, a building that only allows work after six. Price those openly and the paint itself is the easy part.</p>
@@ -1229,36 +1639,75 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>quoteai writes this kind of itemized quote, with separate rough-in and finish lines and the province's tax, and sends it as a PDF from the job. See <a href="/quotes/plumber/">quoting for plumbers</a> for how it handles service and renovation work. Whatever you use, finish every quote with your licence or certificate numbers, how long the price holds, and the warranty on parts and labour.</p>
 `,
   "quote-vs-estimate-vs-invoice-difference": `
-<p>Clients and contractors use these words loosely, and the confusion causes real disputes. Here is a plain guide.</p>
+<p>The three documents answer different questions. An estimate answers "roughly what will this cost?", a quote answers "what exactly will you do, and for how much?", and an invoice answers "what do I owe you now?". Mixing them up is how a contractor ends up bound to a number they meant as a ballpark, or sends an invoice a business client cannot use for its tax claim.</p>
 
-<h2>Estimate</h2>
-<p>An approximate price based on available information. It may change, and it is usually not binding. Good for early conversations when the scope is unclear.</p>
-
-<h2>Quote</h2>
-<p>A fixed price for a defined scope, valid for a set period. Once accepted it is typically binding on both sides, which is why scope and exclusions must be exact.</p>
-
-<h2>Bid</h2>
-<p>A formal price offer submitted in competition, often for commercial or public projects, following the client's documents and deadlines.</p>
-
-<h2>Proposal</h2>
-<p>A fuller document combining price with a description of the approach, schedule, credentials and terms.</p>
-
-<h2>Invoice</h2>
-<p>A request for payment for work done or a deposit due. It shows amounts, taxes, due date and payment methods, and it is the document the CRA expects to see for GST/HST purposes.</p>
-
-<h2>Which should you send?</h2>
+<h2>Estimate: a best guess, until it is in the contract</h2>
+<p>In everyday Canadian trade practice, an estimate is your informed opinion of the cost before the scope is fully known: the walls are not open yet, the client has not picked fixtures, or you have only seen photos. It signals that the final price may move.</p>
+<p>In Ontario, "may move" has a legal limit. Section 10 of the <a href="https://www.ontario.ca/laws/statute/02c30" rel="noopener">Consumer Protection Act, 2002</a> says that if a consumer agreement includes an estimate, you cannot charge more than 10% above it; if you do, the client can require you to provide the work at the estimated price. The province tells homeowners to <a href="https://www.ontario.ca/page/your-rights-when-starting-home-renovations-or-repairs" rel="noopener">make sure the estimate is included in the contract</a> for exactly that reason. The only way above the cap is a signed change for added or different work, which is what <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a> are for.</p>
+<p>So in Ontario, an estimate that ends up in the signed agreement is a price with a 10% margin, not a guess. Two habits follow:</p>
 <ul>
-  <li>Unknown conditions: <strong>estimate</strong> with a range and a note on what could change it</li>
-  <li>Defined work: <strong>quote</strong></li>
-  <li>Competitive or large project: <strong>bid or proposal</strong></li>
-  <li>When work is accepted or complete: <strong>invoice</strong></li>
+  <li>Say on the document what the estimate depends on ("assumes drywall is sound behind existing tile"), so a hidden condition is clearly a change, not an overrun.</li>
+  <li>If you cannot price within 10%, do not sign on an estimate. Visit again, open up an inspection hole, or quote the known work and list the unknown as a separate item to be priced when exposed.</li>
 </ul>
 
-<h2>Protecting yourself</h2>
-<p>If you give an estimate, say it is an estimate. If you give a fixed quote, list exclusions and handle changes in writing: <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>. Add terms from a <a href="/blog/how-to-write-a-contractor-contract-canada/">contract</a> when the job is big.</p>
+<h2>Quote: a fixed offer that becomes the contract</h2>
+<p>A quote is a firm price for a defined scope, valid until a stated date. Until the client accepts, it is an offer you can let expire. Once the client signs it, it is the agreement, and everything written on it binds you both.</p>
+<p>That has consequences people overlook:</p>
+<ul>
+  <li><strong>Provincial contract rules apply to it.</strong> Ontario requires home renovation contracts worth more than $50 to be in writing and to include specific information: an itemized description, warranties, taxes, a schedule and the deposit, among others (<a href="https://www.ontario.ca/page/guide-home-renovation-and-roofing-businesses" rel="noopener">Ontario: a guide for home renovation and roofing businesses</a>). A one-line quote that a client signs at their kitchen table can be a non-compliant contract.</li>
+  <li><strong>Where it is signed matters.</strong> The same Ontario guide gives clients who sign at home a 10-day cooling-off period. Québec, BC and Alberta have their own cancellation rules for contracts signed at the client's home; our <a href="/blog/how-to-write-a-contractor-contract-canada/">contractor contract guide</a> covers each.</li>
+  <li><strong>The scope is the limit.</strong> What is not on the quote is not in the price. That is why itemized scope and an exclusions list matter more than the total; see <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>.</li>
+</ul>
+<p>A bid is a quote submitted in competition against the owner's documents and deadline; a proposal wraps a quote in method, schedule and credentials. Legally, both work like a quote once accepted.</p>
 
-<h2>One flow, not four documents</h2>
-<p>The cleanest approach is a single record that moves from quote to accepted job to invoice. See <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a> and <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a quote that wins jobs</a>, or try <a href="/pricing/">free quoting</a>.</p>
+<h2>Invoice: what the CRA expects to see</h2>
+<p>An invoice asks for payment for a deposit, a milestone or finished work. If you are registered for the GST/HST, you have to tell customers when the tax applies, by showing the tax amount, the rate, or that the total includes it. If you are a small supplier under the $30,000 threshold and not registered (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/when-register-charge.html" rel="noopener">CRA: when to register</a>), you do not collect GST/HST, so the invoice has no tax line.</p>
+<p>Your business clients, such as property managers and general contractors, claim input tax credits for the tax you charge, and they need specific information on your invoice to do it. The CRA sets it by the total of the invoice (<a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4022/general-information-gst-hst-registrants.html#H3_305" rel="noopener">RC4022: input tax credit information requirements</a>; the rules are in the <a href="https://laws-lois.justice.gc.ca/eng/regulations/SOR-91-45/section-3.html" rel="noopener">Input Tax Credit Information (GST/HST) Regulations</a>):</p>
+<table>
+  <thead>
+    <tr><th>Invoice total</th><th>Information required</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Under $100</td><td>Your business or trading name, the invoice date, the total amount</td></tr>
+    <tr><td>$100 to $499.99</td><td>All of the above, plus the GST/HST charged (or a statement that the price includes it, with the rate) and your GST/HST registration number</td></tr>
+    <tr><td>$500 or more</td><td>All of the above, plus the customer's name, a brief description of the work, and the terms of payment</td></tr>
+  </tbody>
+</table>
+<p>Nearly every trade invoice is over $500, so in practice every field applies. Homeowners do not claim input tax credits, but there is no reason to keep two invoice formats.</p>
+
+<h2>Québec: the QST equivalent</h2>
+<p>Revenu Québec applies the same three bands to the QST (<a href="https://www.revenuquebec.ca/en/businesses/consumption-taxes/gsthst-and-qst/collecting-gst-and-qst/preparing-invoices/" rel="noopener">Revenu Québec: preparing invoices</a>). From $100, the invoice needs both your GST and QST registration numbers; from $500, the customer's name and the terms of payment. Revenu Québec also asks for the QST amount and a description of the work at every level, and where one amount covers both taxes, the invoice must say it includes GST and QST. The QST rate is 9.975% on top of the 5% GST (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA: GST/HST rates by province</a>). Show the two taxes on separate lines; it satisfies both lists without thinking about it.</p>
+
+<h2>Example: one job, three documents</h2>
+<p>Example only, with assumed prices: repainting a 12 x 14 ft bedroom in Ontario, where HST is 13% (CRA rates page above).</p>
+<p><strong>The estimate, after a phone call and photos:</strong> "Repaint bedroom walls, ceiling and trim, two coats: estimated $1,250 plus HST. Assumes no plaster repair beyond small nail holes; final price confirmed after a site visit."</p>
+<p><strong>The quote, after the site visit</strong> (Q-2210, valid 30 days):</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Prep: fill, sand, spot-prime patches; protect floor and furniture</td><td>1</td><td>room</td><td>$220.00</td><td>$220.00</td></tr>
+    <tr><td>Walls, two coats premium acrylic eggshell</td><td>400</td><td>sq ft</td><td>$1.60</td><td>$640.00</td></tr>
+    <tr><td>Ceiling, two coats flat ceiling white</td><td>168</td><td>sq ft</td><td>$1.25</td><td>$210.00</td></tr>
+    <tr><td>Baseboard, casing and one door, semi-gloss</td><td>1</td><td>room</td><td>$180.00</td><td>$180.00</td></tr>
+    <tr><td><strong>Subtotal</strong></td><td></td><td></td><td></td><td><strong>$1,250.00</strong></td></tr>
+    <tr><td>HST (Ontario, 13%)</td><td></td><td></td><td></td><td>$162.50</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td><strong>$1,412.50</strong></td></tr>
+  </tbody>
+</table>
+<p><strong>The invoice, on completion</strong> (INV-2210), with the CRA fields for a total of $500 or more:</p>
+<ul>
+  <li>Business name and address, and GST/HST registration number: required from $100.</li>
+  <li>Invoice number and date: the date is required at every level.</li>
+  <li>Customer: the client's name, required from $500.</li>
+  <li>Description: "Bedroom repaint per quote Q-2210: prep, walls, ceiling, trim and door, two coats", required from $500.</li>
+  <li>Amounts: subtotal $1,250.00, HST 13% $162.50, total $1,412.50.</li>
+  <li>Terms: "Due within 15 days of the invoice date; e-Transfer or cheque", required from $500.</li>
+</ul>
+<p>Why it works: the estimate states its assumption, so the quote can differ without an argument. The quote is itemized, so the invoice can describe the work by pointing to it. And the invoice carries the tax line and registration number, so a landlord or property manager client can claim the tax back. quoteai keeps the three in one record, turning an accepted quote into the invoice with the province's taxes. For getting that invoice paid, see <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">collecting payment from clients</a>, and the <a href="/tools/sales-tax-calculator/">sales tax calculator</a> for any province's tax lines.</p>
+
+<p><em>This is general information about Ontario consumer rules and federal and Québec sales tax requirements, not legal or tax advice.</em></p>
 `,
   "siding-replacement-cost-canada-2026": `
 <p>New siding changes how a house looks, performs and sells. It also costs enough that homeowners compare quotes carefully. Typical 2026 installed ranges:</p>
@@ -1507,67 +1956,158 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Check the tax lines with the <a href="/tools/sales-tax-calculator/">sales tax calculator</a>. If you would rather not build the table by hand, <a href="/quotes/tile-installer/">quoteai for tile installers</a> writes an itemized quote with the province's taxes and sends it as a PDF.</p>
 `,
   "how-to-raise-your-prices-contractors-without-losing-clients": `
-<p>Material, fuel, insurance and wages go up, but many contractors keep their rates frozen for years because they fear losing work. The result is shrinking margin and burnout. A planned price increase is usually less risky than it feels.</p>
+<p>A price increase goes wrong in one of two ways: it comes too late, after a year of jobs that quietly lost money, or it lands as a surprise on a client who had already budgeted for the old rate. Both are avoidable. Decide from your own numbers, give clients a clear date, and protect the quotes and contracts already in play.</p>
 
-<h2>Signs it is time</h2>
+<h2>Know when: your own numbers come first</h2>
+<p>Inflation headlines tell you the direction of costs in general. They don't tell you whether your rates are wrong. Three things in your own records do.</p>
 <ul>
-  <li>You win almost every quote you send</li>
-  <li>You are booked weeks ahead</li>
-  <li>Your costs rose and your rates did not</li>
-  <li>Your profit per job is shrinking: <a href="/blog/how-to-track-job-costs-contractors/">job cost tracking</a></li>
+  <li><strong>Job-cost results.</strong> Compare estimated and actual hours and materials on your last ten or twenty finished jobs. If actual cost keeps creeping toward the quoted price on the same kind of work, your rate is behind your costs, not your estimating. The method is in <a href="/blog/how-to-track-job-costs-contractors/">how to track job costs</a>.</li>
+  <li><strong>Utilisation.</strong> Divide the hours you billed by the hours you paid for, your own included. If that share is dropping because of driving, quoting and callbacks, the hours you do bill have to carry more overhead, and the rate has to reflect it.</li>
+  <li><strong>Backlog and win rate.</strong> If you are booked well ahead and accept almost everything you quote, demand is telling you the price is low for the market you serve. If the calendar is thin and you lose most quotes, a rate increase is still possible, but fix how you sell first.</li>
 </ul>
-<p>If nobody ever says "that's expensive", you are probably too cheap.</p>
+<p>Rebuild the rate from the bottom: wage, burden, overhead per billable hour, then margin. The <a href="/tools/labour-rate-calculator/">labour rate calculator</a> does the arithmetic, and the <a href="/tools/markup-margin-calculator/">markup and margin calculator</a> keeps you from confusing a 20% markup with a 20% margin.</p>
 
-<h2>Work out the number</h2>
-<p>Start from your real costs and target margin, not from competitors. See <a href="/tools/markup-margin-calculator/">markup vs margin</a>. A common approach is a modest increase, often 5–10%, once or twice a year, rather than a big jump after years of nothing.</p>
+<h2>Use official price data as context, not as your increase</h2>
+<p>Statistics Canada publishes two series worth knowing when you explain a change to a client.</p>
+<p>The Consumer Price Index measures what households pay. In its <a href="https://www150.statcan.gc.ca/n1/daily-quotidien/261116/dq261116a-eng.htm" rel="noopener">release for October 2026</a>, the CPI rose 3.1% year over year, the same as in September; excluding energy, it rose 2.0%. That is the number your residential clients hear on the news.</p>
+<p>The Building Construction Price Index is closer to your world. It measures the change in prices that contractors charge to build a set of new residential and non-residential buildings in 15 census metropolitan areas. For the <a href="https://www150.statcan.gc.ca/n1/daily-quotidien/261029/dq261029e-eng.htm" rel="noopener">third quarter of 2026</a>, residential construction costs rose 0.8% from the previous quarter and 2.7% year over year across the 15 areas, and non-residential costs rose 4.3% year over year. Builders told Statistics Canada the increases were driven by higher material, fuel, transportation and labour expenses, and the release notes that metal and steel products led cost growth under retaliatory tariffs.</p>
+<p>Two cautions. The index covers new construction in large cities, not renovation or service work in your town. And a national average is not your cost structure: an electrician whose wage rates went up and a painter whose paint price did not will see different numbers. Use these figures to show a client that costs are moving across the industry; set your own increase from your job costs.</p>
 
-<h2>Raise prices on new quotes first</h2>
-<p>New leads have no reference price, so the increase is invisible. Update your price list and quoting software so every new quote uses current rates.</p>
+<h2>Raise each line, not just the hourly rate</h2>
+<p>Look at every price you charge, not only the headline rate: helper or apprentice rate, after-hours rate, materials markup, flat-rate items such as a unit turnover or a standard fixture swap, and your minimum charge.</p>
+<p>The minimum charge deserves its own look. A short service call costs you travel, set-up and paperwork no matter how small the task, and when your hourly rate rises the minimum often lags behind. The <a href="/blog/how-to-price-a-job-labour-materials-markup/">pricing guide</a> shows how to build a minimum charge from the cost of a call-out. State it plainly on quotes and invoices ("minimum service call, includes the first hour on site") so it is not a surprise.</p>
 
-<h2>Tell existing clients properly</h2>
+<h2>Honour open quotes and signed work</h2>
+<p>New rates apply to new quotes. A quote you have sent is an offer, and if the client accepts it within its validity period, that is the price. Re-pricing it after acceptance damages trust more than any increase.</p>
 <ul>
-  <li>Give notice, often 30 days, before the change.</li>
-  <li>Explain briefly: "Material and insurance costs have increased, so rates go up on [date]."</li>
-  <li>Thank them and offer to book before the change if they have pending work.</li>
+  <li><strong>Put a validity period on every quote</strong> (for example, 30 days) and honour it. When a quote expires, re-issue it at current rates with one line saying so.</li>
+  <li><strong>Watch estimates with homeowners.</strong> In Ontario, the <a href="https://www.ontario.ca/laws/statute/02c30" rel="noopener">Consumer Protection Act, 2002</a> says that if a consumer agreement includes an estimate, the supplier can't charge more than 10% above it, and the consumer can require the work at the estimated price. Other provinces have their own consumer rules, so check yours before you send a revised price on accepted work.</li>
+  <li><strong>Changes in scope are different.</strong> Extra work the client asks for is priced at current rates through a written change order. See <a href="/blog/how-to-handle-change-orders-contractors/">how to handle change orders</a>.</li>
 </ul>
 
-<h2>Protect quotes in progress</h2>
-<p>Keep a validity period on quotes and honour it. For long jobs, add clauses for major supplier increases: <a href="/blog/reduce-material-costs-contractors-canada/">material cost guide</a>.</p>
+<h2>Escalation clauses for long jobs</h2>
+<p>On a job that runs for months, or one priced now and built next season, a fixed price carries your risk on materials you haven't bought yet. An escalation clause shares that risk in a way both sides can check. A workable clause names:</p>
+<ul>
+  <li>the materials it covers (for example lumber, steel, copper wire or pipe), not "all costs";</li>
+  <li>the baseline: the supplier quote and its date that your price is built on;</li>
+  <li>the trigger: a change above a stated percentage before you buy;</li>
+  <li>the proof: the new supplier invoice, shared with the client;</li>
+  <li>that it works both ways, so a price drop is credited;</li>
+  <li>notice before you buy, and the client's option to approve, substitute or pre-pay materials at the quoted price.</li>
+</ul>
+<p>Put the clause in the contract before signing, in plain language. Adding it mid-job is a renegotiation. The <a href="/blog/how-to-write-a-contractor-contract-canada/">contractor contract guide</a> covers where it sits among the other clauses.</p>
 
-<h2>Justify with value, not apology</h2>
-<p>Better communication, reliable scheduling, clean sites and a clear warranty support higher prices. See <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to win more bids</a>.</p>
+<h2>Telling repeat and commercial clients</h2>
+<p>One-off homeowners see your new rates on their next quote. Clients who buy from you regularly deserve notice, and commercial clients often need it:</p>
+<ul>
+  <li><strong>Ask about their budget cycle.</strong> Property managers and condo boards set budgets for the year. Notice that reaches them before budgeting is far easier to absorb than a mid-year change.</li>
+  <li><strong>Give a date, not a vague "soon".</strong> Sixty days is a reasonable notice period for a regular commercial client. Check any service agreement first: if it fixes rates for a term, the new rates start when the term renews.</li>
+  <li><strong>Say what changes and what doesn't.</strong> A short table of old and new rates removes guesswork.</li>
+  <li><strong>Explain once, briefly, without apologising.</strong> Costs rose; here is the new rate; here is when it starts.</li>
+  <li><strong>Offer a way to lock in.</strong> Work orders issued before the effective date are done at current rates.</li>
+</ul>
 
-<h2>Expect some pushback</h2>
-<p>You may lose a few price-sensitive clients, and that is normal. If you lose them and keep the rest, your income usually rises while your workload falls.</p>
+<h2>Example: a price-change letter and rate table</h2>
+<p>Example only. The business, client and rates are invented to show the format; the figures are not a recommendation.</p>
+<blockquote>
+  <p>Subject: Rate update effective March 1</p>
+  <p>Hello, thank you for another year of work on your buildings. Our labour, insurance and vehicle costs have risen, and our rates will change on March 1. The table below shows each rate before and after.</p>
+  <p>Work orders you issue before March 1 will be completed at current rates, even if the work is scheduled later. Quotes already sent remain valid until the expiry date shown on each one. Materials continue to be billed at cost plus the same markup as today.</p>
+  <p>If you'd like to discuss the change or plan larger work before your budget is finalised, reply to this email or call the office.</p>
+</blockquote>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Current rate</th><th>From March 1</th><th>Change</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Labour, lead hand (per hour)</td><td>$95.00</td><td>$102.00</td><td>+7.4%</td></tr>
+    <tr><td>Labour, helper (per hour)</td><td>$60.00</td><td>$64.00</td><td>+6.7%</td></tr>
+    <tr><td>Minimum service call (includes first hour)</td><td>$150.00</td><td>$165.00</td><td>+10.0%</td></tr>
+    <tr><td>After-hours and emergency (1.5 times lead hand rate)</td><td>$142.50</td><td>$153.00</td><td>+7.4%</td></tr>
+    <tr><td>Unit turnover repaint, one-bedroom, walls only (flat rate)</td><td>$1,150.00</td><td>$1,225.00</td><td>+6.5%</td></tr>
+    <tr><td>Materials markup on cost</td><td>15%</td><td>15%</td><td>No change</td></tr>
+  </tbody>
+</table>
+<p>All rates are before sales tax. Why it is built this way: the letter leads with the date and the protections (work orders before the date, quotes to their expiry) because those are the questions a property manager asks first. The minimum call rises more than the hourly rate because it had fallen behind the real cost of a short visit. Showing the unchanged markup is as useful as showing the increases: it tells the client exactly where the change is.</p>
+
+<h2>After the change</h2>
+<p>Update your price list the day the change takes effect so every new quote uses it; quoteai builds each itemized quote from your saved rates with your province's taxes, which keeps the rate the same on every quote. Then watch the same numbers you started with: win rate, backlog and job-cost results over the next few months. Review rates once a year, at the same time, so the next change is routine for you and expected by your clients.</p>
+<p>This is general information, not legal advice. For questions about a specific contract, consult a lawyer in your province.</p>
 `,
   "how-to-hire-your-first-employee-contractor-canada": `
-<p>This is general information, not legal or tax advice. Employment rules vary by province, so confirm details with your accountant and provincial authorities. Hiring is the step that turns a self-employed tradesperson into a business owner, and it comes with obligations you cannot skip.</p>
+<p>The first hire changes three things at once. You become a payroll agent for the CRA, holding back tax, CPP and EI and remitting them on a deadline. You take on your province's employment standards and its health and safety law for someone else. And your workers' compensation account starts to count real payroll. None of it is hard once it is set up, but most of it has to be in place before the first pay, not after.</p>
 
-<h2>Employee or subcontractor?</h2>
-<p>If you control when, where and how the person works, they are likely an employee regardless of what you call them. See <a href="/blog/how-to-hire-and-pay-subcontractors-canada/">hiring subcontractors</a> for the difference.</p>
+<h2>Confirm it is an employee</h2>
+<p>If you set the hours, supervise the work, supply the major equipment and pay by the hour, the person is very likely an employee, whatever your agreement calls them. The tests, and what happens when a "sub" is really a worker, are in <a href="/blog/how-to-hire-and-pay-subcontractors-canada/">how to hire and pay subcontractors</a>.</p>
 
-<h2>Set-up checklist</h2>
+<h2>Before the first pay: CRA set-up</h2>
 <ul>
-  <li><strong>Payroll account with the CRA</strong> for source deductions (income tax, CPP, EI). In Quebec you also deal with Revenu Québec and the QPP, QPIP and related programs.</li>
-  <li><strong>Workers' compensation registration</strong> (WSIB, WorkSafeBC, CNESST and others)</li>
-  <li><strong>Employment agreement</strong> covering pay, hours, probation, duties and termination</li>
-  <li><strong>Minimum standards</strong>: overtime, vacation pay, statutory holidays and breaks per your province</li>
-  <li><strong>Health and safety</strong>: orientation, required training and records</li>
-  <li><strong>Insurance</strong> updates: <a href="/blog/contractor-insurance-canada-what-you-need/">insurance guide</a></li>
-  <li><strong>Record of employment (ROE)</strong> and year-end slips (T4)</li>
+  <li><strong>Payroll account.</strong> You add a payroll (RP) program account to your business number, and you must register for it before the first remittance due date (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/set-up-new-employee.html" rel="noopener">CRA: set up a new employee</a>; <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/open-manage-payroll-account.html" rel="noopener">CRA: open or manage a payroll account</a>).</li>
+  <li><strong>SIN and TD1 forms.</strong> Get the employee's social insurance number and the completed federal and provincial TD1 forms before you pay them. Keep the forms with the employee's records and do not send them to the CRA. If an employee does not give you a TD1, deductions are based on the basic personal amount only (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/set-up-new-employee/filing-form-td1.html" rel="noopener">CRA: TD1 forms</a>).</li>
+  <li><strong>Québec.</strong> Québec runs its own income tax, pension plan (QPP) and parental insurance plan, so Québec payroll is calculated with Revenu Québec's WebRAS, not the CRA calculator (<a href="https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-businesses/payroll-deductions-online-calculator.html" rel="noopener">CRA: Payroll Deductions Online Calculator</a>).</li>
 </ul>
 
-<h2>Know the true cost</h2>
-<p>An employee costs more than their hourly wage: employer CPP/EI contributions, vacation pay, workers' compensation premiums, tools, vehicle, training and unproductive time. Many contractors estimate 20–30% on top of wages. Build it into your hourly rate and quotes.</p>
+<h2>Deductions and your share</h2>
+<p>For 2026, outside Québec:</p>
+<ul>
+  <li><strong>CPP:</strong> 5.95% from the employee and the same 5.95% from you, on pensionable earnings up to $74,600, after a $3,500 annual basic exemption (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/canada-pension-plan-cpp/cpp-contribution-rates-maximums-exemptions.html" rel="noopener">CRA: CPP rates, maximums and exemptions</a>). The exemption is prorated per pay; the CRA's chart gives $134.61 for 26 biweekly pays, and its manual-calculation page confirms that you remit both your employee's share and your matching share (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/canada-pension-plan-cpp/cpp-contribution-rates-maximums.html" rel="noopener">CRA: calculate CPP contributions</a>).</li>
+  <li><strong>EI:</strong> 1.63% from the employee on insurable earnings up to $68,900, and you pay 1.4 times the employee's premium. In Québec the employee rate is 1.30% (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/employment-insurance-ei/ei-premium-rates-maximums.html" rel="noopener">CRA: EI premium rates and maximums</a>).</li>
+  <li><strong>Income tax:</strong> depends on the employee's TD1 claims, province and pay. Use the CRA's <a href="https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-businesses/payroll-deductions-online-calculator.html" rel="noopener">Payroll Deductions Online Calculator (PDOC)</a> rather than working it by hand.</li>
+</ul>
+<p>As a regular remitter, your remittance is due by the 15th of the following month. A new employer (payroll account open less than 12 months) can remit quarterly if its monthly withholding is under $1,000 and its payroll and GST/HST compliance record is perfect (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/remitting-source-deductions/how-when-remit-due-dates.html" rel="noopener">CRA: when to remit</a>). T4 slips are due by the last day of February for the previous year (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/file-information-returns-slip-summaries/when-to-file.html" rel="noopener">CRA: when to file</a>).</p>
 
-<h2>Make sure there is work</h2>
-<p>Before hiring, confirm you have enough booked jobs and healthy cash flow: <a href="/blog/contractor-cash-flow-management-canada/">cash flow guide</a>.</p>
+<h2>Workers' compensation registration</h2>
+<p>In Ontario construction, you have 10 calendar days from hiring your first employee to register with the WSIB (<a href="https://www.wsib.ca/en/businesses/registration-and-coverage/expanded-compulsory-coverage-construction-industry" rel="noopener">WSIB: expanded compulsory coverage in construction</a>). In British Columbia, all employers must have WorkSafeBC coverage unless exempt (<a href="https://www.worksafebc.com/en/insurance/need-coverage/who-needs-coverage" rel="noopener">WorkSafeBC: who needs coverage</a>). In Québec, you have 60 days from your first worker's first day to register with the CNESST (<a href="https://www.cnesst.gouv.qc.ca/fr/demarches-formulaires/employeurs/inscription-cnesst" rel="noopener">CNESST: inscription</a>). Your premium is charged on payroll, so it changes the moment you have one; the <a href="/blog/contractor-insurance-canada-what-you-need/">contractor insurance guide</a> covers the rest of the coverage picture.</p>
 
-<h2>Train and delegate</h2>
-<p>Write down how you do the job (checklists, photos, standards) so the new hire does not rely on your memory. See <a href="/blog/construction-project-management-small-contractors/">job site management</a>.</p>
+<h2>Employment standards: the construction rules</h2>
+<h3>Ontario</h3>
+<p>Vacation pay is at least 4% of gross wages for employees with under five years of employment, and 6% after that (<a href="https://www.ontario.ca/document/your-guide-employment-standards-act-0/vacation" rel="noopener">Ontario ESA guide: vacation</a>). Overtime for most employees starts after 44 hours in a week, at 1&frac12; times the regular rate (<a href="https://www.ontario.ca/document/your-guide-employment-standards-act-0/overtime-pay" rel="noopener">Ontario ESA guide: overtime pay</a>).</p>
+<p>Construction employees (on a construction site, other than maintenance, road building and sewer and watermain work) have special rules under O. Reg. 285/01 and 288/01. They are not entitled to daily or weekly limits on hours, the various rest periods, notice of termination or termination pay, or severance pay. They are also not entitled to public holidays or public holiday pay if they receive at least 7.7% of hourly wages as vacation or holiday pay (under five years of employment) or at least 9.7% (five years or more) (<a href="https://www.ontario.ca/document/industries-and-jobs-exemptions-or-special-rules/manufacturing-construction-and-mining" rel="noopener">Ontario: manufacturing, construction and mining special rules</a>). Decide which way you will handle holidays and write it in the offer letter. More on the province on our <a href="/provinces/ontario/">Ontario page</a>.</p>
+<h3>British Columbia</h3>
+<p>Employees earn two weeks of vacation after 12 months and three weeks after five years. Vacation pay is at least 4% of wages, rising to 6% after five years, and employees employed five calendar days or less are not entitled to it (<a href="https://www2.gov.bc.ca/gov/content/employment-business/employment-standards-advice/employment-standards/time-off/vacation" rel="noopener">BC: vacation under the Employment Standards Act</a>).</p>
 
-<h2>Where it fits in growth</h2>
-<p>Hiring is one step of a bigger plan: <a href="/blog/how-to-scale-a-contracting-business-canada/">how to scale a contracting business</a>.</p>
+<h2>Safety from the first day (Ontario)</h2>
+<ul>
+  <li><strong>Awareness training.</strong> Every worker must complete basic occupational health and safety awareness training as soon as practicable (<a href="https://www.ontario.ca/laws/regulation/130297" rel="noopener">O. Reg. 297/13, s. 1</a>); the ministry says to do it within the first few days, before the worker is exposed to hazards, and a signed workbook is the record (<a href="https://www.ontario.ca/page/worker-health-and-safety-awareness-four-steps" rel="noopener">Ontario: worker health and safety awareness in four steps</a>).</li>
+  <li><strong>Working at heights.</strong> A worker who may use a travel restraint, fall restricting or fall arrest system, safety net, work belt or safety belt must have completed a working at heights program approved by the Chief Prevention Officer, from an approved provider. The training is valid for three years, and you keep a record of it (O. Reg. 297/13, ss. 6 to 10).</li>
+  <li><strong>Posters and policies.</strong> Post the Health and Safety at Work: Prevention Starts Here poster and a copy of the Occupational Health and Safety Act, and give each employee the employment standards poster (<a href="https://www.ontario.ca/page/posters-required-workplace" rel="noopener">Ontario: posters required in the workplace</a>). Written health and safety, violence and harassment policies, and a health and safety representative, come in at six or more regularly employed workers (<a href="https://www.ontario.ca/page/health-and-safety-small-businesses" rel="noopener">Ontario: health and safety for small businesses</a>). Below that, the policies need not be written, but the same page describes the program that carries them out: training, inspections, protective equipment and procedures for the hazards of the work you actually do.</li>
+</ul>
+
+<h2>Example: first pay period</h2>
+<p>Example only. Assumptions: Ontario carpentry business, employee paid $30.00 an hour, 80 hours in a biweekly period (26 pays a year), no taxable benefits, vacation pay accrued and paid separately, 2026 CPP and EI rates from the CRA pages above. Income tax is not shown: enter the same pay in PDOC with the employee's TD1 claims to get it.</p>
+<table>
+  <thead>
+    <tr><th>Line</th><th>Calculation</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Gross pay</td><td>80 h &times; $30.00</td><td>$2,400.00</td></tr>
+    <tr><td>CPP, employee</td><td>($2,400.00 &minus; $134.61) &times; 5.95%</td><td>&minus;$134.79</td></tr>
+    <tr><td>EI, employee</td><td>$2,400.00 &times; 1.63%</td><td>&minus;$39.12</td></tr>
+    <tr><td>Income tax</td><td>from PDOC</td><td>&minus;(PDOC)</td></tr>
+    <tr><td><strong>Net pay before income tax</strong></td><td></td><td><strong>$2,226.09</strong></td></tr>
+    <tr><td>CPP, employer</td><td>matches employee</td><td>$134.79</td></tr>
+    <tr><td>EI, employer</td><td>$39.12 &times; 1.4</td><td>$54.77</td></tr>
+    <tr><td><strong>To remit for this pay</strong></td><td>both CPP shares + both EI shares + income tax withheld</td><td><strong>$363.47 + tax</strong></td></tr>
+  </tbody>
+</table>
+<p>At $62,400 a year this employee stays under both the CPP and EI maximums, so nothing stops partway through the year. The employer's cost per pay is $2,400.00 + $134.79 + $54.77 = $2,589.56 before vacation pay and the WSIB premium.</p>
+<p>The checklist for that first pay:</p>
+<ol>
+  <li>Payroll account added to your business number.</li>
+  <li>SIN, federal and Ontario TD1 forms on file.</li>
+  <li>WSIB registration within 10 calendar days of the hire.</li>
+  <li>Awareness training done; working at heights certificate copied if the work needs it.</li>
+  <li>Posters up, employment standards poster handed over, offer letter signed with wage and holiday pay method.</li>
+  <li>Pay run in PDOC, pay stub issued, remittance diarized for the 15th of next month.</li>
+  <li>Calendar entries for T4s (end of February) and, if the job ends, the Record of Employment.</li>
+</ol>
+
+<h2>When the job ends: the Record of Employment</h2>
+<p>Issue a Record of Employment whenever an employee has, or will have, seven consecutive calendar days with no work and no insurable earnings, even if they don't plan to claim EI. Filed electronically, it is due within five calendar days after the end of the pay period in which that happens for weekly, biweekly or semi-monthly pay (<a href="https://www.canada.ca/en/employment-social-development/programs/ei/ei-list/reports/roe-guide/understand.html" rel="noopener">Service Canada: understanding the ROE</a>). In seasonal construction that can be every winter.</p>
+
+<h2>Price the hire before you make it</h2>
+<p>The table shows the employer's share of CPP and EI; add vacation pay, the workers' compensation premium, tools and the hours you pay but cannot bill. <a href="/blog/how-to-price-a-job-labour-materials-markup/">How to price a job</a> turns those into an hourly rate, and the <a href="/tools/labour-rate-calculator/">labour rate calculator</a> runs it with your numbers.</p>
+<p>This is general information, not legal, tax or payroll advice. Confirm the rules for your province with the CRA, your provincial employment standards office and your workers' compensation board.</p>
 `,
   "how-to-follow-up-on-quotes-contractors": `
 <p>Silence after a quote rarely means no. The client may be waiting on a second price, a spouse, a bank, or simply a free evening to read it properly. A follow-up gives them an easy moment to ask what they were going to ask anyway, and it tells you where the job really stands, so you can plan your schedule around facts instead of hope.</p>

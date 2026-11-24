@@ -227,8 +227,25 @@ Every page that stays indexed must meet this bar: at least 900 words of main con
   - the new "get more jobs as a contractor" article
 - **Each article:** 1,400–1,500 words, 2–9 checked official sources, and a labelled worked example.
 
-**Remaining batches:**
-  - business articles: contract, insurance, subcontractors, first employee, payment, cash flow, job costing, change orders, raising prices, GBP, reviews, quote vs estimate, scaling, project management
+**S3 batch 3 status (2026-11-24): built.**
+- **Rewritten to the bar:** the 14 business articles:
+  - contract (ON/BC/QC/AB rules, BC's August 2026 door-to-door changes)
+  - change orders
+  - quote vs estimate vs invoice (current ITC invoice bands: $100 / $500)
+  - insurance and workers' compensation clearances
+  - subcontractors (T5018, Construction Act payment periods)
+  - first employee (2026 CPP/EI)
+  - getting paid (prompt payment by province, liens, small claims)
+  - cash flow (GST/HST filing periods)
+  - job costing
+  - raising prices (StatCan CPI and building price index)
+  - scaling (with the slow-season material)
+  - project management (O. Reg. 213/91 notice of project)
+  - Google Business Profile
+  - reviews (Google policy, Competition Bureau, CASL)
+- **Every indexed article now meets the S3 bar**, except `free-quote-template-for-contractors-canada`, which is rebuilt with the template downloads (item 4).
+
+**Remaining S3 work:**
   - template downloads (item 4)
   - FR trade pages (item 5)
   - trade-page sample quotes (item 6)

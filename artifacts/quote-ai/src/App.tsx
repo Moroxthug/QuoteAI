@@ -108,7 +108,7 @@ const NotificationsPage = lazy(pageLoaders.notifications);
 const MenuPage = lazy(pageLoaders.menu);
 const PublicQuotePage = lazy(() => import("@/pages/p/[id]"));
 
-const SeoLanding = lazy(() => import("@/pages/seo/[type]"));
+const SeoLanding = lazy(() => import("@/pages/seo/en-type"));
 const SeoLandingFr = lazy(() => import("@/pages/seo/fr-type"));
 const SeoCityLanding = lazy(() => import("@/pages/seo/city-landing"));
 const BlogPage = lazy(() => import("@/pages/blog/index"));

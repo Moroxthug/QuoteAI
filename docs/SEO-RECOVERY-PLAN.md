@@ -269,8 +269,13 @@ Every page that stays indexed must meet this bar: at least 900 words of main con
 - **Excel templates:** now have a "Registered for GST/HST?" switch that zeroes the tax lines.
 - **Recheck:** the Rénoclimat amounts (new rules since 1 October 2026) once its online portal launches.
 
+**S3 item 6 status (2026-11-24): built.** All 16 English trade pages (`/quotes/<trade>/`) are hand-written (`src/data/en-trade-pages.ts`, loaded only on English routes by `src/pages/seo/en-type.tsx`).
+- Each page is built around one full sample quote for that trade (header, scope, 9–14 lines, the province's tax lines, deposit and payment schedule, exclusions), in a job and province different from the trade's blog guide, plus what each part of the quote does and what changes by province. 7–11 official sources each, all opened.
+- The shared benefits, "Canadian market" and deep-dive blocks are hidden on these pages. Unique text measured on the built pages: 83–87 % per page (bar: 60 %).
+- `generate-sitemap.ts` fails the build if a live English trade has no hand-written page.
+- `freelance` now targets handymen and solo tradespeople (label, use cases, example), in line with the site's contractor audience; the French page already covered both.
+
 **Remaining S3 work:**
-  - trade-page sample quotes (item 6)
   - bylines once the owner names an author (S5)
 
 ### S4: New pages for real buyer queries (2 weeks, overlapping S3)

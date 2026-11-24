@@ -6,6 +6,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 import { SECTORS, CITIES, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS, enSectorLive, frSectorIndexed, CITY_PAGES_INDEXED, RETIRED_SECTOR_REDIRECTS, FR_HANDWRITTEN_SECTOR_SLUGS } from "../src/data/seo-data.js";
 import { FR_TRADE_PAGES } from "../src/data/fr-trade-pages.js";
+import { EN_TRADE_PAGES } from "../src/data/en-trade-pages.js";
 import { BLOG_ARTICLES, BLOG_CATEGORIES, BLOG_REDIRECTS } from "../src/data/blog-data.js";
 // Homeowner posts kept live but noindexed (SEO-RECOVERY-PLAN S3.1) stay out.
 const LISTED_ARTICLES = BLOG_ARTICLES.filter((a) => !a.noindex);
@@ -171,6 +172,11 @@ const inactiveCitySlugs = CITIES.map((c) => c.slug).filter((slug) => !activeSlug
   const written = Object.keys(FR_TRADE_PAGES).sort().join(",");
   const listed = [...FR_HANDWRITTEN_SECTOR_SLUGS].sort().join(",");
   if (written !== listed) throw new Error(`fr-trade-pages.ts (${written}) and FR_HANDWRITTEN_SECTOR_SLUGS (${listed}) differ`);
+
+  // Every live English trade page is hand-written (S3 item 6): a new trade
+  // needs its en-trade-pages.ts entry before it ships.
+  const enMissing = Object.keys(SECTORS).filter((slug) => enSectorLive(slug) && !EN_TRADE_PAGES[slug]);
+  if (enMissing.length) throw new Error(`en-trade-pages.ts has no page for: ${enMissing.join(", ")}`);
 
   // Merged blog posts (blog-index.ts BLOG_REDIRECTS) must 301 too, and a
   // merged slug must not still be a live article.

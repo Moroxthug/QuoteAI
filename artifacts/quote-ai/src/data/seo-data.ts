@@ -594,8 +594,8 @@ export const SECTORS: Record<string, SectorData> = {
       ],
     },
     sectorType: "professional",
-    label: "Freelancer",
-    labelPlural: "freelancers and consultants",
+    label: "Solo tradesperson",
+    labelPlural: "handymen and solo tradespeople",
     titleTag: "Quotes for Freelancers & Consultants | quoteai",
     titleVariants: [
       "Quotes for Freelancers & Consultants | quoteai",
@@ -620,18 +620,18 @@ export const SECTORS: Record<string, SectorData> = {
     ],
     h2HowItWorks: "How it works: 3 steps",
     howItWorks: [
-      { step: "1. Describe the project", desc: "Write: 'Company website build: UI/UX design, React front end, CMS integration, on-page SEO, 2 rounds of revisions, 30-day delivery.'" },
+      { step: "1. Describe the job", desc: "Write: 'Half-day repair list: patch two drywall holes, rehang a sticking door, replace a bathroom fan, recaulk the tub, materials included.'" },
       { step: "2. AI structures the proposal", desc: "quoteai generates line items with estimated hours, rates, and subtotals. Includes payment terms and delivery dates." },
       { step: "3. A professional PDF that sells", desc: "A document with your logo that shows competence. The client feels the value before the call even happens." },
     ],
-    h2UseCases: "Common fields for freelancers and consultants",
+    h2UseCases: "Jobs solo tradespeople quote",
     useCases: [
-      "Web developers and software developers",
-      "Graphic designers and UX/UI designers",
-      "Marketing and SEO consultants",
-      "Copywriters and content creators",
-      "Photographers and videographers",
-      "Business consultants and coaches",
+      "Home repair lists",
+      "Drywall patches and paint touch-ups",
+      "Fixture and fan replacements",
+      "Doors, trim and hardware",
+      "Small decks, fences and gates",
+      "Caulking and weatherstripping",
     ],
     h2Faq: "Frequently asked questions",
     faq: [
@@ -639,7 +639,7 @@ export const SECTORS: Record<string, SectorData> = {
       { q: "Can I quote clients outside Canada?", a: "Yes — you can adjust currency and language details manually for international clients." },
       { q: "Can I attach a portfolio or case study to the quote?", a: "The PDF quote merges easily with other documents. You can combine it with your portfolio into a single file to send." },
     ],
-    jsonLdDescription: "AI quoting software for Canadian freelancers and consultants.",
+    jsonLdDescription: "Quoting software for Canadian handymen and solo tradespeople.",
   },
 
   "building-consultant": {

@@ -19,7 +19,7 @@ export const SECTOR_SLUGS: Record<string, SectorSlugEntry> = {
   "welder-fabricator": { frSlug: "soudeur-metallier", label: "Welder & Metal Fabricator", frLabel: "Soudeur-métallier" },
   "carpenter-cabinetmaker": { frSlug: "menuisier-ebeniste", label: "Carpenter & Cabinetmaker", frLabel: "Menuisier-ébéniste" },
   "hvac-technician": { frSlug: "technicien-cvc", label: "HVAC & Heating Technician", frLabel: "Technicien CVC" },
-  freelance: { frSlug: "travailleur-autonome", label: "Freelancer", frLabel: "Travailleur autonome" },
+  freelance: { frSlug: "travailleur-autonome", label: "Solo tradesperson", frLabel: "Travailleur autonome" },
   "building-consultant": { frSlug: "expert-batiment", label: "Building Consultant", frLabel: "Expert en bâtiment" },
   mason: { frSlug: "macon", label: "Mason & Concrete Contractor", frLabel: "Maçon" },
   landscaper: { frSlug: "paysagiste", label: "Landscaper", frLabel: "Paysagiste" },

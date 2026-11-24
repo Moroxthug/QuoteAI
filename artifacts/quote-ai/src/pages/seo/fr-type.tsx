@@ -5,5 +5,5 @@ import SeoLanding from "./[type]";
 import { FR_TRADE_PAGES } from "@/data/fr-trade-pages";
 
 export default function SeoLandingFr() {
-  return <SeoLanding frPages={FR_TRADE_PAGES} />;
+  return <SeoLanding pages={FR_TRADE_PAGES} />;
 }

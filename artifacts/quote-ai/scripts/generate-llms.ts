@@ -14,6 +14,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { SECTORS, enSectorLive, frSectorIndexed } from "../src/data/seo-data.js";
+import { EN_TRADE_PAGES } from "../src/data/en-trade-pages.js";
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../src/data/blog-data.js";
 // Homeowner posts kept live but noindexed (SEO-RECOVERY-PLAN S3.1) stay out.
 const LISTED_ARTICLES = BLOG_ARTICLES.filter((a) => !a.noindex);
@@ -39,7 +40,7 @@ const plans = MARKETING_PLANS.map((p) => {
 
 const sectorLinks = Object.entries(SECTORS)
   .filter(([slug]) => enSectorLive(slug))
-  .map(([slug, s]) => `- [${s.labelPlural.replace(/^./, (c) => c.toUpperCase())}](${BASE}/quotes/${slug}/): ${s.metaDescription}`)
+  .map(([slug, s]) => `- [${s.labelPlural.replace(/^./, (c) => c.toUpperCase())}](${BASE}/quotes/${slug}/): ${EN_TRADE_PAGES[slug]?.metaDescription ?? s.metaDescription}`)
   .join("\n");
 
 const sectorLinksFr = Object.entries(SECTORS)

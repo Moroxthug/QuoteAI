@@ -4,7 +4,7 @@
 // (seo-data.ts FR_HANDWRITTEN_SECTOR_SLUGS must list the same keys; the
 // sitemap build fails if they drift). Written in French first; every rule is
 // linked to the official page it comes from.
-export interface FrTradePage {
+export interface TradePage {
   titleTag: string;
   metaDescription: string;
   h1: string;
@@ -15,7 +15,7 @@ export interface FrTradePage {
   updatedAt: string;
 }
 
-export const FR_TRADE_PAGES: Record<string, FrTradePage> = {
+export const FR_TRADE_PAGES: Record<string, TradePage> = {
   "air-conditioning-installer": {
     titleTag: "Soumission climatisation et thermopompe murale | quoteai",
     metaDescription: "Soumission d'installateur de climatisation au Québec : sous-catégorie RBQ 15.9 ou 15.10, attestation halocarbures, porte-à-porte interdit, LogisVert, exemple.",

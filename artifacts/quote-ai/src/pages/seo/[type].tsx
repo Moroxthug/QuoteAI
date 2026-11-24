@@ -4,7 +4,7 @@ import { ArrowRight, CheckCircle2, Clock, Download, FileText, Shield, TrendingUp
 import { SeoHead } from "@/components/seo-head";
 import { SECTORS, DEFAULT_SECTOR, RELATED_SECTORS, SECTOR_KEY_BY_FR_SLUG, CITY_SECTORS, ACTIVE_CITIES, FRENCH_PRIMARY_CITY_SLUGS, enSectorLive, frSectorLive, frSectorIndexed } from "@/data/seo-data";
 import { BLOG_INDEX, SECTOR_ARTICLES } from "@/data/blog-index";
-import type { FrTradePage } from "@/data/fr-trade-pages";
+import type { TradePage } from "@/data/fr-trade-pages";
 import { getOgImagePath, getSectorFrContent, getSectorDeepDive, cityBasePath, type Lang as EngineLang } from "@/data/seo-render-engine";
 import { QuotePreviewMockup } from "@/components/quote-preview-mockup";
 import { useLanguage, isFrenchPath } from "@/i18n/LanguageContext";
@@ -276,7 +276,7 @@ function PreventiviGratisPlansBlock() {
   );
 }
 
-export default function SeoLanding({ frPages }: { frPages?: Record<string, FrTradePage> } = {}) {
+export default function SeoLanding({ pages }: { pages?: Record<string, TradePage> } = {}) {
   const { t } = useLanguage();
   const [pathname] = useLocation();
   const isFr = isFrenchPath(pathname);
@@ -293,13 +293,13 @@ export default function SeoLanding({ frPages }: { frPages?: Record<string, FrTra
   // are hand-authored per sector (SectorData.fr); h1/intro/benefits/howItWorks/faq
   // come from the generic French templates in seo-render-engine.ts.
   const frContent = isFr ? getSectorFrContent(s) : null;
-  // A hand-written French page (fr-trade-pages.ts) replaces the generic copy.
-  const frPage = isFr ? frPages?.[slug] : undefined;
-  const titleTag = frPage?.titleTag ?? (isFr ? s.fr.titleTag : s.titleTag);
-  const metaDescription = frPage?.metaDescription ?? (isFr ? s.fr.metaDescription : s.metaDescription);
-  const h1 = frPage?.h1 ?? frContent?.h1 ?? s.h1;
-  const h1Highlight = frPage?.h1Highlight ?? frContent?.h1Highlight ?? s.h1Highlight;
-  const intro = frPage?.intro ?? frContent?.intro ?? s.intro;
+  // A hand-written page (fr-trade-pages.ts / en-trade-pages.ts) replaces the generic copy.
+  const page = pages?.[slug];
+  const titleTag = page?.titleTag ?? (isFr ? s.fr.titleTag : s.titleTag);
+  const metaDescription = page?.metaDescription ?? (isFr ? s.fr.metaDescription : s.metaDescription);
+  const h1 = page?.h1 ?? frContent?.h1 ?? s.h1;
+  const h1Highlight = page?.h1Highlight ?? frContent?.h1Highlight ?? s.h1Highlight;
+  const intro = page?.intro ?? frContent?.intro ?? s.intro;
   const h2Benefits = frContent?.h2Benefits ?? s.h2Benefits;
   const benefits = frContent?.benefits ?? s.benefits;
   const h2HowItWorks = frContent?.h2HowItWorks ?? s.h2HowItWorks;
@@ -307,7 +307,7 @@ export default function SeoLanding({ frPages }: { frPages?: Record<string, FrTra
   const h2UseCases = frContent?.h2UseCases ?? s.h2UseCases;
   const useCases = isFr ? s.fr.useCases : s.useCases;
   const h2Faq = frContent?.h2Faq ?? s.h2Faq;
-  const faq = frPage?.faq ?? frContent?.faq ?? s.faq;
+  const faq = page?.faq ?? frContent?.faq ?? s.faq;
   const labelPlural = isFr ? s.fr.labelPlural : s.labelPlural;
   const label = isFr ? s.fr.label : s.label;
   const deepDive = getSectorDeepDive(s, engineLang);
@@ -396,20 +396,20 @@ export default function SeoLanding({ frPages }: { frPages?: Record<string, FrTra
       {/* ── Downloadable templates (SEO-RECOVERY-PLAN S3 item 4) ── */}
       {isFr && slug === "word-template" && <TemplateDownloadsFr />}
 
-      {/* ── Hand-written French page body ─────────────────── */}
-      {frPage && (
+      {/* ── Hand-written page body ─────────────────────────── */}
+      {page && (
         <section className="sec" id="guide">
           <div className="wrap" style={{ maxWidth: 780 }}>
-            <div className="prose blog-prose max-w-none" dangerouslySetInnerHTML={{ __html: frPage.bodyHtml }} />
+            <div className="prose blog-prose max-w-none" dangerouslySetInnerHTML={{ __html: page.bodyHtml }} />
             <p style={{ fontSize: 13, color: "var(--faint)", marginTop: 24 }}>
-              Mis à jour le <time dateTime={frPage.updatedAt}>{new Date(frPage.updatedAt).toLocaleDateString("fr-CA", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}</time>
+              {t("blog.updatedPrefix")} <time dateTime={page.updatedAt}>{new Date(page.updatedAt).toLocaleDateString(isFr ? "fr-CA" : "en-CA", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}</time>
             </p>
           </div>
         </section>
       )}
 
       {/* ── Benefits ─────────────────────────────────────── */}
-      {!frPage && (
+      {!page && (
       <section className="sec soft">
         <div className="wrap">
           <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
@@ -467,12 +467,12 @@ export default function SeoLanding({ frPages }: { frPages?: Record<string, FrTra
 
       {/* ── Guide-specific blocks ────────────────────────── */}
       {slug === "excel-template" && <ExcelWordComparisonBlock tool="Excel" />}
-      {slug === "word-template" && !frPage && <ExcelWordComparisonBlock tool="Word" />}
+      {slug === "word-template" && !page && <ExcelWordComparisonBlock tool="Word" />}
       {slug === "how-to-quote" && <ComeFareGuideBlock />}
       {slug === "free-quote" && <PreventiviGratisPlansBlock />}
 
       {/* ── "Built for the Canadian market" ──────────────── */}
-      {!frPage && (
+      {!page && (
       <section className="sec">
         <div className="wrap" style={{ maxWidth: 980 }}>
           <div className="card" style={{ padding: "clamp(28px, 4vw, 48px)" }}>
@@ -506,7 +506,7 @@ export default function SeoLanding({ frPages }: { frPages?: Record<string, FrTra
       )}
 
       {/* ── Long-form (Phase 80: from the retired static bodies) ── */}
-      {!frPage && (
+      {!page && (
       <section className="sec" aria-label={deepDive.heading}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <div className="sec-head" style={{ display: "block", textAlign: "center" }}>

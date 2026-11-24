@@ -57,22 +57,22 @@ quoteai next to Jobber, Joist and Housecall Pro for Canadian contractors, with e
 
 ## Quoting software by trade
 
-- [Painters](https://quoteai.ca/quotes/painter/): Create quotes for interior and exterior painting jobs in 30 seconds with AI. Quoting software built for Canadian painters. Free to try.
-- [Electricians](https://quoteai.ca/quotes/electrician/): Quoting software for electricians: create quotes for wiring, panel upgrades, and rewiring in 30 seconds. AI built for Canadian electricians. Free.
-- [Plumbers](https://quoteai.ca/quotes/plumber/): Create quotes for plumbing and heating jobs in 30 seconds. AI quoting software for Canadian plumbers. No spreadsheets. Free.
-- [General contractors](https://quoteai.ca/quotes/general-contractor/): Quoting software for general contractors: framing, foundations, finishing. AI-built itemized quotes in 30 seconds. For Canadian small businesses.
-- [Renovation contractors](https://quoteai.ca/quotes/renovation-contractor/): Quotes for full renovations in 30 seconds. AI for renovation contractors and tradespeople across Canada.
-- [Welders and metal fabricators](https://quoteai.ca/quotes/welder-fabricator/): Quotes for metal fabrication and welding in 30 seconds. AI quoting software for Canadian welders and fabricators. Free.
-- [Carpenters and cabinetmakers](https://quoteai.ca/quotes/carpenter-cabinetmaker/): Create quotes for custom cabinetry, millwork and finish carpentry in 30 seconds. AI quoting software for Canadian carpenters. Free.
-- [HVAC and heating technicians](https://quoteai.ca/quotes/hvac-technician/): Quoting software for HVAC and heating technicians: furnaces, heat pumps, in-floor heat. AI in 30 seconds for Canadian trades.
-- [Freelancers and consultants](https://quoteai.ca/quotes/freelance/): Create professional quotes for consulting, marketing, design and IT work in 30 seconds. AI quoting software for Canadian freelancers. Free.
-- [Masons and concrete contractors](https://quoteai.ca/quotes/mason/): Create quotes for masonry, foundations, and concrete work in 30 seconds. AI quoting software for Canadian masons. Try it free.
-- [Landscapers](https://quoteai.ca/quotes/landscaper/): Create quotes for lawn care, landscaping, and yard maintenance in 30 seconds. AI quoting software for Canadian landscapers. Try it free.
-- [Tile installers](https://quoteai.ca/quotes/tile-installer/): Create quotes for tile, porcelain, and mosaic installation in 30 seconds. AI quoting software for Canadian tile installers. Try it free.
-- [Window and door installers](https://quoteai.ca/quotes/window-door-installer/): Create quotes for windows, doors, and exterior openings in vinyl, fibreglass, and wood in 30 seconds. AI quoting software for Canadian installers.
-- [Roofing companies](https://quoteai.ca/quotes/roofer/): Create quotes for roof replacement, shingles, and flashing in 30 seconds. AI quoting software for Canadian roofers. Try it free.
-- [Air conditioning and HVAC installers](https://quoteai.ca/quotes/air-conditioning-installer/): Create quotes for AC, ductless heat pumps, and ventilation installs in 30 seconds. AI quoting software for Canadian installers. Free.
-- [Flooring installers](https://quoteai.ca/quotes/flooring-installer/): Create quotes for hardwood, laminate, epoxy, and carpet installation in 30 seconds. AI quoting software for Canadian flooring installers. Try it free.
+- [Painters](https://quoteai.ca/quotes/painter/): A full sample painting quote for an exterior repaint in BC: lead test, prep hours, scaffold, GST only, payment stages and exclusions, explained line by line.
+- [Electricians](https://quoteai.ca/quotes/electrician/): A full electrician quote example for a Level 2 EV charger in Calgary: line items, GST, deposit, exclusions, and who can pull permits in Alberta, BC and Ontario.
+- [Plumbers](https://quoteai.ca/quotes/plumber/): A plumbing quote example for a backwater valve in a Montréal basement: line items, GST and QST, deposit, exclusions, and licensing in Québec, Alberta, Ontario.
+- [General contractors](https://quoteai.ca/quotes/general-contractor/): Sample general contractor quote for a BC kitchen renovation with subcontracted trades, allowances, GST and a 10% holdback in the payment schedule.
+- [Renovation contractors](https://quoteai.ca/quotes/renovation-contractor/): A sample renovation quote for a Toronto basement with a bathroom: allowances, permit line, subtrades, 13% HST, deposit schedule, and the rules in ON, BC and QC.
+- [Welders and metal fabricators](https://quoteai.ca/quotes/welder-fabricator/): Sample welding and fabrication quote for a galvanized exterior stair in Québec: RBQ licence line, shop drawing, TPS and TVQ, deposit, and rules in AB and ON.
+- [Carpenters and cabinetmakers](https://quoteai.ca/quotes/carpenter-cabinetmaker/): A sample cabinetmaker quote for a built-in mudroom unit in Québec: drawing approval, shop and site lines, GST and QST, RBQ licence, payments and exclusions.
+- [HVAC and heating technicians](https://quoteai.ca/quotes/hvac-technician/): An HVAC quote example for a gas furnace replacement in Mississauga: line items, HST, deposit, exclusions, TSSA registration and Ontario's in-home sales rules.
+- [Handymen and solo tradespeople](https://quoteai.ca/quotes/freelance/): Sample quote for a self-employed handyman in BC: task-by-task lines, GST and the $30,000 small supplier rule, why no PST, deposit limits, WorkSafeBC coverage.
+- [Masons and concrete contractors](https://quoteai.ca/quotes/mason/): Sample masonry quote for a brick veneer rebuild, repointing and parging in Montréal: line items, GST and QST, payment stages, exclusions and permits.
+- [Landscapers](https://quoteai.ca/quotes/landscaper/): Sample landscaping quote for a Calgary retaining wall, rock beds and drip line: line items, 5% GST, plant warranty, deposit, rules in Alberta, BC and Québec.
+- [Tile installers](https://quoteai.ca/quotes/tile-installer/): A sample tile quote for a kitchen floor and backsplash in Alberta: membrane, supply vs labour, GST, deposit and Alberta prepaid contracting licence, explained.
+- [Window and door installers](https://quoteai.ca/quotes/window-door-installer/): Sample window and door quote for a full-frame patio door and five windows in Halifax: opening-by-opening lines, 14% HST, deposit, exclusions and permits.
+- [Roofing companies](https://quoteai.ca/quotes/roofer/): A full sample roofing quote for a Calgary reroof with Class 4 shingles and an SBS porch roof: line items, GST, deposit, exclusions and Alberta rules.
+- [Air conditioning and HVAC installers](https://quoteai.ca/quotes/air-conditioning-installer/): A ductless heat pump quote example for Kelowna, BC: line items, GST, why no PST, a rebate-ready invoice, and refrigerant and licensing rules in BC, ON and QC.
+- [Flooring installers](https://quoteai.ca/quotes/flooring-installer/): A sample flooring quote for engineered hardwood and LVP in Nova Scotia: removal, subfloor prep, old vinyl left in place, 14% HST and exclusions, explained.
 
 ## Help centre
 

@@ -18,6 +18,7 @@
     "qa:seo": "tsx ./scripts/seo-check.ts",
     "indexnow": "tsx ./scripts/indexnow.ts",
     "llms": "tsx ./scripts/generate-llms.ts",
+    "templates": "tsx ./scripts/generate-templates.ts",
     "submit-to-google": "tsx ./scripts/submit-to-google.ts",
     "ga-traffic-report": "tsx ./scripts/ga-traffic-report.ts",
     "gsc-inspect": "tsx ./scripts/gsc-inspect-urls.ts",

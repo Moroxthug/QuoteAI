@@ -1671,9 +1671,10 @@ const NON_LOCAL_SECTOR_SLUGS = new Set([
 // really template/guide doorways, are retired: each one 301s (vercel.json) to
 // the page that serves its intent. fr: null keeps the French page live.
 export const RETIRED_SECTOR_REDIRECTS: Record<string, { en: string; fr: string | null }> = {
-  "excel-template": { en: "/tools/", fr: "/fr/outils/" },
-  // The French "modèle de soumission Word" page ranks; only the English one goes.
-  "word-template": { en: "/tools/", fr: null },
+  "excel-template": { en: "/blog/free-quote-template-for-contractors-canada/", fr: "/fr/soumissions/modele-soumission-word/" },
+  // Both point at the pages with the downloadable templates (S3 item 4). The
+  // French "modèle de soumission Word" page ranks, so it stays.
+  "word-template": { en: "/blog/free-quote-template-for-contractors-canada/", fr: null },
   "free-quote": { en: "/pricing/", fr: "/fr/tarifs/" },
   "how-to-quote": { en: "/blog/how-to-write-a-professional-quote-that-wins-jobs/", fr: "/fr/guides/" },
   "decorative-painter": { en: "/quotes/painter/", fr: "/fr/soumissions/peintre/" },

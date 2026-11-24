@@ -142,12 +142,13 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
   },
   {
     slug: "free-quote-template-for-contractors-canada",
-    title: "Free Quote Template for Contractors in Canada (GST/HST/QST Included)",
-    seoTitle: "Free Contractor Quote Template for Canada",
-    metaDescription: "What a Canadian contractor quote must include: scope, line items, GST/HST/QST, deposit, validity and signature. Copy the structure, then see how to automate it.",
+    title: "Free Contractor Quote and Contract Templates for Canada (Excel and Word)",
+    seoTitle: "Free Contractor Quote Template (Excel, Word)",
+    metaDescription: "Download a free contractor quote template in Excel or Word with GST/HST, PST and QST for every province, plus a renovation contract template. No sign-up.",
     category: "Tools",
     publishedAt: "2026-10-31",
-    readingTimeMin: 3,
+    updatedAt: "2026-11-24",
+    readingTimeMin: 5,
     relatedSectors: ["general-contractor", "renovation-contractor", "freelance"],
   },
   {

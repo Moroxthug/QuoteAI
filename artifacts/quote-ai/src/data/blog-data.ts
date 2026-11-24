@@ -594,41 +594,69 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>This is general information, not legal advice.</p>
 `,
   "free-quote-template-for-contractors-canada": `
-<p>If you search for a "free quote template" you'll find hundreds of generic US documents with no mention of GST, HST or QST. A Canadian contractor quote has to do more: show the right tax for your province, protect you on scope, and be clear enough that the client can say yes without calling you three times. Here is the structure that works, section by section.</p>
-
-<h2>What every contractor quote should include</h2>
+<h2>Download the templates</h2>
+<p>Three files, free, no sign-up. They open in Microsoft Excel and Word, Google Sheets and Docs, LibreOffice and Apple Numbers and Pages.</p>
 <ul>
-  <li><strong>Your business details</strong>: legal or trade name, phone, email, address, and your GST/HST number (plus QST number if you operate in Quebec). Once you are registered, tax numbers on documents are expected.</li>
-  <li><strong>Client details and job address</strong>: the billing party and the site, which are often different.</li>
-  <li><strong>Quote number and date</strong>: so you and the client can both refer to it later.</li>
-  <li><strong>Scope of work</strong>: what is included and, just as important, what is not.</li>
-  <li><strong>Line items</strong>: labour, materials, equipment, subcontractors, permits, disposal.</li>
-  <li><strong>Taxes</strong>: shown as a separate line, not buried in the price.</li>
-  <li><strong>Payment terms</strong>: deposit, progress payments, balance due.</li>
-  <li><strong>Validity period</strong>: how long the price holds (30 days is common; shorten it when material prices are moving).</li>
-  <li><strong>Acceptance</strong>: a signature or electronic acceptance line.</li>
+  <li><strong><a href="/templates/quote-template-canada.xlsx" download>Quote template, Excel (.xlsx)</a></strong>: line items calculate themselves, and a province list fills in the right sales tax lines for all 13 provinces and territories.</li>
+  <li><strong><a href="/templates/quote-template-canada.docx" download>Quote template, Word (.docx)</a></strong>: the same layout for people who prefer to type a document, with the tax lines to fill in by hand.</li>
+  <li><strong><a href="/templates/renovation-contract-template.docx" download>Renovation contract template, Word (.docx)</a></strong>: thirteen clauses with notes in brackets on what each province requires.</li>
 </ul>
+<p>Working in French or in Québec? The <a href="/fr/soumissions/modele-soumission-word/">French quote template</a> has TPS and TVQ lines and a field for your RBQ licence number.</p>
 
-<h2>Getting Canadian taxes right</h2>
-<p>Tax depends on where the work is performed. In general: Alberta, Saskatchewan (GST plus PST rules), Manitoba and BC have different structures from the HST provinces, and Quebec charges GST plus QST. A few examples of the combined rates in force at the time of writing:</p>
+<h2>What is in the Excel quote template</h2>
+<p>The workbook has three sheets.</p>
 <ul>
-  <li><strong>Ontario</strong>: 13% HST</li>
-  <li><strong>Quebec</strong>: 5% GST + 9.975% QST</li>
-  <li><strong>Alberta</strong>: 5% GST only</li>
-  <li><strong>BC</strong>: 5% GST, with PST applying to some goods</li>
-  <li><strong>Atlantic provinces</strong>: 15% HST</li>
+  <li><strong>Quote</strong>: your business details, the client and job, twenty line items (description, quantity, unit, unit price, amount), then subtotal, tax lines and total. Yellow cells are the ones you fill in; everything else calculates.</li>
+  <li><strong>Tax rates</strong>: one row per province and territory with its GST, HST, PST, RST or QST rate. The quote looks up the province you pick.</li>
+  <li><strong>How to use</strong>: the steps below, in short.</li>
 </ul>
-<p>Rates and rules change, so confirm with the Canada Revenue Agency or Revenu Québec, or your accountant, before you fix a template. The point is that a template with one hard-coded tax rate will be wrong the moment you work across a provincial border.</p>
+<p>Pick the province where the work is done, not where your business is based. The sales tax on a renovation follows the place of supply, which for work on a building is generally where the property is. The rates in the file are the ones on the CRA's <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">GST/HST rates page</a> as of November 2026: 5% GST in Alberta, the territories, BC, Manitoba, Saskatchewan and Québec; 13% HST in Ontario; 14% in Nova Scotia; 15% in New Brunswick, Newfoundland and Labrador and Prince Edward Island. If a rate changes, change it on the Tax rates sheet and every quote you build from the file follows.</p>
 
-<h2>Scope of work: where most disputes start</h2>
-<p>Most quote disputes are not about price, they are about what the price covered. Write the scope as a short list of outcomes ("Supply and install 3 interior doors, including trim and paint-ready finish") and add an explicit exclusions list ("Drywall repair, painting and electrical are not included"). One extra sentence on how changes are handled ("Work outside this scope will be quoted separately and approved before it starts") saves many arguments.</p>
+<h3>Québec: GST and QST on two lines</h3>
+<p>In Québec the template shows GST at 5% and QST at 9.975% on separate lines, calculated on the same subtotal. That matches how <a href="https://www.revenuquebec.ca/en/businesses/consumption-taxes/gsthst-and-qst/collecting-gst-and-qst/calculating-the-taxes/" rel="noopener">Revenu Québec describes the calculation</a>. Add your RBQ licence number in the licence field: the RBQ requires it on estimates, contracts and invoices, in the form "RBQ licence: XXXX-XXXX-XX" (<a href="https://www.rbq.gouv.qc.ca/en/licence/fulfilling-your-obligations/displaying-your-licence/" rel="noopener">RBQ, displaying your licence</a>).</p>
 
-<h2>Deposits and payment schedule</h2>
-<p>For anything beyond a small repair, ask for a deposit before ordering materials or booking your crew. Common patterns are 10–30% on acceptance, a progress payment at a milestone, and the balance on completion. Whatever you choose, put it on the quote in plain numbers, not a vague "deposit required". Check provincial consumer protection rules, because some provinces cap deposits on home renovation contracts.</p>
+<h3>BC, Saskatchewan and Manitoba: PST is a choice you have to check</h3>
+<p>The template does not add PST or RST unless you set "Charge PST/RST?" to Yes. That is deliberate. Whether provincial sales tax appears on your client's bill depends on the province and the kind of contract. In British Columbia, for example, a contractor who supplies and installs materials that become part of a building generally pays PST when buying the materials and does not charge PST to the client (<a href="https://www2.gov.bc.ca/gov/content/taxes/sales-taxes/pst/charge-collect/pst-real-property-contractors/contractors-paying-pst" rel="noopener">BC, contractors paying PST</a>). Read your province's rules for contractors, then decide.</p>
 
-<h2>Where a static template falls short</h2>
-<p>A Word or Excel template looks free, but you pay for it in time: retyping client details, recalculating taxes, fixing formatting, exporting to PDF, then chasing the client. Mistakes creep in, and the quote reaches the client hours or days after the visit, when other contractors may have already replied.</p>
-<p>That is the gap <a href="/pricing/">quoteai's free quoting</a> is built for: you describe the job, it builds the itemized quote with the right Canadian taxes, and you send a professional PDF from your phone. If you are comparing approaches, see <a href="/compare/">how quoteai compares with other quoting software</a>, or read the full guide on <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>.</p>
+<h3>Only show GST/HST if you are registered</h3>
+<p>If your taxable sales are under the CRA's small supplier threshold of $30,000, registration is optional (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/when-register-charge" rel="noopener">CRA, when to register</a>). If you are not registered, delete the GST/HST number and set the tax lines to zero: charging tax you are not registered to collect is a problem, not a formality. Once you are registered, your GST/HST number goes in the header.</p>
+
+<h2>How to fill in a quote that gets signed</h2>
+<p>A template only helps if what goes into it is specific. Four habits make the difference:</p>
+<ol>
+  <li><strong>One task or material per line.</strong> "Labour: prep and two coats, living room, 8 hr" tells the client what they are paying for. "Painting, $3,600" gives them nothing to compare except the total.</li>
+  <li><strong>Name the product or grade.</strong> "Premium acrylic eggshell" or "architectural shingles" stops a cheaper bid from looking like the same job.</li>
+  <li><strong>Write the exclusions.</strong> Permits, moving furniture, hidden damage, disposal. Whatever you leave out, the client will assume is included.</li>
+  <li><strong>Set a validity date and a deposit.</strong> Ontario's guide for renovation businesses recommends deposits of no more than 10% of the total (<a href="https://www.ontario.ca/page/guide-home-renovation-and-roofing-businesses" rel="noopener">ontario.ca</a>).</li>
+</ol>
+<p>The <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">guide to writing a professional quote</a> covers each section in detail, and <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a> covers the numbers that go into the unit price column.</p>
+
+<h2>Example: a filled-in quote</h2>
+<p>Example only: the rates and prices are assumptions to show the layout. Job: replace a bathroom vanity and faucet in Ontario.</p>
+<table>
+  <thead><tr><th>Description</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr></thead>
+  <tbody>
+    <tr><td>Labour: disconnect and remove old vanity and faucet, cap supplies</td><td>2</td><td>hr</td><td>$85.00</td><td>$170.00</td></tr>
+    <tr><td>Labour: install new 30 in. vanity, faucet, P-trap and supply lines, test for leaks</td><td>3.5</td><td>hr</td><td>$85.00</td><td>$297.50</td></tr>
+    <tr><td>Vanity, 30 in., white shaker, with top (client-approved model)</td><td>1</td><td>each</td><td>$640.00</td><td>$640.00</td></tr>
+    <tr><td>Single-lever faucet, chrome</td><td>1</td><td>each</td><td>$145.00</td><td>$145.00</td></tr>
+    <tr><td>Supply lines, P-trap, sealant</td><td>1</td><td>lot</td><td>$48.00</td><td>$48.00</td></tr>
+    <tr><td>Disposal of old vanity</td><td>1</td><td>each</td><td>$40.00</td><td>$40.00</td></tr>
+    <tr><td><strong>Subtotal</strong></td><td></td><td></td><td></td><td>$1,340.50</td></tr>
+    <tr><td>HST (13%)</td><td></td><td></td><td></td><td>$174.27</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td><strong>$1,514.77</strong></td></tr>
+  </tbody>
+</table>
+<p>Why it is written this way: removal and installation are separate, so the client sees what the second visit costs if they supply their own vanity; the vanity line names the model the client approved, so there is no argument about which one; disposal is its own line because it is the first thing a client asks about. Below the table go the exclusions (wall or floor repairs behind the old vanity), the validity date, and "deposit $150 on acceptance, balance on completion".</p>
+
+<h2>Using the contract template</h2>
+<p>For anything bigger than a small repair, the signed quote should sit inside a written contract. In Ontario, a renovation contract over $50 must be in writing, and a contract signed at the client's home carries a 10-day cooling-off period (<a href="https://www.ontario.ca/page/guide-home-renovation-and-roofing-businesses" rel="noopener">ontario.ca</a>). Québec, Alberta and BC have their own rules on what the contract must say and how a client can cancel.</p>
+<p>The contract template has thirteen clauses: parties, scope (pointing to your quote), price and taxes, payment schedule, changes, schedule and delays, permits, site and clean-up, insurance and workers' compensation, warranty, cancellation, disputes and entire agreement. The cancellation clause is left as a bracketed note on purpose, because the required wording differs by province. Read <a href="/blog/how-to-write-a-contractor-contract-canada/">how to write a contractor contract in Canada</a> before you fill it in, and have a lawyer review your final version. For changes once the job is under way, see <a href="/blog/how-to-handle-change-orders-contractors/">handling change orders</a>.</p>
+
+<h2>Excel or Word: which to use</h2>
+<p>Use the Excel file if you quote more than a few jobs a month: the arithmetic and the tax lines are done for you, and you can keep a copy per job as a record. Use the Word file if your quotes are mostly written scope with a handful of prices, or if you want to paste in photos. Either way, save as PDF before you send it, so the client cannot edit it and it reads the same on a phone.</p>
+<p>A spreadsheet stops being enough when you need the same quote turned into an invoice, deposits tracked, or quotes sent from the job site. That is what quoteai does: you describe the job, it writes an itemized quote with the province's taxes and sends it as a PDF from your phone. The templates here stay free either way.</p>
+<p>General information, not tax or legal advice.</p>
 `,
   "how-to-collect-payment-from-clients-contractor-canada": `
 <p>Collecting money is decided mostly before the first tool comes off the truck. The deposit, the billing schedule, what counts as a complete invoice and what happens when a payment is late should all be written into the quote and contract the client signs. After that, getting paid is a matter of following your own paperwork.</p>

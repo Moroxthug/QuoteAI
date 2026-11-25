@@ -100,6 +100,7 @@ Annual billing charges ten months for a year. Details: [Pricing](${BASE}/pricing
 - [Pilot](${BASE}/pilot/): the BC, Ontario and Québec launch.
 - [WhatsApp quotes](${BASE}/whatsapp/): create and send quotes from WhatsApp.
 - [About](${BASE}/about/): who builds quoteai and why.
+- [Editorial policy](${BASE}/editorial-policy/): how the guides and calculators are sourced, dated and corrected.
 - [Contact](${BASE}/contact/)
 - [Help centre](${BASE}/help/): how-to articles for every part of the product.
 - [Blog](${BASE}/blog/): Canadian cost guides and how-to-quote guides for trades.

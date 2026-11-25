@@ -112,6 +112,7 @@ const PublicQuotePage = lazy(() => import("@/pages/p/[id]"));
 const SeoLanding = lazy(() => import("@/pages/seo/en-type"));
 const SeoLandingFr = lazy(() => import("@/pages/seo/fr-type"));
 const FeaturePage = lazy(() => import("@/pages/feature"));
+const EditorialPolicyPage = lazy(() => import("@/pages/editorial-policy"));
 const SeoCityLanding = lazy(() => import("@/pages/seo/city-landing"));
 const BlogPage = lazy(() => import("@/pages/blog/index"));
 const ContractsListPage = lazy(pageLoaders.contracts);
@@ -280,6 +281,9 @@ function Router() {
       <Route path="/tools/:slug" component={() => <PublicLayout><Suspense fallback={null}><ToolPage /></Suspense></PublicLayout>} />
       <Route path="/fr/outils/:slug" component={() => <PublicLayout><Suspense fallback={null}><ToolPage /></Suspense></PublicLayout>} />
       {/* Comparison pages, both languages (pages/compare) */}
+      {/* Editorial policy (SEO plan S5.3) */}
+      <Route path="/editorial-policy" component={() => <PublicLayout><Suspense fallback={null}><EditorialPolicyPage lang="en" /></Suspense></PublicLayout>} />
+      <Route path="/fr/politique-editoriale" component={() => <PublicLayout><Suspense fallback={null}><EditorialPolicyPage lang="fr" /></Suspense></PublicLayout>} />
       {/* Feature pages (SEO plan S4), both languages, at the site root */}
       {FEATURE_SLUG_PAIRS.flatMap((f) => [
         <Route key={f.en} path={`/${f.en}`} component={() => <PublicLayout><Suspense fallback={null}><FeaturePage id={f.id} lang="en" /></Suspense></PublicLayout>} />,

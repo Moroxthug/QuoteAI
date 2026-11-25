@@ -327,6 +327,20 @@ Every page that stays indexed must meet this bar: at least 900 words of main con
    - Collect reviews on Google Business Profile and Capterra/G2, not as self-hosted stars.
 5. Remove unsourced claims ("1.2 million tradespeople", "4–6 hrs saved/week", "median 30 sec", "used across the country") or source them.
 
+**S5 status (2026-11-25): built with the owner's rulings.**
+- **Testimonials:** removed; none could be confirmed with written permission. Collect reviews on Google Business Profile and Capterra (S6 kit). The footer's "Reviews" link now points to the editorial policy.
+- **Byline:** company byline only. Every article and French guide shows "By the quoteai editorial team" with a link to the policy; the Article JSON-LD carries `publishingPrinciples`. No author page, since no person is named. If the owner later names an author, add an author page and swap the byline.
+- **Editorial policy:** `/editorial-policy/` ↔ `/fr/politique-editoriale/` (`src/pages/editorial-policy.tsx`). It covers who writes (including that drafts use AI writing tools and are checked against official sources), sourcing, dates, product mentions, no affiliates, not-advice and corrections. Sitemap 140 → 142.
+- **Unsourced claims removed:**
+  - About page: "1.2 million tradespeople", "3–4 hours a week", the unverifiable Toronto-painter story, "used across the country", "Canadian market pricing".
+  - Home stats bar: "median 30 sec", "4–6 hrs saved". They are replaced by 2 languages and the calculator count.
+  - "About 30 seconds" stays as a product description (owner ruling).
+- **Schema price:** the owner asked for $19. The SoftwareApplication offer is computed from the cheapest published plan in `pricing.ts`, so it shows $29 today, matching /pricing/. It changes to $19 by itself when /pricing/ does; a schema price that differs from the page is a structured-data violation.
+- **Fixed:** four French trade pages said the RBQ number is already in the quote PDF header. `api-server/src/quotes/pdf.ts` prints the GST number but no licence number, so they now tell contractors to put it in the quote notes.
+- **Not done:**
+  - S5.1's founder name, photo, founding date and address (owner chose no named person).
+  - A product fix to print the RBQ number on the quote PDF.
+
 ### S6: Authority (owner-led, starts now, runs continuously)
 DR 12 is the ceiling on everything above. Target: 15 relevant referring domains in 8 weeks.
 1. **Directories and listings:** Capterra, G2, GetApp, Software Advice, SaaSworthy, Product Hunt (EN), BetaList; Google Business Profile, Bing Places, Apple Business Connect.

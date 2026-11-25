@@ -13,7 +13,7 @@ import { SkipLink } from "@/components/a11y";
 import SupportBot, { openSupportChat } from "@/components/support-bot";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TRADE_LABELS } from "@/i18n/translations";
-import { getLanguageCounterpartPath, localizedPath, PROVINCE_SLUG_PAIRS, RETIRED_SECTOR_SLUGS, featurePath } from "@/data/seo-slugs";
+import { getLanguageCounterpartPath, localizedPath, PROVINCE_SLUG_PAIRS, RETIRED_SECTOR_SLUGS, featurePath, EDITORIAL_PATHS } from "@/data/seo-slugs";
 import { PROVINCE_NAMES } from "@/lib/tax-profiles";
 import { legalIdentityLines } from "@workspace/legal-entity";
 
@@ -346,7 +346,7 @@ function SiteLayout({ children }: { children: React.ReactNode }) {
             <Link href="/about/">{t("footer.aboutUs")}</Link>
             <Link href="/contact/">{t("footer.contact")}</Link>
             <Link href="/blog/">{t("footer.newsroom")}</Link>
-            <Link href={localizedPath("/#reviews", lang)}>{t("footer.reviews")}</Link>
+            <Link href={lang === "fr" ? EDITORIAL_PATHS.fr : EDITORIAL_PATHS.en}>{t("footer.editorial")}</Link>
           </FooterCol>
           <FooterCol title={t("footer.support")} folded={phone}>
             <Link href="/help/">{t("footer.helpCenter")}</Link>

@@ -2,11 +2,12 @@ import { useCountUp } from "@/hooks/use-count-up";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TRADE_LABELS } from "@/i18n/translations";
 import { CANADIAN_PROVINCES } from "@/lib/tax-profiles";
-import { RETIRED_SECTOR_SLUGS } from "@/data/seo-slugs";
+import { RETIRED_SECTOR_SLUGS, TOOL_SLUG_PAIRS } from "@/data/seo-slugs";
 
 const TRADES_COUNT = Object.keys(TRADE_LABELS.en).filter((slug) => !RETIRED_SECTOR_SLUGS.has(slug)).length;
 // Every province and territory has a tax profile (src/lib/tax-profiles.ts).
 const JURISDICTIONS = CANADIAN_PROVINCES.length;
+const TOOLS_COUNT = TOOL_SLUG_PAIRS.length;
 
 function StatTile({
   target,
@@ -53,21 +54,18 @@ export function StatsBar({ className = "" }: { className?: string }) {
           </h2>
           <p className="lead">
             {lang === "fr"
-              ? "Taxes gérées, langues couvertes, et la paperasse disparue — mesuré dans les chiffres que nos utilisateurs rapportent."
-              : "Tax handled, languages covered, and the paperwork gone — measured in the numbers our users report."}
+              ? "Taxes gérées, deux langues, et la paperasse réduite : ce que le produit couvre aujourd'hui."
+              : "Tax handled, two languages, and less paperwork: what the product covers today."}
           </p>
         </div>
         <div className="stat-grid">
           <StatTile
-            target={30}
-            suffix={lang === "fr" ? " s" : " sec"}
-            label={lang === "fr" ? "temps médian pour une soumission terminée, contre 30 à 60 min" : "median time to a finished quote, down from 30–60 min"}
+            target={2}
+            label={lang === "fr" ? "langues, français et anglais, pour vous et vos clients" : "languages, English and French, for you and your clients"}
           />
           <StatTile
-            target={6}
-            prefix="4–"
-            suffix={lang === "fr" ? " h" : " hrs"}
-            label={lang === "fr" ? "économisées par semaine, redonnées au chantier ou à la famille" : "saved per week, back into the job site or family"}
+            target={TOOLS_COUNT}
+            label={lang === "fr" ? "calculateurs gratuits : taxes, retenue, marge et taux horaire" : "free calculators: sales tax, holdback, markup and labour rate"}
           />
           <StatTile
             target={TRADES_COUNT}

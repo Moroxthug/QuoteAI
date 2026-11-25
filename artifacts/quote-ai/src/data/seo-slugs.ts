@@ -107,7 +107,11 @@ export function comparePath(lang: "en" | "fr", id?: CompetitorId): string {
   return `${base}${pair[lang]}/`;
 }
 
+/** SEO plan S5.3: the editorial policy, linked from every article byline. */
+export const EDITORIAL_PATHS = { en: "/editorial-policy/", fr: "/fr/politique-editoriale/" } as const;
+
 const LOCALE_PAGE_PAIRS: ReadonlyArray<{ en: string; fr: string }> = [
+  { en: "/editorial-policy", fr: "/fr/politique-editoriale" },
   { en: "/pricing", fr: "/fr/tarifs" },
   { en: "/pilot", fr: "/fr/pilote" },
   // Phase 95: the legal pages.

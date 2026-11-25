@@ -5,6 +5,7 @@ import { BLOG_ARTICLES } from "@/data/blog-data";
 import { SECTORS, ACTIVE_CITIES, CITY_SECTORS, CITY_PAGES_INDEXED, enSectorLive } from "@/data/seo-data";
 import { extractToc, injectHeadingIds } from "@/data/blog-toc";
 import { articleToolLinks } from "@/data/article-links";
+import { EDITORIAL_PATHS } from "@/data/seo-slugs";
 import { SeoHead } from "@/components/seo-head";
 import { BASE_URL } from "@/data/json-ld";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -76,6 +77,7 @@ export default function BlogArticlePage() {
       dateModified: article.updatedAt ?? article.publishedAt,
       inLanguage: "en-CA",
       author: { "@type": "Organization" as const, "@id": `${BASE_URL}/#org`, name: "quoteai", url: BASE_URL },
+      publishingPrinciples: `${BASE_URL}${EDITORIAL_PATHS.en}`,
       publisher: {
         "@type": "Organization" as const,
         "@id": `${BASE_URL}/#org`,
@@ -136,6 +138,9 @@ export default function BlogArticlePage() {
           </h1>
           <p className="lead" style={{ maxWidth: "none" }}>
             {article.metaDescription}
+          </p>
+          <p className="blog-byline">
+            {t("blog.byline")} · <Link href={EDITORIAL_PATHS.en}>{t("blog.howWeWrite")}</Link>
           </p>
         </header>
 

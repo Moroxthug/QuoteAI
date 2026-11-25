@@ -80,7 +80,7 @@ export function pricingJsonLd(lang: "en" | "fr"): JsonLdSchema {
   };
 }
 
-/** WebSite + SoftwareApplication for "/" and "/fr" (with the homepage reviews). */
+/** Organization, WebSite and SoftwareApplication for "/" and "/fr" (no reviews: S5.4). The offer price follows the cheapest published plan in pricing.ts, so it always matches /pricing/. */
 export function homepageJsonLd(lang: "en" | "fr"): JsonLdSchema[] {
   const fr = lang === "fr";
   const website = {

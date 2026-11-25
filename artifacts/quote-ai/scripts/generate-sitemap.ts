@@ -70,6 +70,10 @@ for (const t of TOOL_SLUG_PAIRS) {
   entries.push(url(`${BASE_URL}/fr/outils/${t.fr}/`, "0.8", "monthly", TOOL_PAGES[t.id].updatedAt));
 }
 
+// Editorial policy (SEO plan S5.3).
+entries.push(url(`${BASE_URL}/editorial-policy/`, "0.5", "yearly", "2026-11-25"));
+entries.push(url(`${BASE_URL}/fr/politique-editoriale/`, "0.5", "yearly", "2026-11-25"));
+
 // Feature pages (SEO plan S4), both languages.
 for (const f of FEATURE_SLUG_PAIRS) {
   entries.push(url(`${BASE_URL}/${f.en}/`, "0.9", "monthly", FEATURE_PAGES[f.id].en.updatedAt));

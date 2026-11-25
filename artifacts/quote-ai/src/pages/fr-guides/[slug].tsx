@@ -7,6 +7,7 @@ import { FaqList } from "@/components/faq-list";
 import { useAuth } from "@/hooks/use-auth";
 import { breadcrumbJsonLd, faqJsonLd, BASE_URL } from "@/data/json-ld";
 import { FR_GUIDES, FR_GUIDES_HUB as UI } from "@/data/fr-guides";
+import { EDITORIAL_PATHS } from "@/data/seo-slugs";
 import NotFound from "@/pages/not-found";
 
 export const frDate = (iso: string) =>
@@ -39,6 +40,7 @@ export default function FrGuidePage() {
             datePublished: g.updatedAt,
             dateModified: g.updatedAt,
             author: { "@id": `${BASE_URL}/#org` },
+            publishingPrinciples: `${BASE_URL}${EDITORIAL_PATHS.fr}`,
             publisher: { "@id": `${BASE_URL}/#org` },
             citation: g.sources.map((s) => s.url),
           },
@@ -56,7 +58,7 @@ export default function FrGuidePage() {
           <p className="eyebrow on-dark" style={{ marginBottom: 22 }}>{UI.eyebrow}</p>
           <h1>{g.h1}</h1>
           <p className="lead">{g.lead}</p>
-          <p className="hero-note">{UI.updated} {frDate(g.updatedAt)}</p>
+          <p className="hero-note">{UI.updated} {frDate(g.updatedAt)} · {UI.byline} · <Link href={EDITORIAL_PATHS.fr} style={{ color: "inherit", textDecoration: "underline" }}>{UI.howWeWrite}</Link></p>
         </div>
       </section>
 

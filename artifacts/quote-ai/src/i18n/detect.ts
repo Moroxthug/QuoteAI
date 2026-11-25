@@ -27,6 +27,7 @@ export function isEnglishLocalePath(pathname: string): boolean {
     pathname === "/pilot" || pathname === "/pilot/" ||
     pathname === "/privacy-policy" || pathname === "/privacy-policy/" ||
     pathname === "/terms" || pathname === "/terms/" ||
+    pathname === "/editorial-policy" || pathname === "/editorial-policy/" ||
     // SEO plan S4 feature pages (kept in step with seo-slugs FEATURE_SLUG_PAIRS).
     /^\/(estimating-software|invoicing-software|contractor-crm|job-costing-software|contracts-e-signature)\/?$/.test(pathname)
   );

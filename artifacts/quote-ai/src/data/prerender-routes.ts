@@ -36,6 +36,9 @@ export function listPrerenderRoutes(): PrerenderRoute[] {
       { path: `/tools/${t.en}`, lang: "en" as const },
       { path: `/fr/outils/${t.fr}`, lang: "fr" as const },
     ]),
+    // Editorial policy (SEO plan S5.3).
+    { path: "/editorial-policy", lang: "en" as const },
+    { path: "/fr/politique-editoriale", lang: "fr" as const },
     // Feature pages (SEO plan S4), both languages.
     ...FEATURE_SLUG_PAIRS.flatMap((f) => [
       { path: `/${f.en}`, lang: "en" as const },

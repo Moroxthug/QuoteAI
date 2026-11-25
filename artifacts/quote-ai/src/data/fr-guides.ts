@@ -718,6 +718,8 @@ export const FR_GUIDES_HUB = {
   lead: "Les règles qui touchent chaque soumission et chaque facture au Québec, expliquées simplement, avec les sources officielles.",
   eyebrow: "Guides",
   updated: "Mis à jour le",
+  byline: "Par l'équipe éditoriale de quoteai",
+  howWeWrite: "Comment nous recherchons et vérifions nos guides",
   sourcesTitle: "Sources officielles",
   relatedTitle: "À lire aussi",
   faqTitle: "Questions fréquentes",

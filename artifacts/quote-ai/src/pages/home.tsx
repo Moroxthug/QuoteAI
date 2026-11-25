@@ -4,7 +4,6 @@ import { ArrowRight, Receipt, Shield, Zap } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
 import { RevealHeading } from "@/components/reveal-heading";
 import { StatsBar } from "@/components/stats-bar";
-import { TestimonialsSection } from "@/components/testimonials-section";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -446,8 +445,7 @@ export default function Home() {
         </div>
       </ScrollSection>
 
-      {/* ── REVIEWS (real, verified testimonials) ─────────────── */}
-      <TestimonialsSection />
+      {/* Testimonials removed (SEO-RECOVERY-PLAN S5.4, owner 2026-11-25): none could be confirmed with written permission. Collect reviews on Google Business Profile and Capterra instead. */}
 
       {/* ── PLANS (Phase 112: the prices, before anyone has to find /pricing) ── */}
       <ScrollSection className="sec" id="plans-teaser">

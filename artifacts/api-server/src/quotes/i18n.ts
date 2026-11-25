@@ -31,6 +31,7 @@ const Q = {
   taxId: { en: "Tax ID", fr: "N° de taxe" },
   gstNo: { en: "GST/HST No.", fr: "N° TPS/TVH" },
   qstNo: { en: "QST No.", fr: "N° TVQ" },
+  licenceNo: { en: "Licence No.", fr: "N° de licence" },
   tel: { en: "Tel", fr: "Tél." },
   date: { en: "Date", fr: "Date" },
   page: { en: "Page", fr: "Page" },

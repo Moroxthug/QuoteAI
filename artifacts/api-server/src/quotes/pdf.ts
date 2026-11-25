@@ -52,6 +52,8 @@ export async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: Prof
   const companyAddress = snap?.address || profile?.address || "";
   const companyPhone = snap?.phone || profile?.phone || "";
   const companyEmail = snap?.email || profile?.email || "";
+  // Shown on every quote: Quebec requires the RBQ licence on contractor documents.
+  const companyLicence = profile?.licenceNumber || "";
   // The DB default title is the English string; a French document localises it unless the company typed its own.
   const titolo1 = quote.titoloPreventivoRiga1 && quote.titoloPreventivoRiga1 !== qt("defaultTitle", "en") ? quote.titoloPreventivoRiga1 : qt("defaultTitle", lang);
   const titolo2 = quote.titoloPreventivoRiga2 || "";
@@ -75,6 +77,7 @@ export async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: Prof
     { text: companyName, fontSize: 13, bold: true, color: DARK, margin: [0, 4, 0, 2] },
   ];
   if (companyVat) companyInfoStack.push({ text: `${qt("gstNo", lang)}${colon(lang)} ${companyVat}`, fontSize: 8, color: "#555555" });
+  if (companyLicence) companyInfoStack.push({ text: `${qt("licenceNo", lang)}${colon(lang)} ${companyLicence}`, fontSize: 8, color: "#555555" });
   if (companyAddress) companyInfoStack.push({ text: companyAddress, fontSize: 8, color: "#555555" });
   if (companyPhone) companyInfoStack.push({ text: `${qt("tel", lang)}${colon(lang)} ${companyPhone}`, fontSize: 8, color: "#555555" });
   if (companyEmail) companyInfoStack.push({ text: companyEmail, fontSize: 8, color: "#555555" });
@@ -454,6 +457,8 @@ export async function generateQuotePdfBuffer(quote: QuoteRow, profile: ProfileRo
   const companyAddress = snap?.address || profile?.address || "";
   const companyPhone = snap?.phone || profile?.phone || "";
   const companyEmail = snap?.email || profile?.email || "";
+  // Shown on every quote: Quebec requires the RBQ licence on contractor documents.
+  const companyLicence = profile?.licenceNumber || "";
   // The DB default title is the English string; a French document localises it unless the company typed its own.
   const titolo1 = quote.titoloPreventivoRiga1 && quote.titoloPreventivoRiga1 !== qt("defaultTitle", "en") ? quote.titoloPreventivoRiga1 : qt("defaultTitle", lang);
   const titolo2 = quote.titoloPreventivoRiga2 || "";
@@ -475,6 +480,7 @@ export async function generateQuotePdfBuffer(quote: QuoteRow, profile: ProfileRo
     { text: companyName, fontSize: 13, bold: true, color: DARK, margin: [0, 4, 0, 2] },
   ];
   if (companyVat) companyInfoStack.push({ text: `${qt("gstNo", lang)}${colon(lang)} ${companyVat}`, fontSize: 8, color: "#555555" });
+  if (companyLicence) companyInfoStack.push({ text: `${qt("licenceNo", lang)}${colon(lang)} ${companyLicence}`, fontSize: 8, color: "#555555" });
   if (companyAddress) companyInfoStack.push({ text: companyAddress, fontSize: 8, color: "#555555" });
   if (companyPhone) companyInfoStack.push({ text: `${qt("tel", lang)}${colon(lang)} ${companyPhone}`, fontSize: 8, color: "#555555" });
   if (companyEmail) companyInfoStack.push({ text: companyEmail, fontSize: 8, color: "#555555" });

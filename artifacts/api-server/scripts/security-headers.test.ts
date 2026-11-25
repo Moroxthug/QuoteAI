@@ -25,7 +25,7 @@ type HeaderRule = { source: string; headers: Header[] };
 
 function pageRule(): HeaderRule {
   const cfg = JSON.parse(readFileSync(VERCEL_JSON, "utf8")) as { headers?: HeaderRule[] };
-  const rule = cfg.headers?.find((h) => h.source === "/((?!api/).*)");
+  const rule = cfg.headers?.find((h) => h.source === "/((?!api/|embed/).*)");
   if (!rule) throw new Error("vercel.json has no header rule for the non-API pages");
   return rule;
 }
@@ -87,5 +87,28 @@ describe("security headers (vercel.json)", () => {
     // our own origin — the policy must delegate to self, not disable them.
     const pp = header(rule, "Permissions-Policy") ?? "";
     for (const feature of ["geolocation", "microphone", "camera"]) expect(pp).toContain(`${feature}=(self)`);
+  });
+});
+
+// SEO-RECOVERY-PLAN S6.3: the embeddable calculators are the one thing other
+// sites may frame. Only the static /embed/ folder gets frame-ancestors *, and
+// it runs no inline script; every app page keeps SAMEORIGIN.
+describe("embeddable calculator headers", () => {
+  const cfg = JSON.parse(readFileSync(VERCEL_JSON, "utf8")) as { headers?: HeaderRule[] };
+  const framable = (cfg.headers ?? []).filter((r) => (header(r, "Content-Security-Policy") ?? "").includes("frame-ancestors *"));
+
+  test("only /embed/ can be framed by other sites", () => {
+    expect(framable.map((r) => r.source)).toEqual(["/embed/(.*)"]);
+  });
+
+  test("the embed CSP allows no inline or third-party script", () => {
+    const csp = header(framable[0]!, "Content-Security-Policy") ?? "";
+    expect(directive(csp, "script-src")).toEqual(["'self'"]);
+    expect(directive(csp, "default-src")).toEqual(["'none'"]);
+    expect(header(framable[0]!, "X-Frame-Options")).toBeUndefined();
+  });
+
+  test("the page rule excludes /embed/ and nothing else new", () => {
+    expect(pageRule().source).toBe("/((?!api/|embed/).*)");
   });
 });

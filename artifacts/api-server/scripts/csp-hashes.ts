@@ -17,7 +17,7 @@ type Header = { key: string; value: string };
 type HeaderRule = { source: string; headers: Header[] };
 
 const cfg = JSON.parse(readFileSync(VERCEL_JSON, "utf8")) as { headers?: HeaderRule[] };
-const rule = cfg.headers?.find((h) => h.source === "/((?!api/).*)");
+const rule = cfg.headers?.find((h) => h.source === "/((?!api/|embed/).*)");
 const csp = rule?.headers.find((h) => h.key === "Content-Security-Policy");
 if (!rule || !csp) throw new Error("vercel.json: no Content-Security-Policy on the page header rule");
 

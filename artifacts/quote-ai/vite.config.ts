@@ -31,6 +31,37 @@ function widgetPlugin(): Plugin {
     },
   };
 }
+// SEO-RECOVERY-PLAN S6.3: /embed/calculator.js, the script of the embeddable
+// calculators (public/embed/calculator.html). Bundled on its own with esbuild
+// (it imports the calculator arithmetic and the tax table), served live in
+// dev and emitted into dist/public/embed in the client build.
+const EMBED_SRC = path.resolve(import.meta.dirname, "src/embed/calculator.ts");
+async function compileEmbed(minify: boolean): Promise<string> {
+  // esbuild is Vite's own dependency (not one of ours under pnpm), so resolve it from there.
+  const { createRequire } = await import("node:module");
+  const { pathToFileURL } = await import("node:url");
+  const fromVite = createRequire(createRequire(import.meta.url).resolve("vite"));
+  const { build } = (await import(pathToFileURL(fromVite.resolve("esbuild")).href)) as typeof import("esbuild");
+  const out = await build({ entryPoints: [EMBED_SRC], bundle: true, write: false, format: "esm", target: "es2019", minify, legalComments: "none" });
+  return out.outputFiles[0]!.text;
+}
+function embedPlugin(): Plugin {
+  return {
+    name: "quoteai-embed",
+    configureServer(server) {
+      server.middlewares.use("/embed/calculator.js", (_req, res, next) => {
+        compileEmbed(false).then((code) => {
+          res.setHeader("Content-Type", "application/javascript; charset=utf-8");
+          res.setHeader("Cache-Control", "no-cache");
+          res.end(code);
+        }, next);
+      });
+    },
+    async generateBundle() {
+      this.emitFile({ type: "asset", fileName: "embed/calculator.js", source: await compileEmbed(true) });
+    },
+  };
+}
 // Phase 115: one dictionary chunk per language. The strings are authored as
 // { en, fr } in one file (translations.ts, translations.dashboard.ts — the
 // i18n audit and every phase edit them that way), but a visitor only ever
@@ -152,7 +183,7 @@ export default defineConfig(({ isSsrBuild, mode }) => {
     react(),
     tailwindcss(),
     i18nSplitPlugin(),
-    ...(isSsrBuild || native ? [] : [widgetPlugin(), chunkMapPlugin()]),
+    ...(isSsrBuild || native ? [] : [widgetPlugin(), embedPlugin(), chunkMapPlugin()]),
     ...(native ? [nativeHtmlPlugin()] : []),
   ],
   resolve: {

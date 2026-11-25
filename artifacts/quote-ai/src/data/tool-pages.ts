@@ -96,6 +96,16 @@ export const TOOL_UI = {
   perHour: { en: "/ h", fr: "/ h" },
   yearlyRevenue: { en: "Labour revenue per year", fr: "Revenus de main-d'œuvre par année" },
   invalid: { en: "Enter a number.", fr: "Entrez un nombre." },
+  // Embed box (S6.3), on the sales-tax and holdback pages
+  embedTitle: { en: "Put this calculator on your site", fr: "Ajoutez ce calculateur à votre site" },
+  embedBody: {
+    en: "Free for trade associations, schools, blogs and suppliers. Paste this code into any page: the calculator runs in a frame, updates when rates change, and carries no ads or tracking.",
+    fr: "Gratuit pour les associations, écoles, blogues et fournisseurs. Collez ce code dans n'importe quelle page : le calculateur s'affiche dans un cadre, suit les changements de taux, sans publicité ni suivi.",
+  },
+  embedCode: { en: "Embed code", fr: "Code à intégrer" },
+  embedCopy: { en: "Copy code", fr: "Copier le code" },
+  embedCopied: { en: "Copied", fr: "Copié" },
+  embedCredit: { en: "by", fr: "de" },
   tableProvince: { en: "Province or territory", fr: "Province ou territoire" },
   tableTaxes: { en: "Taxes to charge", fr: "Taxes à percevoir" },
   tableTotalRate: { en: "Combined rate", fr: "Taux combiné" },

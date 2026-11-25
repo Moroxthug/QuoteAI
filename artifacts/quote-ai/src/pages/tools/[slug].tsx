@@ -4,6 +4,7 @@
 // the prerendered HTML, the rule behind each number is written out under it,
 // and the sales-tax and markup pages carry a reference table. Copy lives in
 // data/tool-pages.ts, arithmetic in lib/calculators.ts.
+import { useState } from "react";
 import { Link, useParams, useLocation } from "wouter";
 import { ArrowRight, Calculator } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
@@ -60,6 +61,27 @@ function MarginTable({ lang }: { lang: Lang }) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+/** S6.3: the copy-and-paste code for /embed/calculator.html. The credit link
+ * sits outside the iframe, on the host page itself. */
+function EmbedBox({ id, lang, name, path }: { id: "salesTax" | "holdback"; lang: Lang; name: string; path: string }) {
+  const [copied, setCopied] = useState(false);
+  const code =
+    `<iframe src="${BASE_URL}/embed/calculator.html?tool=${id}&amp;lang=${lang}" title="${name}" width="100%" height="${id === "holdback" ? 600 : 470}" style="border:0;max-width:600px" loading="lazy"></iframe>\n` +
+    `<p style="font-size:13px">${name} ${TOOL_UI.embedCredit[lang]} <a href="${BASE_URL}${path}">quoteai</a></p>`;
+  const copy = () => {
+    navigator.clipboard?.writeText(code).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }, () => {});
+  };
+  return (
+    <div className="tool-block tool-embed" id="embed">
+      <h2 className="h2 tool-h2">{TOOL_UI.embedTitle[lang]}</h2>
+      <p>{TOOL_UI.embedBody[lang]}</p>
+      <label className="tool-embed-label" htmlFor={`embed-${id}`}>{TOOL_UI.embedCode[lang]}</label>
+      <textarea id={`embed-${id}`} className="tool-embed-code" readOnly rows={5} value={code} onFocus={(e) => e.currentTarget.select()} />
+      <button type="button" className="btn btn-navy tool-embed-btn" onClick={copy} aria-live="polite">{copied ? TOOL_UI.embedCopied[lang] : TOOL_UI.embedCopy[lang]}</button>
     </div>
   );
 }
@@ -142,6 +164,7 @@ export default function ToolPage() {
             </div>
           ))}
           <p className="prov-fine">{TOOL_UI.disclaimer[lang]}</p>
+          {(pair.id === "salesTax" || pair.id === "holdback") && <EmbedBox id={pair.id} lang={lang} name={page.h1[lang].replace(/[.?]$/, "")} path={path} />}
         </div>
       </section>
 

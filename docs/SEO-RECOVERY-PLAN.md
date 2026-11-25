@@ -339,7 +339,7 @@ DR 12 is the ceiling on everything above. Target: 15 relevant referring domains 
 - **Item 3 built:** embeddable GST/HST and holdback calculators at `/embed/calculator.html?tool=salesTax|holdback&lang=en|fr`, a standalone page (`src/embed/calculator.ts`, compiled by `embedPlugin` in vite.config.ts; 10 kB) using the same tested arithmetic as /tools. The two calculator pages, EN and FR, show copy-paste embed code with the credit link on the host page.
 - **Framing:** only `/embed/` may be framed by other sites (its own CSP: `frame-ancestors *`, no inline script, noindex); every other page keeps `SAMEORIGIN`. Pinned by `api-server/scripts/security-headers.test.ts`.
 - **Owner kit:** `docs/S6-AUTHORITY-KIT.md` has listing copy (EN/FR), the directory and association lists, pitch emails, Reddit/YouTube rules and a tracking table.
-- **Item 4 (labour-rate index) waits** on a read-only count of quotes per trade and province, plus a privacy-policy check.
+- **Item 4 (labour-rate index): not viable yet** (read-only count on production, 2026-11-25). 31 live quotes from 7 accounts (12 Sep to 6 Nov 2026), some of them test accounts; at most 4 accounts priced any line by the hour (41 hourly lines in 12 quotes). The bar is about 30 contractors per trade and province cell. Re-count when there are around 100 active paying accounts; a national figure by trade could come before provincial cells. The privacy policy check is still owed before publishing.
 
 ### S7: Measure and decide (weekly, from the day S1 ships)
 - **Weekly Search Console export** (clicks, impressions, position by page family) into docs/seo-metrics.md, compared with this baseline:

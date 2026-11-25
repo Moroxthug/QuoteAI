@@ -110,6 +110,8 @@ Who to pitch, one at a time with a personal note:
 A quarterly "Canadian trade labour-rate index" from anonymised quotes is the one asset competitors can't copy. Before anything is built:
 1. **Volume:** are there enough quotes per trade and province for a median to mean something? Rule of thumb: at least 30 per cell. This needs a read-only count on the production database, which I haven't run.
 2. **Privacy:** confirm the privacy policy covers aggregated, anonymised statistics, or update it first.
+**Count run 2026-11-25:** 31 quotes from 7 accounts, at most 4 with hourly lines. Not enough yet; re-count at around 100 active paying accounts.
+
 3. **If both are yes:** a script publishes median hourly rates by trade and province, with counts, at /data/labour-rates/, refreshed each quarter.
 
 ## 6. Reddit and YouTube

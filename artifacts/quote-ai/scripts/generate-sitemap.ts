@@ -18,6 +18,7 @@ import { FEATURE_PAGES } from "../src/data/feature-pages.js";
 import { CHECKED_AT } from "../src/data/compare-pages.js";
 import { FR_GUIDES } from "../src/data/fr-guides.js";
 import { TOOL_PAGES } from "../src/data/tool-pages.js";
+import { ARTICLE_LINKS } from "../src/data/article-links.js";
 
 const BASE_URL = "https://quoteai.ca";
 
@@ -193,6 +194,16 @@ const inactiveCitySlugs = CITIES.map((c) => c.slug).filter((slug) => !activeSlug
   if (blogMissing.length) throw new Error(`vercel.json is missing redirects for merged blog posts: ${blogMissing.join("; ")}`);
   const stillLive = BLOG_ARTICLES.filter((a) => a.slug in BLOG_REDIRECTS).map((a) => a.slug);
   if (stillLive.length) throw new Error(`merged blog posts are still articles: ${stillLive.join(", ")}`);
+
+  // S4.4: every indexed article links one calculator and one feature page.
+  const noLinks = BLOG_ARTICLES.filter((a) => !a.noindex && !ARTICLE_LINKS[a.slug]).map((a) => a.slug);
+  if (noLinks.length) throw new Error(`article-links.ts has no calculator/feature entry for: ${noLinks.join(", ")}`);
+  const featHrefs = FEATURE_SLUG_PAIRS.map((f) => `/fr/${f.fr}/`);
+  const guideGaps = FR_GUIDES.filter((g) =>
+    !g.related.some((r) => r.href.startsWith("/fr/outils/") && r.href !== "/fr/outils/") ||
+    !g.related.some((r) => featHrefs.includes(r.href)),
+  ).map((g) => g.slug);
+  if (guideGaps.length) throw new Error(`French guides need a calculator and a feature page in related: ${guideGaps.join(", ")}`);
 }
 
 // ─── robots.txt ──────────────────────────────────────────────────────────────

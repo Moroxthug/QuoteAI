@@ -1018,6 +1018,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     "blog.quotesInYourCityPrefix": "Quotes for",
     "blog.quotesInYourCitySuffix": "in your city",
     "blog.relatedArticles": "Related articles",
+    "blog.toolsTitle": "Tools for this job",
+    "blog.toolsCalculator": "Free calculator",
+    "blog.toolsFeature": "In quoteai",
 
     // ── SEO landing page chrome (src/pages/seo/*) ────────────────────
     "seo.builtForMarket": "Built for the Canadian market",
@@ -2498,6 +2501,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     "blog.quotesInYourCityPrefix": "Soumissions pour",
     "blog.quotesInYourCitySuffix": "dans votre ville",
     "blog.relatedArticles": "Articles connexes",
+    "blog.toolsTitle": "Outils pour ce travail",
+    "blog.toolsCalculator": "Calculateur gratuit",
+    "blog.toolsFeature": "Dans quoteai",
 
     // ── SEO landing page chrome (src/pages/seo/*) ────────────────────
     "seo.builtForMarket": "Conçu pour le marché canadien",

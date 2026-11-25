@@ -15,7 +15,7 @@ import { homepageJsonLd } from "@/data/json-ld";
 import { MARKETING_PLANS, type MarketingPlan } from "@/data/pricing";
 import { FaqList } from "@/components/faq-list";
 import { COMPETITORS, QUOTEAI_CELLS, ROW_LABELS, type RowId } from "@/data/compare-pages";
-import { comparePath } from "@/data/seo-slugs";
+import { comparePath, featurePath } from "@/data/seo-slugs";
 
 const HOME_COMPARE_ROWS = ["quoteBuilding", "tax", "currency", "singleQuote", "trial"] as const satisfies readonly RowId[];
 const SPREADSHEET_CELLS: Record<(typeof HOME_COMPARE_ROWS)[number], { en: string; fr: string }> = {
@@ -25,6 +25,15 @@ const SPREADSHEET_CELLS: Record<(typeof HOME_COMPARE_ROWS)[number], { en: string
   singleQuote: { en: "Free, but by hand", fr: "Gratuit, mais à la main" },
   trial: { en: "—", fr: "—" },
 };
+
+/** S4.4: the French home shows French guides, not English blog posts. Kept
+ * here (not imported from fr-guides.ts) so the guides' text stays out of the
+ * home chunk; the titles are the guides' h1s. */
+const FR_HOME_GUIDES = [
+  { href: "/fr/guides/tps-tvq-acompte-entrepreneur/", slug: "tps-tvq-acompte-entrepreneur", title: "TPS et TVQ sur un acompte : quand les percevoir", category: "Guide", publishedAt: "2026-11-24" },
+  { href: "/fr/guides/retenue-contractuelle-hypotheque-legale/", slug: "retenue-contractuelle-hypotheque-legale", title: "Retenue contractuelle et hypothèque légale au Québec", category: "Guide", publishedAt: "2026-11-24" },
+  { href: "/fr/guides/cnesst-entrepreneur-construction/", slug: "cnesst-entrepreneur-construction", title: "La CNESST pour l'entrepreneur en construction", category: "Guide", publishedAt: "2026-11-24" },
+];
 
 /** Phase 112: the questions the homepage answers (the full list is on /pricing). */
 const HOME_FAQ_KEYS = ["trial", "oneshot", "cancel", "pilot"] as const;
@@ -184,7 +193,7 @@ export default function Home() {
             </p>
           </div>
           <div className="tiles">
-            <Link href="#story-quotes" className="tile t-green">
+            <Link href={featurePath(lang, "estimating")} className="tile t-green">
               <h3>{lang === "fr" ? "Soumissions IA" : "AI Quotes"}</h3>
               <p className="tile-short">{lang === "fr" ? "Décrivez le travail, recevez une soumission chiffrée et taxée en 30 secondes." : "Describe the job, get a priced and taxed quote in 30 seconds."}</p>
               <p className="tile-long">
@@ -194,7 +203,7 @@ export default function Home() {
               </p>
               <span className="cta-link tile-more">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
             </Link>
-            <Link href="#story-jobs" className="tile t-purple">
+            <Link href={featurePath(lang, "crm")} className="tile t-purple">
               <h3>{lang === "fr" ? "CRM et prospects" : "CRM & Leads"}</h3>
               <p className="tile-short">{lang === "fr" ? "Chaque prospect dans un pipeline, relancé jusqu'à la signature." : "Every lead in one pipeline, followed up until it signs."}</p>
               <p className="tile-long">
@@ -204,7 +213,7 @@ export default function Home() {
               </p>
               <span className="cta-link tile-more">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
             </Link>
-            <Link href="#story-jobs" className="tile t-teal">
+            <Link href={featurePath(lang, "job-costing")} className="tile t-teal">
               <h3>{lang === "fr" ? "Chantiers" : "Job Sites"}</h3>
               <p className="tile-short">{lang === "fr" ? "Une soumission acceptée devient un chantier : tâches, équipe, budget." : "An accepted quote becomes a job: tasks, crew, budget."}</p>
               <p className="tile-long">
@@ -214,7 +223,7 @@ export default function Home() {
               </p>
               <span className="cta-link tile-more">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
             </Link>
-            <Link href="#story-invoicing" className="tile t-yellow">
+            <Link href={featurePath(lang, "invoicing")} className="tile t-yellow">
               <h3>{lang === "fr" ? "Facturation et paiements" : "Invoicing & Payments"}</h3>
               <p className="tile-short">{lang === "fr" ? "Des factures depuis la soumission, des rappels jusqu'au paiement." : "Invoices from the quote, reminders until it is paid."}</p>
               <p className="tile-long">
@@ -224,7 +233,7 @@ export default function Home() {
               </p>
               <span className="cta-link tile-more">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
             </Link>
-            <Link href="#story-invoicing" className="tile t-green">
+            <Link href={featurePath(lang, "contracts")} className="tile t-green">
               <h3>{lang === "fr" ? "Contrats et documents" : "Contracts & Documents"}</h3>
               <p className="tile-short">{lang === "fr" ? "Contrats signés en ligne, chaque document dans une archive." : "Contracts signed online, every document in one archive."}</p>
               <p className="tile-long">
@@ -414,11 +423,13 @@ export default function Home() {
               <span className="eyebrow">{lang === "fr" ? "Salle de presse" : "Newsroom"}</span>
               <h2 className="h2">{lang === "fr" ? "Les dernières nouvelles de quoteai" : "The latest from quoteai"}</h2>
             </div>
-            <Link href="/blog/" className="cta-link">{lang === "fr" ? "Voir tous les articles" : "View all news"} <ArrowRight className="chev h-4 w-4" /></Link>
+            <Link href={lang === "fr" ? "/fr/guides/" : "/blog/"} className="cta-link">{lang === "fr" ? "Voir tous les guides" : "View all news"} <ArrowRight className="chev h-4 w-4" /></Link>
           </div>
           <div className="news-grid">
-            {[...BLOG_LISTED].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3).map((article) => (
-              <Link key={article.slug} href={`/blog/${article.slug}/`} className="card news-card">
+            {(lang === "fr" ? FR_HOME_GUIDES : [...BLOG_LISTED].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3).map((a) => ({
+              href: `/blog/${a.slug}/`, slug: a.slug, title: a.title, category: a.category, publishedAt: a.publishedAt,
+            }))).map((article) => (
+              <Link key={article.slug} href={article.href} className="card news-card">
                 <div className="news-media">
                   <MarketingImage slot="news-card" seed={article.slug} />
                 </div>

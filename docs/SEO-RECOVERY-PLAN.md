@@ -312,6 +312,11 @@ Every page that stays indexed must meet this bar: at least 900 words of main con
 - Fixed along the way: the sales-tax calculator's small-supplier rule (one quarter over $30,000 counts, with associated businesses); the holdback calculator's text (Ontario annual release, precise tax timing, residential scope in ON/BC/QC).
 - Not fixed, minor: `city-trade-facts.ts` says each Montréal borough has "its own fees" (the base fee rule is city-wide); the payment article's prompt-payment list lacks Manitoba (in force 1 April 2025).
 
+**S4 item 4 status (2026-11-25): built. S4 is complete.**
+- **Articles:** every indexed blog article ends with a "Tools for this job" block linking one calculator and one feature page (`src/data/article-links.ts`; 31 articles had no feature link, 9 no calculator). The French guides carry both in `related`. `generate-sitemap.ts` fails the build if an indexed article or a French guide lacks either.
+- **Hubs:** audited on the built site; /blog/, /tools/, /fr/outils/, /compare/, /fr/comparer/, /fr/guides/, /quotes/, /fr/soumissions/ and /help/ already link every child page. Provinces and features have no hub page; they are linked from the home page and the footer.
+- **Home:** already linked every hub. The five product tiles now open the feature pages (they jumped to anchors on the same page), and the French home's news block shows the newest French guides instead of English blog posts.
+
 ### S5: Trust and E-E-A-T (owner input needed; this week)
 1. About page with the founder's real name and photo, founding date, Canadian business address and a short honest story.
 2. One author page per writer, with a bio and credentials; every article carries a byline.

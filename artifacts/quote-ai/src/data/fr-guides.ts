@@ -114,6 +114,7 @@ export const FR_GUIDES: readonly FrGuide[] = [
     related: [
       { label: "Calculateur de TPS, TVH, TVP et TVQ", href: "/fr/outils/calculateur-taxes-de-vente/" },
       { label: "Logiciel de soumission au Québec", href: "/fr/provinces/quebec/" },
+      { label: "Logiciel de facturation pour entrepreneurs", href: "/fr/logiciel-facturation/" },
     ],
   },
 
@@ -187,6 +188,7 @@ export const FR_GUIDES: readonly FrGuide[] = [
     related: [
       { label: "Logiciel de soumission au Québec", href: "/fr/provinces/quebec/" },
       { label: "Calculateur de retenue de construction", href: "/fr/outils/calculateur-retenue/" },
+      { label: "Contrats et signature électronique", href: "/fr/contrats-signature-electronique/" },
     ],
   },
 
@@ -251,6 +253,8 @@ export const FR_GUIDES: readonly FrGuide[] = [
     related: [
       { label: "TPS et TVQ sur vos soumissions et factures", href: "/fr/guides/tps-tvq-soumissions-factures-entrepreneur/" },
       { label: "Logiciel de soumission au Québec", href: "/fr/provinces/quebec/" },
+      { label: "Calculateur de TPS, TVH, TVP et TVQ", href: "/fr/outils/calculateur-taxes-de-vente/" },
+      { label: "Logiciel de soumission", href: "/fr/logiciel-soumission/" },
     ],
   },
   {

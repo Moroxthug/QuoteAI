@@ -1017,6 +1017,16 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
 .blog-toc a { font-size: 14px; color: var(--ink); line-height: 1.4; }
 .blog-toc a:hover { color: var(--navy); }
 .blog-toc li.sub { padding-left: 18px; }
+/* S4.4: one calculator and one feature page under every indexed article. */
+.blog-tools { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--line); }
+.blog-tools .eyebrow { margin-bottom: 16px; }
+.blog-tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.blog-tool-card { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 20px 44px 20px 22px; min-height: 44px; text-decoration: none; }
+.blog-tool-kind { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.blog-tool-name { font-weight: 700; color: var(--navy); line-height: 1.3; }
+.blog-tool-desc { font-size: 14px; color: var(--muted, var(--ink)); line-height: 1.45; }
+.blog-tool-card .chev { position: absolute; right: 18px; top: 22px; color: var(--navy); }
+.blog-tool-card:hover .blog-tool-name { text-decoration: underline; }
 
 .blog-prose {
   --tw-prose-body: var(--muted-mk);

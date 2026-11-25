@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { BLOG_ARTICLES } from "@/data/blog-data";
 import { SECTORS, ACTIVE_CITIES, CITY_SECTORS, CITY_PAGES_INDEXED, enSectorLive } from "@/data/seo-data";
 import { extractToc, injectHeadingIds } from "@/data/blog-toc";
+import { articleToolLinks } from "@/data/article-links";
 import { SeoHead } from "@/components/seo-head";
 import { BASE_URL } from "@/data/json-ld";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -45,6 +46,7 @@ export default function BlogArticlePage() {
   const ogImage = `/og/blog/${article.slug}.png`;
   const toc = extractToc(article.contentHtml);
   const bodyHtml = injectHeadingIds(article.contentHtml);
+  const toolLinks = article.noindex ? null : articleToolLinks(article.slug);
 
   const relatedArticles = BLOG_ARTICLES.filter(
     (a) => a.slug !== article.slug && !a.noindex &&
@@ -155,6 +157,25 @@ export default function BlogArticlePage() {
             className="prose blog-prose max-w-none"
             dangerouslySetInnerHTML={{ __html: bodyHtml }}
           />
+
+          {toolLinks && (
+            <aside className="blog-tools" aria-labelledby="blog-tools-title">
+              <h2 id="blog-tools-title" className="eyebrow grey">{t("blog.toolsTitle")}</h2>
+              <div className="blog-tools-grid">
+                {[
+                  { ...toolLinks.tool, kind: t("blog.toolsCalculator") },
+                  { ...toolLinks.feature, kind: t("blog.toolsFeature") },
+                ].map((l) => (
+                  <Link key={l.href} href={l.href} className="card blog-tool-card">
+                    <span className="blog-tool-kind">{l.kind}</span>
+                    <span className="blog-tool-name">{l.name}</span>
+                    <span className="blog-tool-desc">{l.desc}</span>
+                    <ArrowRight className="chev h-4 w-4" aria-hidden="true" />
+                  </Link>
+                ))}
+              </div>
+            </aside>
+          )}
         </div>
 
         {relatedSectorObjects.length > 0 && (

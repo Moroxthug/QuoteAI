@@ -480,6 +480,26 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     readingTimeMin: 6,
     relatedSectors: ["electrician", "plumber", "general-contractor", "freelance"],
   },
+  {
+    slug: "hst-on-renovation-quotes-ontario",
+    title: "How to charge HST on a renovation quote in Ontario",
+    seoTitle: "HST on renovation quotes in Ontario",
+    metaDescription: "Ontario's 13% HST on renovation quotes: the $30,000 registration threshold, which province's tax applies, deposits, change orders and a worked basement example.",
+    category: "Business",
+    publishedAt: "2026-11-24",
+    readingTimeMin: 7,
+    relatedSectors: ["general-contractor","renovation-contractor","freelance"],
+  },
+  {
+    slug: "holdback-rules-by-province-canada",
+    title: "Construction holdback rules by province: how much, when it is released, and the tax",
+    seoTitle: "Holdback rules by province (Canada, 2026)",
+    metaDescription: "Holdback percentage, release timing, lien deadline and prompt payment by province, Québec's retention rules, and a $120,000 Ontario job billed with HST.",
+    category: "Business",
+    publishedAt: "2026-11-24",
+    readingTimeMin: 7,
+    relatedSectors: ["general-contractor","renovation-contractor","electrician","plumber"],
+  },
 ];
 
 /**

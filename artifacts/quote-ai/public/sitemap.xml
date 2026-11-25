@@ -302,7 +302,7 @@
   </url>
   <url>
     <loc>https://quoteai.ca/fr/guides/</loc>
-    <lastmod>2026-11-13</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -321,6 +321,30 @@
   <url>
     <loc>https://quoteai.ca/fr/guides/soumission-contrat-en-francais-charte/</loc>
     <lastmod>2026-11-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/guides/permis-renovation-montreal-arrondissement/</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/guides/cnesst-entrepreneur-construction/</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/guides/retenue-contractuelle-hypotheque-legale/</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/guides/tps-tvq-acompte-entrepreneur/</loc>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -800,6 +824,18 @@
   </url>
   <url>
     <loc>https://quoteai.ca/blog/how-to-get-more-jobs-as-a-contractor-canada/</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/blog/hst-on-renovation-quotes-ontario/</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/blog/holdback-rules-by-province-canada/</loc>
     <lastmod>2026-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

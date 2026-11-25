@@ -91,7 +91,7 @@ quoteai next to Jobber, Joist and Housecall Pro for Canadian contractors, with e
 - [Jobs: setup review, milestones and change orders](https://quoteai.ca/help/jobs-milestones-and-change-orders/): Each signed contract becomes a job with AI-proposed milestones, schedule and budget. Confirm in one click and handle extras with change orders the customer signs.
 - [Invoices, e-Transfer and card payments](https://quoteai.ca/help/invoices-and-getting-paid/): Deposit, progress and final invoices follow the contract's payment schedule. Customers pay by Interac e-Transfer or card, with reminders 3, 7 and 14 days overdue.
 - [Track costs, scan receipts and log time](https://quoteai.ca/help/costs-receipts-and-time/): Photograph a receipt and the AI files it to the job. Workers clock in and out from a personal link, no app or login, and the job's margin updates in real time.
-- [Invite your team and set roles](https://quoteai.ca/help/team-accounts-and-roles/): Give office staff, foremen or your accountant their own login with a role that limits what they can see and do. Pro includes 2 seats, Elite 5.
+- [Invite your team and set roles](https://quoteai.ca/help/team-accounts-and-roles/): Give office staff, foremen or your accountant their own login with a role that limits what they can see and do. Pro includes 2 seats, Business 5 and Elite 10.
 - [Leads, follow-ups and review requests](https://quoteai.ca/help/leads-and-follow-ups/): Quote requests from your website widget, WhatsApp, Meta Lead Ads or Google Local Services Ads land in Leads. Follow up within Canada's anti-spam rules.
 - [Integrations and importing your old quotes](https://quoteai.ca/help/integrations-and-imports/): Send from Gmail, sync Google Calendar or Outlook, post paid invoices to QuickBooks or Wave, take cards via Stripe, and import past quotes from spreadsheets or PDFs.
 - [Delete your account and data](https://quoteai.ca/help/delete-your-account/): How to delete your QuoteAI account from the app or the website, what is erased, what the law makes us keep, and how to change your mind within 7 days.
@@ -124,7 +124,7 @@ quoteai next to Jobber, Joist and Housecall Pro for Canadian contractors, with e
 - [How to Raise Your Prices as a Contractor Without Losing Clients](https://quoteai.ca/blog/how-to-raise-your-prices-contractors-without-losing-clients/): When to raise contractor rates, how to read StatCan price data, how to tell repeat and commercial clients, and how to handle open quotes and long jobs.
 - [Hiring Your First Employee as a Contractor in Canada: Payroll, Standards and Safety](https://quoteai.ca/blog/how-to-hire-your-first-employee-contractor-canada/): Payroll account, TD1s, 2026 CPP and EI, WSIB registration, Ontario construction ESA rules, working at heights and the ROE, with a sample first pay calculation.
 
-All 31 guides: [Blog](https://quoteai.ca/blog/). Full text of the help centre: [llms-full.txt](https://quoteai.ca/llms-full.txt).
+All 33 guides: [Blog](https://quoteai.ca/blog/). Full text of the help centre: [llms-full.txt](https://quoteai.ca/llms-full.txt).
 
 ## En français
 
@@ -151,6 +151,10 @@ Guides pour les entrepreneurs du Québec ([tous](https://quoteai.ca/fr/guides/))
 - [TPS et TVQ sur vos soumissions et factures](https://quoteai.ca/fr/guides/tps-tvq-soumissions-factures-entrepreneur/) : Taux, inscription, calcul de la TVQ et mentions obligatoires sur une facture selon son montant.
 - [Votre numéro de licence RBQ : où l'inscrire](https://quoteai.ca/fr/guides/numero-licence-rbq-soumission-contrat/) : Les documents, publicités et véhicules où votre numéro RBQ doit figurer, le format et les exceptions.
 - [Soumissions, contrats et factures en français](https://quoteai.ca/fr/guides/soumission-contrat-en-francais-charte/) : Ce que la Charte de la langue française exige pour vos factures et contrats types, et quand l'anglais est permis.
+- [Permis de rénovation à Montréal : ce que l'entrepreneur doit savoir](https://quoteai.ca/fr/guides/permis-renovation-montreal-arrondissement/) : Travaux visés, mandat du propriétaire, frais, délais et clause de permis dans la soumission.
+- [La CNESST pour l'entrepreneur en construction](https://quoteai.ca/fr/guides/cnesst-entrepreneur-construction/) : Inscription, taux de prime, déclaration des salaires, attestation de conformité des sous-traitants et avis de chantier.
+- [Retenue contractuelle et hypothèque légale au Québec](https://quoteai.ca/fr/guides/retenue-contractuelle-hypotheque-legale/) : Retenue prévue au contrat, droits du Code civil, hypothèque légale, dénonciation et délais de 30 jours et 6 mois.
+- [TPS et TVQ sur un acompte : quand les percevoir](https://quoteai.ca/fr/guides/tps-tvq-acompte-entrepreneur/) : Acompte ou dépôt, date où les taxes sont exigibles, factures progressives et facture finale sans double taxe.
 
 Comparaisons ([toutes](https://quoteai.ca/fr/comparer/)) :
 - [quoteai ou Jobber](https://quoteai.ca/fr/comparer/quoteai-ou-jobber/)

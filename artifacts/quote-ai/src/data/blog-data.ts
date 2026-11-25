@@ -2580,6 +2580,158 @@ const BLOG_CONTENT: Record<string, string> = {
 </table>
 <p>The last row ends the guessing. After a few months, the log shows which sources bring the jobs on your list, so you can move time and money to them.</p>
 `,
+  "hst-on-renovation-quotes-ontario": `
+<p>HST on a renovation quote looks simple: one line, 13%. The trouble is around it: whether you have to charge it yet, which rate applies near a provincial border, and what to do with deposits, change orders and all-in prices.</p>
+
+<h2>The rate: 13%, shown as one line</h2>
+<p>The HST rate in Ontario is 13% (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA: GST/HST rates by province</a>). It is made of a 5% federal part and an 8% provincial part; the CRA's <a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4028/gst-hst-new-housing-rebate.html" rel="noopener">new housing rebate guide (RC4028)</a> refers to both parts because the rebates are calculated on each separately.</p>
+<p>On your quote and invoice, the split does not appear. The CRA's page on <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate.html" rel="noopener">charging and collecting the GST/HST</a> says that when HST applies you show the total HST rate and do not show the federal and provincial parts separately. So an Ontario quote has one line, "HST 13%", where a Québec quote has two (GST and QST), because those are two different taxes.</p>
+<p>HST applies to your labour as well as your materials. Most property and services supplied in Canada are subject to the GST/HST (<a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4022/general-information-gst-hst-registrants.html" rel="noopener">CRA Guide RC4022</a>), and an installed renovation is a taxable supply of both. Keep labour in the taxable subtotal.</p>
+
+<h2>When you have to start charging it</h2>
+<p>You only charge HST if you are registered. You can stay unregistered while you are a small supplier, and the CRA's page on <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/when-register-charge.html" rel="noopener">when to register and charge</a> sets out exactly when that ends:</p>
+<ul>
+  <li><strong>Over $30,000 in a single calendar quarter.</strong> You stop being a small supplier on the spot. You charge HST on the job that took you over the line, and on everything after it.</li>
+  <li><strong>Over $30,000 across the last four consecutive calendar quarters</strong> (but not in one quarter). You stop being a small supplier at the end of the month after the quarter in which you went over, and charge HST from your first sale after that.</li>
+  <li><strong>Register within 29 days</strong> of your effective date of registration, in either case.</li>
+</ul>
+<p>The $30,000 counts revenue from all your taxable sales before expenses, including those of associated businesses, not profit and not one job. Watch the running total: if a large job priced without tax is the one that crosses $30,000, the HST on it is still owed. RC4022 is plain that if you were required to charge it and did not, you are still liable for it. Registering voluntarily before the threshold is allowed.</p>
+
+<h2>Which province's tax: the job site decides</h2>
+<p>For work on a building, the rate follows the property, not your office address. The CRA's <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-place-supply.html" rel="noopener">place-of-supply rules</a> treat construction and renovation as services in relation to real property, taxed in the province where the property is located. The CRA's own example is a Québec company painting a warehouse in Ontario: it charges HST at the Ontario rate.</p>
+<ul>
+  <li>A Gatineau contractor finishing a basement in Ottawa charges 13% HST.</li>
+  <li>An Ottawa contractor renovating a kitchen in Gatineau does not charge HST. Québec is not an HST province, so the GST of 5% applies, and the QST of 9.975% (both listed on the CRA rates page) is a Revenu Québec matter. Check with Revenu Québec whether you need to register for the QST before you quote there.</li>
+</ul>
+<p>Put the job address on the quote and set the tax from it, not from your template's default.</p>
+
+<h2>What the quote and invoice must show</h2>
+<p>The CRA requires you to tell the customer whether HST applies and whether it is included in the price or added separately. You do that by showing the rate and either the HST as its own line or a clear statement that the total includes HST (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate.html" rel="noopener">CRA</a>). On a quote, a separate line is clearer for everyone.</p>
+<p>On invoices, a client who is itself registered (a landlord, a property manager, a general contractor you sub for) needs certain details to claim the HST back. The CRA's <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/calculate-prepare-report/input-tax-credit.html" rel="noopener">input tax credit requirements</a> scale with the total: under $100, from $100 to $499.99, and $500 or more. From $100 the invoice needs your GST/HST registration number; from $500 it also needs the customer's name, a description of the work and the payment terms. The full table is in <a href="/blog/quote-vs-estimate-vs-invoice-difference/">quote vs. estimate vs. invoice</a>. Those clients can check your number in the CRA's <a href="https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-businesses/confirming-a-gst-hst-account-number.html" rel="noopener">GST/HST Registry</a>.</p>
+
+<h2>Deposits and when HST becomes payable</h2>
+<p>Two different things get called a deposit, and the CRA treats them differently.</p>
+<ul>
+  <li><strong>A deposit in the CRA's sense.</strong> RC4022 says not to collect GST/HST when a customer gives you a deposit towards a taxable purchase, and to collect it when you apply the deposit to the purchase price. If the client walks away and forfeits it, the forfeited amount is taxable.</li>
+  <li><strong>A first payment of the price.</strong> If your contract makes the signing amount an instalment of the contract price and you invoice it, the general rule applies: you owe the tax on the earlier of the day you are paid and the day payment is due, and the CRA usually treats the invoice date as the due date (RC4022). The tax goes in the return for the period that includes the invoice date, paid or not.</li>
+</ul>
+<p>The second is simpler to run: invoice the payment on account with HST, then credit the pre-tax amount on the final invoice. Write the clause so it says which one it is, and ask your accountant if unsure. Filing periods and setting the tax money aside are covered in <a href="/blog/contractor-cash-flow-management-canada/">contractor cash flow</a>.</p>
+
+<h2>Worked example: an Ottawa basement</h2>
+<p>Example only, with assumed prices: finishing a 640 sq ft basement in Ottawa for a homeowner, registered contractor, HST 13%.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Framing, exterior walls and partitions</td><td>120</td><td>lin ft</td><td>$28.00</td><td>$3,360.00</td></tr>
+    <tr><td>Insulation and vapour barrier, walls and rim joist</td><td>650</td><td>sq ft</td><td>$3.40</td><td>$2,210.00</td></tr>
+    <tr><td>Drywall, hang, tape and finish</td><td>1,400</td><td>sq ft</td><td>$3.10</td><td>$4,340.00</td></tr>
+    <tr><td>Electrical rough-in and finish, licensed subcontractor</td><td>1</td><td>lot</td><td>$4,800.00</td><td>$4,800.00</td></tr>
+    <tr><td>Luxury vinyl plank, supplied and installed</td><td>640</td><td>sq ft</td><td>$7.25</td><td>$4,640.00</td></tr>
+    <tr><td>Interior doors with casing</td><td>4</td><td>each</td><td>$425.00</td><td>$1,700.00</td></tr>
+    <tr><td>Paint, walls and ceilings, two coats</td><td>1</td><td>lot</td><td>$2,950.00</td><td>$2,950.00</td></tr>
+    <tr><td><strong>Subtotal</strong></td><td></td><td></td><td></td><td><strong>$24,000.00</strong></td></tr>
+    <tr><td>HST 13%</td><td></td><td></td><td></td><td>$3,120.00</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td><strong>$27,120.00</strong></td></tr>
+  </tbody>
+</table>
+<p>The contract makes 10% of the price a first payment, invoiced on signing. During the job the client signs a change order for six pot lights at $185.00 each.</p>
+<table>
+  <thead>
+    <tr><th>Invoice</th><th>Before HST</th><th>HST 13%</th><th>Amount due</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1. Payment on account, on signing (10% of $24,000.00)</td><td>$2,400.00</td><td>$312.00</td><td>$2,712.00</td></tr>
+    <tr><td>Change order 1: six pot lights</td><td>$1,110.00</td><td></td><td></td></tr>
+    <tr><td>2. Final: contract $24,000.00 + change order $1,110.00 = $25,110.00, less payment on account $2,400.00</td><td>$22,710.00</td><td>$2,952.30</td><td>$25,662.30</td></tr>
+    <tr><td><strong>Total billed</strong></td><td><strong>$25,110.00</strong></td><td><strong>$3,264.30</strong></td><td><strong>$28,374.30</strong></td></tr>
+  </tbody>
+</table>
+<p>Check: 13% of $25,110.00 is $3,264.30, and $25,110.00 plus $3,264.30 is $28,374.30, so the HST was charged once on every dollar. Two ways to get it wrong:</p>
+<ul>
+  <li>Charging HST on the full $25,110.00 on the final invoice but subtracting only the $2,400.00 deposit. The client pays $312.00 of HST twice.</li>
+  <li>Billing the change order with no tax because "it's just an extra". The pot lights are part of the taxable supply; $144.30 of HST would be missing and you would still owe it.</li>
+</ul>
+<p>If you prefer to show the full HST on the final invoice, subtract the deposit including its tax ($2,712.00) instead. The amount due comes out the same.</p>
+
+<h2>Tax-included prices: backing HST out</h2>
+<p>If a client asks for a single all-in price, the CRA allows it as long as the document says clearly that the total includes HST. To find the price before tax, divide by 1.13; the HST is the total times 13/113. An all-in $5,650.00 is $5,000.00 plus $650.00 of HST. If you quote "$5,000 all in" without doing that division, you have given away $575.22 of HST ($5,000.00 x 13/113, rounded) out of your own margin. The <a href="/tools/sales-tax-calculator/">sales tax calculator</a> does the split both ways.</p>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Charging HST while unregistered.</strong> A small supplier that has not registered does not charge it and has no number to put on the invoice. If you are over the threshold, register first.</li>
+  <li><strong>Using 13% on a job outside Ontario.</strong> A job in Gatineau or anywhere else is taxed where the property is, whatever your template says.</li>
+  <li><strong>Forgetting HST on change orders.</strong> Price each one with its tax line before the client signs it (<a href="/blog/how-to-handle-change-orders-contractors/">handling change orders</a>).</li>
+  <li><strong>Charging HST on the deposit and again on the full price</strong> at the end, as in the example above.</li>
+</ul>
+
+<h2>Rebates: rarely the contractor's concern, sometimes the client's</h2>
+<p>For ordinary renovations the client gets no HST back. The GST/HST new housing rebate covers a substantial renovation, which <a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4028/gst-hst-new-housing-rebate.html" rel="noopener">RC4028</a> describes as essentially gutting the house: generally 90% or more of the livable interior removed or replaced. The guide says that renovating a basement, or adding a garage or deck, would not by itself qualify. Where a homeowner does qualify, they claim the rebate from the CRA; you still charge the full 13%. In Ontario, the owner-built Ontario new housing rebate is 75% of the provincial part, up to $24,000 if HST was paid on the land. RC4028 also lists a first-time home buyers' rebate of the federal part for an owner-built house whose construction or substantial renovation begins on or after March 20, 2025 and before 2031, and Ontario rebates of the provincial part for qualifying first-time buyers. All of these turn on the 90% test, so none apply to a bathroom, kitchen or basement job on its own.</p>
+
+<p>quoteai writes an itemized quote with the province's tax line, and the contract, <a href="/invoicing-software/">invoice</a> and payment follow from it.</p>
+
+<p>General information, not legal or tax advice; checked 24 November 2026.</p>
+`,
+  "holdback-rules-by-province-canada": `
+<p>Three questions decide what holdback means for your job: how much the payer keeps, when it must be released, and how long you have to protect your own claim if it isn't. Each province answers them in its own statute, and Québec answers them differently.</p>
+
+<h2>Holdback by province</h2>
+<p>The table covers the provinces whose acts we opened and read. Prince Edward Island, Newfoundland and Labrador and the three territories are left out because their acts were not checked for this page.</p>
+<table>
+  <thead>
+    <tr><th>Province</th><th>Holdback</th><th>When it is released</th><th>Lien or claim deadline</th><th>Prompt payment</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Ontario, <a href="https://www.ontario.ca/laws/statute/90c30" rel="noopener">Construction Act</a></td><td>10% of the price of services or materials as supplied, kept by every payer (s. 22)</td><td>Mandatory annual release after each contract anniversary, in force January 1, 2026 (s. 26). The rest is paid within 14 days after the liens against it expire (s. 26(8))</td><td>A contractor's lien expires 60 days after the earlier of publication of the certificate of substantial performance and completion, abandonment or termination (s. 31)</td><td>Yes, Part I.1, in force October 1, 2019</td></tr>
+    <tr><td>British Columbia, <a href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/97045_01" rel="noopener">Builders Lien Act</a></td><td>10% of the greater of the value supplied and the amount paid (s. 4)</td><td>After the holdback period: 55 days after the certificate of completion, or after completion or abandonment (s. 8)</td><td>Claim of lien filed within 45 days of the certificate of completion, or of completion or abandonment (s. 20)</td><td>Not yet. The <a href="https://www2.gov.bc.ca/gov/content/governments/infrastructure/prompt-payment-legislation" rel="noopener">Construction Prompt Payment Act</a> received Royal Assent on November 27, 2025 but is not in force</td></tr>
+    <tr><td>Alberta, <a href="https://kings-printer.alberta.ca/documents/Acts/P26P4.pdf" rel="noopener">Prompt Payment and Construction Lien Act</a></td><td>10% of work done and materials furnished (s. 18)</td><td>Kept 60 days from the certificate of substantial performance or, without one, from completion; 90 days for oil and gas well work and concrete work (s. 18). Annual or phased release on large contracts (s. 24.1)</td><td>Lien registered within 60 days after the services are completed or the last materials furnished; 90 days for oil and gas wells and concrete (s. 41)</td><td>Yes, for <a href="https://www.alberta.ca/prompt-payment-rules-for-construction-industry" rel="noopener">contracts since August 29, 2022</a></td></tr>
+    <tr><td>Saskatchewan, <a href="https://publications.saskatchewan.ca/api/v1/products/402/formats/445/download" rel="noopener">The Builders' Lien Act</a></td><td>10% of the greater of the value provided and the amount paid (s. 34)</td><td>40 clear days after the certificate of substantial performance is given, or after completion or abandonment (ss. 43, 44). Yearly release on contracts over $25,000,000 running longer than a year (s. 46)</td><td>A contractor's lien expires 40 clear days after the same events unless registered (s. 49)</td><td>Yes, for <a href="https://www.saskatchewan.ca/government/news-and-media/2022/march/01/legislation-to-protect-contractors-takes-effect-today" rel="noopener">contracts entered into after March 1, 2022</a></td></tr>
+    <tr><td>Manitoba, <a href="https://web2.gov.mb.ca/laws/statutes/ccsm/b091.php" rel="noopener">The Builders' Liens Act</a></td><td>7.5% of each payment (s. 24)</td><td>Kept at least 60 days after the certificate of substantial performance, or completion or abandonment (s. 24)</td><td>Contractor's claim registered within 60 days after substantial performance or abandonment (s. 43)</td><td>Yes, for contracts entered into on or after April 1, 2025 (s. 80 and the Act's legislative history)</td></tr>
+    <tr><td>Nova Scotia, <a href="https://nslegislature.ca/sites/default/files/legc/statutes%20HTML/builders'%20lien.htm" rel="noopener">Builders' Lien Act</a></td><td>10% of work, service and materials supplied</td><td>Kept 60 days after the contract is substantially performed</td><td>Lien registered within 60 days after completion or abandonment (s. 24)</td><td>No prompt-payment provisions in the consolidated Act the Legislature publishes (amended to 2014)</td></tr>
+    <tr><td>New Brunswick, <a href="https://laws.gnb.ca/en/document/cs/2020,%20c.29" rel="noopener">Construction Remedies Act</a></td><td>10% of services or materials as supplied (s. 34)</td><td>60 days after the certificate or declaration of substantial performance, or after completion, abandonment or termination (s. 47)</td><td>Contractor's claim registered within 60 days after the earlier of those events (s. 59)</td><td>No prompt-payment provisions in the text consolidated to January 1, 2024</td></tr>
+    <tr><td>Québec, <a href="https://www.legisquebec.gouv.qc.ca/en/document/cs/CCQ-1991" rel="noopener">Civil Code</a></td><td>No statutory percentage. Retention is whatever the contract says, plus the client's withholding rights in arts. 2111 and 2123</td><td>As the contract provides</td><td>Legal hypothec: notice registered within 30 days after the work is completed and served on the owner; extinguished after six months unless an action is published (art. 2727)</td><td>Not covered here</td></tr>
+  </tbody>
+</table>
+<p>In British Columbia, the owner must put the holdback into a holdback account at a savings institution (s. 5(1)), but that rule does not apply to a contract where the total value of work and material is less than $100,000 (s. 5(8)); the 10% holdback itself still applies. In Alberta, the annual or phased release in s. 24.1 only applies above a prescribed contract price; the province's <a href="https://www.alberta.ca/prompt-payment-rules-for-construction-industry" rel="noopener">prompt payment page</a> describes it as projects of at least $10 million lasting more than 12 months.</p>
+
+<h2>Québec: retention by contract, protection by hypothec</h2>
+<p>A Québec contractor has no statutory holdback to track on a private job, but two Civil Code articles do the same work. Under art. 2123, the client may withhold enough to pay workers and anyone else who could enforce a legal hypothec and who has given the client notice of their contract with you, until you hand over an acquittance or provide sufficient security. Under art. 2111, the client may keep enough to cover reservations about apparent defects noted at acceptance until they are corrected. The legal hypothec (arts. 2726 to 2728) secures the increase in value the work gave the building; for anyone without a contract with the owner, it covers only what was supplied after written notice to the owner.</p>
+<p>The 10% "retenue" on Québec quotes is therefore a contract term. Write the percentage, the trigger for release (acceptance, end of the hypothec period, receipt of acquittances) and the date in the contract; <a href="/blog/how-to-write-a-contractor-contract-canada/">how to write a contractor contract</a> covers the clauses.</p>
+
+<h2>Does holdback apply to a homeowner's renovation?</h2>
+<p>In Ontario, yes. The Construction Act defines "owner" as anyone with an interest in the premises at whose request, or for whose benefit, an improvement is made; only a "home buyer" of a new home is carved out (s. 1(1)). A homeowner who hires you to redo a kitchen is an owner, a lien can arise, and s. 22 requires the 10% holdback. We found no separate exception in the Act for home renovations.</p>
+<p>In British Columbia, the 10% holdback applies to residential contracts too; what most small renovations escape is the holdback account, because of the $100,000 threshold in s. 5(8). Elsewhere, check the act and your contract. If you work in Ontario, <a href="/blog/hst-on-renovation-quotes-ontario/">HST on renovation quotes in Ontario</a> covers the tax side of the quote itself.</p>
+
+<h2>Showing holdback on the quote and on progress invoices</h2>
+<p>On the quote, state the holdback percentage, the statute, the billing milestones and how the release will be invoiced. Each progress invoice shows the work for the period, the holdback deducted, the subtotal, the tax on the subtotal and the amount due; the holdback and its tax go on a separate release invoice.</p>
+<p>That split follows the federal rule. Where a holdback is required by provincial law or by a written agreement for construction, renovation or repair, GST/HST on the amount held back is payable on the earlier of the day it is paid out and the day the holdback period expires (<a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/19-1/real-property-gst-hst.html" rel="noopener">CRA GST/HST Memorandum 19-1, paras. 81 to 84</a>). The same memorandum warns that if you charge and collect the tax early, you must remit it with the return for the period in which you collected it; and that a holdback that is neither required by law nor written into the construction contract does not defer the tax at all. In Québec, that is one more reason to write the retention into the contract. For what makes a "proper invoice", see <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">how to collect payment from clients</a>; for holding back from your own subs, see <a href="/blog/how-to-hire-and-pay-subcontractors-canada/">how to hire and pay subcontractors</a>.</p>
+
+<h2>Example: a $120,000 Ontario job billed in three stages</h2>
+<p>Example only, with assumed figures: an addition in Ontario, contract signed February 2, 2026 for $120,000 before tax, billed at three milestones. HST is 13% in Ontario (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA GST/HST rates</a>). The owner keeps 10% of each invoice under s. 22, and HST is charged on the part paid now.</p>
+<table>
+  <thead>
+    <tr><th>Invoice</th><th>Work this period</th><th>Holdback 10%</th><th>Subtotal</th><th>HST 13%</th><th>Amount due</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1. Foundation and framing</td><td>$38,450.00</td><td>$3,845.00</td><td>$34,605.00</td><td>$4,498.65</td><td>$39,103.65</td></tr>
+    <tr><td>2. Closed in, rough-ins passed</td><td>$52,375.50</td><td>$5,237.55</td><td>$47,137.95</td><td>$6,127.93</td><td>$53,265.88</td></tr>
+    <tr><td>3. Finishes, completion</td><td>$29,174.50</td><td>$2,917.45</td><td>$26,257.05</td><td>$3,413.42</td><td>$29,670.47</td></tr>
+    <tr><td>Holdback release</td><td></td><td></td><td>$12,000.00</td><td>$1,560.00</td><td>$13,560.00</td></tr>
+    <tr><td><strong>Total</strong></td><td><strong>$120,000.00</strong></td><td><strong>$12,000.00</strong></td><td><strong>$120,000.00</strong></td><td><strong>$15,600.00</strong></td><td><strong>$135,600.00</strong></td></tr>
+  </tbody>
+</table>
+<p>How the dates work, assuming the job is completed on June 30, 2026 with no certificate of substantial performance and no liens registered:</p>
+<ul>
+  <li>Each proper invoice is payable within 28 days of receipt, unless the owner gives a notice of non-payment within 14 days, and the undisputed part is still due on day 28 (s. 6.4). When you are paid, your subs on that invoice are owed within seven days (s. 6.5).</li>
+  <li>Your lien expires at the end of the 60-day period following completion (s. 31(2)(b)), which here ends August 29, 2026. The owner must pay the $12,000 holdback within 14 days after the liens expire (s. 26(8)), so by September 12, and you pay each sub's holdback within 14 days after receiving it.</li>
+  <li>The job ends before the first contract anniversary, so the annual release in s. 26 never applies. Past February 2, 2027, the owner would have to publish a notice of annual release within 14 days of that anniversary and pay the year's accrued holdback 60 to 74 days after the notice.</li>
+  <li>The $1,560.00 of HST on the holdback becomes payable on the earlier of payment and the end of the holdback period, so it belongs on the release invoice, not on invoices 1 to 3.</li>
+</ul>
+<p>The <a href="/tools/holdback-calculator/">holdback calculator</a> checks each stage the same way. quoteai writes the itemized quote with Ontario's HST line, and the contract, progress invoices and payments follow from it in the <a href="/invoicing-software/">invoicing software</a>.</p>
+
+<p>This is general information, not legal or tax advice, checked 24 November 2026.</p>
+`,
 };
 
 export const BLOG_ARTICLES: BlogArticle[] = BLOG_INDEX.map((meta) => {

@@ -169,8 +169,8 @@ export const TOOL_PAGES: Record<ToolId, ToolPage> = {
       {
         q: { en: "When do I have to register for GST/HST?", fr: "Quand dois-je m'inscrire à la TPS/TVH?" },
         a: {
-          en: "Once your taxable sales pass $30,000 over four consecutive calendar quarters, you are no longer a small supplier and must register and charge tax. Below that, registering is optional. Québec's QST uses the same $30,000 threshold.",
-          fr: "Dès que vos ventes taxables dépassent 30 000 $ sur quatre trimestres civils consécutifs, vous n'êtes plus un petit fournisseur et devez vous inscrire et percevoir les taxes. En dessous, l'inscription est facultative. La TVQ utilise le même seuil de 30 000 $.",
+          en: "Once your taxable sales (with those of associated businesses) pass $30,000 in a single calendar quarter, or over the last four consecutive calendar quarters, you are no longer a small supplier and must register and charge tax. If one quarter pushes you over, tax applies from the sale that crosses the threshold. Below that, registering is optional. Québec's QST uses the same $30,000 threshold.",
+          fr: "Dès que vos ventes taxables (avec celles des entreprises associées) dépassent 30 000 $ dans un seul trimestre civil, ou sur les quatre derniers trimestres civils consécutifs, vous n'êtes plus un petit fournisseur et devez vous inscrire et percevoir les taxes. Si c'est un seul trimestre qui vous fait dépasser le seuil, les taxes s'appliquent dès la vente qui le franchit. En dessous, l'inscription est facultative. La TVQ utilise le même seuil de 30 000 $.",
         },
       },
       {
@@ -216,8 +216,8 @@ export const TOOL_PAGES: Record<ToolId, ToolPage> = {
         h2: { en: "What a holdback is", fr: "Qu'est-ce qu'une retenue?" },
         body: [
           {
-            en: "On most construction contracts, the owner (and every contractor who pays a subcontractor) keeps back part of each payment until the lien period is over. That money protects everyone below in the chain: if a supplier or sub isn't paid, they can claim against the holdback instead of the property.",
-            fr: "Sur la plupart des contrats de construction, le propriétaire (et chaque entrepreneur qui paie un sous-traitant) garde une partie de chaque paiement jusqu'à la fin de la période d'hypothèque ou de privilège. Cet argent protège toute la chaîne : si un fournisseur ou un sous-traitant n'est pas payé, il peut réclamer sur la retenue plutôt que sur l'immeuble.",
+            en: "On most construction contracts, the owner (and every contractor who pays a subcontractor) keeps back part of each payment until the lien period is over (in Ontario, since 1 January 2026, accrued holdback is also released after each contract anniversary). That money protects everyone below in the chain: if a supplier or sub isn't paid, they can claim against the holdback instead of the property.",
+            fr: "Sur la plupart des contrats de construction, le propriétaire (et chaque entrepreneur qui paie un sous-traitant) garde une partie de chaque paiement jusqu'à la fin de la période de privilège (en Ontario, depuis le 1er janvier 2026, la retenue accumulée est aussi libérée après chaque anniversaire du contrat). Au Québec, il n'y a pas de retenue légale sur les contrats privés : la protection est l'hypothèque légale de la construction. Cet argent protège toute la chaîne : si un fournisseur ou un sous-traitant n'est pas payé, il peut réclamer sur la retenue plutôt que sur l'immeuble.",
           },
           {
             en: "Ontario's Construction Act sets the basic holdback at 10 % of the value of the work and materials supplied. British Columbia's Builders Lien Act and Alberta's Prompt Payment and Construction Lien Act also use 10 %. Other provinces set their own rules, and in Québec, where there is no statutory holdback, a retention (often 10 %) is written into the contract itself.",
@@ -255,15 +255,15 @@ export const TOOL_PAGES: Record<ToolId, ToolPage> = {
       {
         q: { en: "Do I charge HST on the holdback amount?", fr: "Dois-je facturer la TVH sur la retenue?" },
         a: {
-          en: "Yes, but when the holdback is released, not on the progress invoice. The calculator shows both amounts.",
-          fr: "Oui, mais à la libération de la retenue, pas sur la facture progressive. Le calculateur affiche les deux montants.",
+          en: "Yes, but not on the progress invoice: GST/HST on the holdback is payable on the earlier of the day it is paid and the day it becomes payable once the holdback period ends. In practice that is the release invoice. The calculator shows both amounts.",
+          fr: "Oui, mais pas sur la facture progressive : les taxes sur la retenue sont payables au premier en date du jour où elle est payée et du jour où elle devient exigible à la fin de la période de retenue. En pratique, c'est la facture de libération. Le calculateur affiche les deux montants.",
         },
       },
       {
         q: { en: "Does holdback apply to small residential jobs?", fr: "La retenue s'applique-t-elle aux petits travaux résidentiels?" },
         a: {
-          en: "The lien acts generally apply to residential work too, but many small renovation contracts are paid in a deposit and a final payment and nobody tracks holdback. Check your province's act and your contract before you deduct it or bill it.",
-          fr: "Les lois sur les privilèges s'appliquent généralement aussi aux travaux résidentiels, mais beaucoup de petits contrats de rénovation se paient en un acompte et un paiement final, sans suivi de retenue. Vérifiez la loi de votre province et votre contrat avant de la déduire ou de la facturer.",
+          en: "In Ontario the Construction Act applies to home renovations too (only buyers of new homes are excluded), and in BC the 10 % holdback applies, though the holdback-account rule doesn't apply to contracts under $100,000. Many small renovation contracts are paid in a deposit and a final payment and nobody tracks holdback. Check your province's act and your contract before you deduct it or bill it.",
+          fr: "En Ontario, la Loi sur la construction s'applique aussi aux rénovations résidentielles (seuls les acheteurs de maisons neuves sont exclus); en Colombie-Britannique, la retenue de 10 % s'applique, mais l'obligation du compte de retenue ne vise pas les contrats de moins de 100 000 $. Au Québec, la retenue est seulement contractuelle. Beaucoup de petits contrats de rénovation se paient en un acompte et un paiement final, sans suivi de retenue. Vérifiez la loi de votre province et votre contrat avant de la déduire ou de la facturer.",
         },
       },
     ],

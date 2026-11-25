@@ -354,6 +354,11 @@ DR 12 is the ceiling on everything above. Target: 15 relevant referring domains 
 - **At 8 weeks, if positions haven't moved:** the cause is authority, not on-page quality, so put S6 ahead of new content.
 - **Request indexing**, once the quota returns: S1 hubs first, then the rewritten articles, 10 a day at most. Run `npm run indexnow` after every deploy.
 
+**S7 status (2026-11-25): started.** The first weekly report is in `docs/seo-metrics.md`.
+- **Totals:** last 7 days 3 clicks, 1.42k impressions, position 48.5. Last 3 months 18 clicks, 5.09k impressions, position 46.6, flat against the baseline. The data predates S3–S6.
+- **Indexing:** 117 "Discovered – not indexed" (target under 40).
+- **IndexNow:** pinged for 51 changed URLs.
+
 ## 4. Owner decisions needed before S1 ships
 1. **Testimonials:** are RBA Construction and Abdul Contracting real customers who agreed to be quoted? If not, they are removed.
 2. **Byline:** whose name and photo go on the About page and the articles? A real business address?

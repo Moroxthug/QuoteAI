@@ -123,8 +123,8 @@ export async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: Prof
         { text: qt("description", lang), style: "tableHeader" },
         { text: qt("unit", lang), style: "tableHeaderCenter" },
         { text: qt("qty", lang), style: "tableHeaderCenter" },
-        { text: "Unit Price ($)", style: "tableHeaderRight" },
-        { text: "Total ($)", style: "tableHeaderRight" },
+        { text: qt("unitPrice", lang), style: "tableHeaderRight" },
+        { text: qt("total", lang), style: "tableHeaderRight" },
       ],
       ...cap.voci.map((v, vi) => {
         const bg = vi % 2 === 0 ? null : "#f8f9fb";
@@ -523,8 +523,8 @@ export async function generateQuotePdfBuffer(quote: QuoteRow, profile: ProfileRo
         { text: qt("description", lang), style: "tableHeader" },
         { text: qt("unit", lang), style: "tableHeaderCenter" },
         { text: qt("qty", lang), style: "tableHeaderCenter" },
-        { text: "Unit Price ($)", style: "tableHeaderRight" },
-        { text: "Total ($)", style: "tableHeaderRight" },
+        { text: qt("unitPrice", lang), style: "tableHeaderRight" },
+        { text: qt("total", lang), style: "tableHeaderRight" },
       ],
       ...cap.voci.map((v, vi) => {
         const bg = vi % 2 === 0 ? null : "#f8f9fb";

@@ -322,8 +322,8 @@ export const CITY_FACTS: Record<string, CityFacts> = {
     province: "QC",
     permitOffice: { en: "your borough (arrondissement)", fr: "votre arrondissement" },
     permitNote: {
-      en: "In Montréal, permits are issued by each of the city's 19 boroughs, each with its own rules and fees, so the quote should name the borough and say who applies for the permit.",
-      fr: "À Montréal, les permis sont délivrés par chacun des 19 arrondissements, chacun avec ses règles et ses frais : la soumission devrait nommer l'arrondissement et préciser qui demande le permis.",
+      en: "In Montréal, permits are issued by each of the city's 19 boroughs, on the same base fee rule but with their own zoning rules, documents and added fees, so the quote should name the borough and say who applies for the permit.",
+      fr: "À Montréal, les permis sont délivrés par chacun des 19 arrondissements, selon la même règle de base pour les frais, mais avec leurs propres règles de zonage, documents exigés et frais additionnels : la soumission devrait nommer l'arrondissement et préciser qui demande le permis.",
     },
     climateShort: { en: "≈ 210 cm of snow a year", fr: "≈ 210 cm de neige par année" },
     climate: {

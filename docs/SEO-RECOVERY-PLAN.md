@@ -310,7 +310,7 @@ Every page that stays indexed must meet this bar: at least 900 words of main con
 - **Two English articles:** `/blog/hst-on-renovation-quotes-ontario/` (one HST line, deposits vs payments on account, place of supply, rebates that don't apply to ordinary renovations) and `/blog/holdback-rules-by-province-canada/` (ON, BC, AB, SK, MB 7.5 %, NS, NB, QC; Ontario's annual release since 1 January 2026; GST/HST on holdback per Memorandum 19-1). PEI, NL and the territories are left out until verified.
 - Each new piece links one calculator and one feature page.
 - Fixed along the way: the sales-tax calculator's small-supplier rule (one quarter over $30,000 counts, with associated businesses); the holdback calculator's text (Ontario annual release, precise tax timing, residential scope in ON/BC/QC).
-- Fixed 2026-11-26: `city-trade-facts.ts` Montréal permit line now says the base fee rule is city-wide. Not fixed, minor: the payment article's prompt-payment list lacks Manitoba (in force 1 April 2025).
+- Fixed 2026-11-26: `city-trade-facts.ts` Montréal permit line now says the base fee rule is city-wide. Fixed 2026-11-27: Manitoba added to the payment article's prompt-payment list and the cash-flow article.
 
 **S4 item 4 status (2026-11-25): built. S4 is complete.**
 - **Articles:** every indexed blog article ends with a "Tools for this job" block linking one calculator and one feature page (`src/data/article-links.ts`; 31 articles had no feature link, 9 no calculator). The French guides carry both in `related`. `generate-sitemap.ts` fails the build if an indexed article or a French guide lacks either.
